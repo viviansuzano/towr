@@ -20,6 +20,7 @@ add_library(${PROJECT_NAME} SHARED
   # driving formulation
   src/parameters_drive.cc
   src/nodes_variables_ee_wheels.cc
+  src/spline_holder_drive.cc
   # sample formulation usage
   src/nlp_formulation.cc
   src/parameters.cc
