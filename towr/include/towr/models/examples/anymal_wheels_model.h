@@ -31,6 +31,15 @@ public:
     nominal_stance_.at(RH) << -x_nominal_b,  -y_nominal_b, z_nominal_b;
 
     max_dev_from_nominal_ << 0.15, 0.1, 0.10;
+
+    const double x_nominal_hip = 0.3405;
+    const double y_nominal_hip = 0.1710;
+    const double z_nominal_hip = 0.0;
+
+    hip_pos_wrt_base_.at(LF) <<  x_nominal_hip,  y_nominal_hip, z_nominal_hip;
+    hip_pos_wrt_base_.at(RF) <<  x_nominal_hip, -y_nominal_hip, z_nominal_hip;
+    hip_pos_wrt_base_.at(LH) << -x_nominal_hip,  y_nominal_hip, z_nominal_hip;
+    hip_pos_wrt_base_.at(RH) << -x_nominal_hip, -y_nominal_hip, z_nominal_hip;
   }
 
 };
