@@ -22,6 +22,7 @@ add_library(${PROJECT_NAME} SHARED
   src/nodes_variables_ee_wheels.cc
   src/spline_holder_drive.cc
   src/terrain_wheels_constraint.cc
+  src/force_wheels_constraint.cc
   # sample formulation usage
   src/nlp_formulation.cc
   src/parameters.cc
