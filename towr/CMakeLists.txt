@@ -17,6 +17,8 @@ set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
 
 # The motion-planning problem formulated through variables and constraints
 add_library(${PROJECT_NAME} SHARED
+  # driving formulation
+  src/parameters_drive.cc
   # sample formulation usage
   src/nlp_formulation.cc
   src/parameters.cc
