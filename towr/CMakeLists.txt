@@ -26,6 +26,7 @@ add_library(${PROJECT_NAME} SHARED
   src/wheels_acc_limits_constraint.cc
   src/base_acc_limits_constraint.cc
   src/wheels_motion_constraint.cc
+  src/nlp_formulation_drive.cc
   # sample formulation usage
   src/nlp_formulation.cc
   src/parameters.cc

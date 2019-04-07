@@ -36,7 +36,6 @@ ParametersDrive::ParametersDrive()
   constraints_.push_back(ForceWheels); 	   //  ensures unilateral forces and inside the friction cone
   constraints_.push_back(WheelsAccLimits); // constrain the acceleration on the wheels
   constraints_.push_back(BaseAccLimits);   // constrain the acceleration of the base
-//  constraints_.push_back(WheelsNonHolonomic); // non-holonomic constrain of the wheels
 //  constraints_.push_back(WheelsMotion);    // constrain minimum and maximum legs extension
 
 }

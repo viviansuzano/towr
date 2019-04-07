@@ -149,7 +149,6 @@ public:
 						EndeffectorAcc,
 						WheelsAccLimits,
 						BaseAccLimits,
-						WheelsNonHolonomic,
 						ForceWheels,
 						WheelsMotion,
   };
