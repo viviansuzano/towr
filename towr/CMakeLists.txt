@@ -114,6 +114,23 @@ if (TARGET GTest::GTest) # only build when modern targets exists
   add_test(${PROJECT_NAME}-test ${PROJECT_NAME}-test)
 endif()
 
+add_executable(anymal_wheels_example 
+  test/anymal_wheels_example.cc
+)
+target_link_libraries(anymal_wheels_example
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ifopt::ifopt_ipopt
+)
+
+add_executable(anymal_example 
+  test/anymal_example.cc
+)
+target_link_libraries(anymal_example
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ifopt::ifopt_ipopt
+)
 
 #############
 ## Install ##
