@@ -210,4 +210,188 @@ ChimneyLR::GetHeightDerivWrtY (double x, double y) const
   return dzdy;
 }
 
+// STEP
+double
+Step::GetHeight(double x, double y) const
+{
+  double h = 0.0;
+
+  if (step_start <= x && x <= step_end)
+    h = coeff(0)*pow(x,3)+coeff(1)*pow(x,2)+coeff(2)*x+coeff(3);
+
+  if (step_end < x)
+    h = height;
+
+  return h;
+}
+
+double
+Step::GetHeightDerivWrtX(double x, double y) const
+{
+  double dhdx = 0.0;
+
+  if (step_start <= x && x <= step_end)
+    dhdx = 3*coeff(0)*pow(x,2)+2*coeff(1)*x+coeff(2);
+
+  return dhdx;
+}
+
+double
+Step::GetHeightDerivWrtXX(double x, double y) const
+{
+  double Dhdx = 0.0;
+
+  if (step_start <= x && x <= step_end)
+    Dhdx = 6*coeff(0)*x+2*coeff(1);
+
+  return Dhdx;
+}
+
+// SLOPE PLAT
+double
+SlopePlat::GetHeight(double x, double y) const
+{
+  double h = 0.0;
+
+  // going up
+  if (x >= slope_start_)
+    h = slope_*(x-slope_start_);
+
+  // flat platform
+  if (x >= x_plat_start_)
+    h = height_center_;
+
+  // going back down
+  if (x >= x_down_start_) {
+    h = height_center_ - slope_*(x-x_down_start_);
+  }
+
+  // back on flat ground
+  if (x >= x_flat_start_)
+    h = 0.0;
+
+  return h;
+}
+
+double
+SlopePlat::GetHeightDerivWrtX(double x, double y) const
+{
+  double dhdx = 0.0;
+  if (x >= slope_start_)
+    dhdx = slope_;
+
+  if (x >= x_plat_start_)
+	dhdx = 0.0;
+
+  if (x >= x_down_start_)
+    dhdx = -slope_;
+
+  if (x >= x_flat_start_)
+    dhdx = 0.0;
+
+  return dhdx;
+}
+
+// LOW FREQUENCY SINE
+double
+SineLowFreq::GetHeight(double x, double y) const
+{
+  double h = h_offset_;
+  if (x >= sine_start_ && x <= sine_end_)
+	h = amp_*sin(freq_*(x-sine_start_)) + h_offset_;
+
+  return h;
+}
+
+double
+SineLowFreq::GetHeightDerivWrtX(double x, double y) const
+{
+  double dhdx = 0.0;
+  if (x >= sine_start_ && x <= sine_end_)
+	dhdx = freq_*amp_*cos(freq_*(x-sine_start_));
+
+  return dhdx;
+}
+
+double
+SineLowFreq::GetHeightDerivWrtXX(double x, double y) const
+{
+  double Dhdx = 0.0;
+  if (x >= sine_start_ && x <= sine_end_)
+	Dhdx = -freq_*amp_*freq_*sin(freq_*(x-sine_start_));
+
+  return Dhdx;
+}
+
+// HIGH FREQUENCY SINE
+double
+SineHighFreq::GetHeight(double x, double y) const
+{
+  double h = h_offset_;
+  if (x >= sine_start_ && x <= sine_end_)
+	h = amp_*sin(freq_*(x-sine_start_)) + h_offset_;
+
+  return h;
+}
+
+double
+SineHighFreq::GetHeightDerivWrtX(double x, double y) const
+{
+  double dhdx = 0.0;
+  if (x >= sine_start_ && x <= sine_end_)
+	dhdx = freq_*amp_*cos(freq_*(x-sine_start_));
+
+  return dhdx;
+}
+
+double
+SineHighFreq::GetHeightDerivWrtXX(double x, double y) const
+{
+  double Dhdx = 0.0;
+  if (x >= sine_start_ && x <= sine_end_)
+	Dhdx = -freq_*amp_*freq_*sin(freq_*(x-sine_start_));
+
+  return Dhdx;
+}
+
+// ROUGH
+double
+Rough::GetHeight(double x, double y) const
+{
+  double h = 0.0;
+  if (x >= rough_start_)
+	h = amp_*sin(freq_*(x-rough_start_))+slope_*(x-rough_start_);
+
+  if (x > rough_end_)
+	h = h_end_;
+
+  return h;
+}
+
+double
+Rough::GetHeightDerivWrtX(double x, double y) const
+{
+  double dhdx = 0.0;
+  if (x >= rough_start_)
+	dhdx = freq_*amp_*cos(freq_*(x-rough_start_))+slope_;
+
+  if (x > rough_end_)
+	dhdx = 0.0;
+
+  return dhdx;
+}
+
+double
+Rough::GetHeightDerivWrtXX(double x, double y) const
+{
+  double Dhdx = 0.0;
+  if (x >= rough_start_)
+	Dhdx = -freq_*amp_*freq_*sin(freq_*(x-rough_start_));
+
+  if (x > rough_end_)
+	Dhdx = 0.0;
+
+  return Dhdx;
+}
+
 } /* namespace towr */

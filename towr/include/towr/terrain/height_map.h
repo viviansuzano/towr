@@ -83,6 +83,11 @@ public:
                    SlopeID,
                    ChimneyID,
                    ChimneyLRID,
+				   SlopePlatID,
+				   StepID,
+				   SineLowFreqID,
+				   SineHighFreqID,
+				   RoughID,
                    TERRAIN_COUNT };
 
   static HeightMap::Ptr MakeTerrain(TerrainID type);
@@ -173,13 +178,18 @@ private:
 
 const static std::map<HeightMap::TerrainID, std::string> terrain_names =
 {
-  {HeightMap::FlatID,        "Flat"       },
-  {HeightMap::BlockID,       "Block"      },
-  {HeightMap::StairsID,      "Stairs"     },
-  {HeightMap::GapID,         "Gap"        },
-  {HeightMap::SlopeID,       "Slope"      },
-  {HeightMap::ChimneyID,     "Chimney"    },
-  {HeightMap::ChimneyLRID,   "ChimenyLR"  }
+  {HeightMap::FlatID,         "Flat"         },
+  {HeightMap::BlockID,        "Block"        },
+  {HeightMap::StairsID,       "Stairs"       },
+  {HeightMap::GapID,          "Gap"          },
+  {HeightMap::SlopeID,        "Slope"        },
+  {HeightMap::ChimneyID,      "Chimney"    	 },
+  {HeightMap::ChimneyLRID,    "ChimenyLR"  	 },
+  {HeightMap::SlopePlatID,    "SlopePlat"    },
+  {HeightMap::StepID,         "Step"         },
+  {HeightMap::SineLowFreqID,  "SineLowFreq"  },
+  {HeightMap::SineHighFreqID, "SineHighFreq" },
+  {HeightMap::RoughID,        "Rough"      	 }
 };
 
 } /* namespace towr */
