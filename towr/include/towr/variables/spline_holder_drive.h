@@ -22,18 +22,18 @@ struct SplineHolderDrive
 {
   /**
    * @brief Fully construct all splines.
-   * @param base_lin  				 The nodes describing the base linear motion.
-   * @param base_ang  				 The nodes describing the base angular motion.
+   * @param base_lin_nodes  		 The nodes describing the base linear motion.
+   * @param base_ang_nodes  		 The nodes describing the base angular motion.
    * @param base_poly_durations 	 The durations of each base polynomial.
-   * @param ee_wheels_motion 		 The nodes describing the wheels motions.
-   * @param ee_wheels_force 		 The nodes describing the wheels forces.
+   * @param ee_wheels_motion_nodes 	 The nodes describing the wheels motions.
+   * @param ee_wheels_force_nodes	 The nodes describing the wheels forces.
    * @param ee_wheels_poly_durations The durations of each wheel's polynomial.
    */
-  SplineHolderDrive (NodesVariables::Ptr base_lin,
-                	 NodesVariables::Ptr base_ang,
+  SplineHolderDrive (NodesVariables::Ptr base_lin_nodes,
+                	 NodesVariables::Ptr base_ang_nodes,
 					 const std::vector<double>& base_poly_durations,
-					 std::vector<NodesVariables::Ptr> ee_wheels_motion,
-					 std::vector<NodesVariables::Ptr> ee_wheels_force,
+					 std::vector<NodesVariables::Ptr> ee_wheels_motion_nodes,
+					 std::vector<NodesVariables::Ptr> ee_wheels_force_nodes,
 					 const std::vector<double>& ee_wheels_poly_durations);
 
   SplineHolderDrive () = default;

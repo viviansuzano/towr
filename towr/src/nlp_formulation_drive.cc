@@ -259,7 +259,6 @@ NlpFormulationDrive::MakeForceWheelsConstraint(const SplineHolderDrive& s) const
   ContraintPtrVec c;
 
   for (int ee=0; ee<params_drive_.GetEECount(); ee++) {
-  //int ee = 0;
     auto constraint = std::make_shared<ForceWheelsConstraint>(terrain_, params_drive_.force_limit_in_x_direction_,
     														  params_drive_.GetTotalTime(),
 														  	  params_drive_.dt_constraint_dynamic_, ee, s);

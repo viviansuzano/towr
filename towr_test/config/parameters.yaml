@@ -1,4 +1,4 @@
-run_derivative_test: true
+run_derivative_test: false
 
 Step:
   initial_pose:
@@ -33,20 +33,20 @@ Flat:
     z: 0.5
    
   final_pose: 
-    x: 0.3
+    x: 1.0
     y: 0.0
     z: 0.5
 
-  total_time: 0.4
+  total_time: 1.0
 
 SineLowFreq:
   initial_pose:
-    x: 1.0
+    x: 0.0
     y: 0.0
     z: 0.7
    
   final_pose: 
-    x: 1.1
+    x: 0.5
     y: 0.0
     z: 0.7
 

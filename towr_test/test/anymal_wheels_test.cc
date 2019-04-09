@@ -53,16 +53,16 @@ bool SetTowrParameters(NlpFormulationDrive *formulation, const std::string& file
 
   // initial feet position
   auto nominal_stance_B = formulation->model_.kinematic_model_->GetNominalStanceInBase();
-//  formulation->initial_ee_W_.resize(n_ee);
-//  for (int ee = 0; ee < n_ee; ++ee) {
-//	  formulation->initial_ee_W_.at(ee) = nominal_stance_B.at(ee) + formulation->initial_base_.lin.at(kPos);
-//	  Eigen::Vector3d ee_pos = formulation->initial_ee_W_.at(ee);
-//	  formulation->initial_ee_W_.at(ee)(Z) = formulation->terrain_->GetHeight(ee_pos.x(), ee_pos.y());
-//  }
-  formulation->initial_ee_W_ = nominal_stance_B;
-  std::for_each(formulation->initial_ee_W_.begin(), formulation->initial_ee_W_.end(),
-				[&](Eigen::Vector3d& p){ p.z() = 0.0; } // feet at 0 height
-  );
+  formulation->initial_ee_W_.resize(n_ee);
+  for (int ee = 0; ee < n_ee; ++ee) {
+	  formulation->initial_ee_W_.at(ee) = nominal_stance_B.at(ee) + formulation->initial_base_.lin.at(kPos);
+	  Eigen::Vector3d ee_pos = formulation->initial_ee_W_.at(ee);
+	  formulation->initial_ee_W_.at(ee)(Z) = formulation->terrain_->GetHeight(ee_pos.x(), ee_pos.y());
+  }
+//  formulation->initial_ee_W_ = nominal_stance_B;
+//  std::for_each(formulation->initial_ee_W_.begin(), formulation->initial_ee_W_.end(),
+//				[&](Eigen::Vector3d& p){ p.z() = 0.0; } // feet at 0 height
+//  );
 
   // Time duration of the motion.
   double total_duration = basenode[terrain]["total_time"].as<double>();
@@ -111,12 +111,12 @@ int main(int argc, char **argv)
 
   // derivative test
   if (run_derivative_test) {
-	solver->SetOption("max_cpu_time", 20.0);
-    //solver->SetOption("max_iter", 0);
+    solver->SetOption("max_iter", 0);
     solver->SetOption("derivative_test", "first-order");
     solver->SetOption("print_level", 4);
     solver->SetOption("derivative_test_perturbation", 1e-4);
     solver->SetOption("derivative_test_tol", 1e-3);
+    //solver->SetOption("derivative_test_print_all", "yes");
   }
 
   solver->Solve(nlp);
