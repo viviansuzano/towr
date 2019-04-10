@@ -37,20 +37,23 @@ TerrainWheelsConstraint::UpdateBoundsAtInstance (double t, int k, VecBound& boun
   bounds.at(k) = ifopt::BoundZero;
 }
 
+TerrainWheelsConstraint::Jacobian
+TerrainWheelsConstraint::GetJacobianTerrainHeight(double x, double y) const
+{
+  Jacobian jac = Eigen::Vector3d::Ones().transpose().sparseView();
+
+  jac.coeffRef(0, X_) = -terrain_->GetDerivativeOfHeightWrt(X_, x, y);
+  jac.coeffRef(0, Y_) = -terrain_->GetDerivativeOfHeightWrt(Y_, x, y);
+
+  return jac;
+}
+
 void
 TerrainWheelsConstraint::UpdateJacobianAtInstance(double t, int k, std::string var_set, Jacobian& jac) const
 {
   if (var_set == id::EEWheelsMotionNodes(ee_)) {
-    jac.middleRows(k,1) = ee_wheels_motion_->GetJacobianWrtNodes(t,kPos).row(Z);
-
-    int n_opt_variables = ee_wheels_motion_->GetNodeVariablesCount();
-    Vector3d pos_ee_W = ee_wheels_motion_->GetPoint(t).p();
-
-    for (auto dim : {X_,Y_}) {
-      int col = k*k6D+dim;
-      if (col >= n_opt_variables) col = (k-1)*k6D+dim;
-	  jac.coeffRef(k,col) = -terrain_->GetDerivativeOfHeightWrt(dim,pos_ee_W.x(),pos_ee_W.y());
-    }
+    Vector3d pos = ee_wheels_motion_->GetPoint(t).p();
+    jac.row(k) = GetJacobianTerrainHeight(pos.x(), pos.y()) * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
   }
 }
 

@@ -38,6 +38,8 @@ private:
   void UpdateBoundsAtInstance(double t, int k, VecBound& bounds) const override;
   void UpdateJacobianAtInstance(double t, int k, std::string var_set, Jacobian& jac) const override;
 
+  Jacobian GetJacobianTerrainHeight(double x, double y) const;
+
 };
 
 } /* namespace towr */
