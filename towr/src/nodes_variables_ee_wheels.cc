@@ -55,6 +55,10 @@ NodesVariablesEEWheelsForce::SetAllAtConstantValue (const VectorXd& force)
       if (nvi.deriv_ == kPos) {
 	    nodes_.at(nvi.id_).at(kPos)(nvi.dim_) = force(nvi.dim_);
       }
+
+//      if (nvi.deriv_ == kVel) {
+//        nodes_.at(nvi.id_).at(kVel)(nvi.dim_) = 0.0;
+//      }
     }
   }
 }

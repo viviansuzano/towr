@@ -104,7 +104,7 @@ int main(int argc, char **argv)
     nlp.AddCostSet(c);
 
   auto solver = std::make_shared<ifopt::IpoptSolver>();
-  solver->SetOption("linear_solver", "ma97"); // ma57, ma77, ma97
+  solver->SetOption("linear_solver", "ma97"); // ma27, ma57, ma77, ma97
   solver->SetOption("jacobian_approximation", "exact"); // "finite difference-values"
   solver->SetOption("max_cpu_time", 180.0); // 3 min
   solver->SetOption("print_level", 5);
@@ -114,8 +114,8 @@ int main(int argc, char **argv)
     solver->SetOption("max_iter", 0);
     solver->SetOption("derivative_test", "first-order");
     solver->SetOption("print_level", 4);
-    solver->SetOption("derivative_test_perturbation", 1e-4);
     solver->SetOption("derivative_test_tol", 1e-3);
+    //solver->SetOption("derivative_test_perturbation", 1e-4);
     //solver->SetOption("derivative_test_print_all", "yes");
   }
 

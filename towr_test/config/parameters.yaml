@@ -1,6 +1,19 @@
 run_derivative_test: false
 
-Step:
+Flat:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.5
+   
+  final_pose: 
+    x: 4.0
+    y: 0.0
+    z: 0.5
+
+  total_time: 4.0
+
+Block:
   initial_pose:
     x: 0.0
     y: 0.0
@@ -9,7 +22,59 @@ Step:
   final_pose: 
     x: 2.0
     y: 0.0
-    z: 0.7
+    z: 0.5
+
+  total_time: 4.0
+
+Stairs:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.5
+   
+  final_pose: 
+    x: 2.0
+    y: 0.0
+    z: 0.5
+
+  total_time: 4.0
+
+Gap:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.5
+   
+  final_pose: 
+    x: 2.0
+    y: 0.0
+    z: 0.5
+
+  total_time: 4.0
+
+Slope:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.5
+   
+  final_pose: 
+    x: 4.0
+    y: 0.0
+    z: 0.5
+
+  total_time: 8.0
+
+Step:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.4
+   
+  final_pose: 
+    x: 1.7
+    y: 0.0
+    z: 0.6
 
   total_time: 5.0
 
@@ -26,19 +91,6 @@ SlopePlat:
 
   total_time: 6.0
 
-Flat:
-  initial_pose:
-    x: 0.0
-    y: 0.0
-    z: 0.5
-   
-  final_pose: 
-    x: 1.0
-    y: 0.0
-    z: 0.5
-
-  total_time: 1.0
-
 SineLowFreq:
   initial_pose:
     x: 0.0
@@ -46,48 +98,28 @@ SineLowFreq:
     z: 0.7
    
   final_pose: 
-    x: 0.5
+    x: 2.0
     y: 0.0
     z: 0.7
 
-  total_time: 0.2
+  total_time: 4.0
 
 SineHighFreq:
   initial_pose:
-    x: 1.0
+    x: 0.0
     y: 0.0
     z: 0.5
    
   final_pose: 
-    x: 1.3
+    x: 2.0
     y: 0.0
     z: 0.5
 
-  total_time: 0.4
+  total_time: 4.0
 
-Slope:
-  initial_pose:
-    x: 1.0
-    y: 0.0
-    z: 0.5
-   
-  final_pose: 
-    x: 1.3
-    y: 0.0
-    z: 0.5
 
-  total_time: 0.4
 
-Gap:
-  initial_pose:
-    x: 1.0
-    y: 0.0
-    z: 0.7
-   
-  final_pose: 
-    x: 1.1
-    y: 0.0
-    z: 0.7
 
-  total_time: 0.2
+
+
 

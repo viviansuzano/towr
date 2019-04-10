@@ -77,7 +77,7 @@ NlpFormulationDrive::MakeBaseVariables () const
   spline_ang->SetByLinearInterpolation(initial_base_.ang.p(), final_base_.ang.p(), params_drive_.GetTotalTime());
 
   // limits all angles displacement to 30 degrees (optional)
-  double ang_limit_ = 30.0*M_PI/180;
+  double ang_limit_ = 20.0*M_PI/180;
   spline_ang->AddAllNodesBounds(kPos, {X,Y,Z}, Vector3d::Constant(-ang_limit_), Vector3d::Constant(ang_limit_));
 
   spline_ang->AddStartBound(kPos, {X,Y,Z}, initial_base_.ang.p());
