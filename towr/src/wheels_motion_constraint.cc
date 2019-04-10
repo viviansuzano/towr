@@ -24,8 +24,8 @@ WheelsMotionConstraint::WheelsMotionConstraint (const KinematicModel::Ptr& model
 
   ee_wheels_motion_ = spline_holder.ee_wheels_motion_.at(ee_);
 
-  max_leg_extension_ = 0.35;
-  min_leg_extension_ = 0.20;
+  max_leg_extension_ = 0.45;
+  min_leg_extension_ = 0.35;
 
   nominal_pos_hip_B_ = model->GetHipPositionInBaseFrame().at(ee);
 
@@ -38,8 +38,8 @@ WheelsMotionConstraint::UpdateConstraintAtInstance (double t, int k,
 {
   Vector3d base_W  = base_linear_->GetPoint(t).p();
   Vector3d pos_ee_W = ee_wheels_motion_->GetPoint(t).p();
-  EulerConverter::MatrixSXd b_R_w = base_angular_.GetRotationMatrixBaseToWorld(t).transpose();
-  Vector3d pos_hip_W = b_R_w*(nominal_pos_hip_B_) + base_W;
+  EulerConverter::MatrixSXd w_R_b = base_angular_.GetRotationMatrixBaseToWorld(t);
+  Vector3d pos_hip_W = w_R_b*(nominal_pos_hip_B_) + base_W;
 
   g(k) = (pos_ee_W - pos_hip_W).norm();
 }
@@ -78,8 +78,8 @@ WheelsMotionConstraint::UpdateJacobianAtInstance (double t, int k,
 {
   Vector3d base_W  = base_linear_->GetPoint(t).p();
   Vector3d pos_ee_W = ee_wheels_motion_->GetPoint(t).p();
-  EulerConverter::MatrixSXd b_R_w = base_angular_.GetRotationMatrixBaseToWorld(t).transpose();
-  Vector3d pos_hip_W = b_R_w*(nominal_pos_hip_B_) + base_W;
+  EulerConverter::MatrixSXd w_R_b = base_angular_.GetRotationMatrixBaseToWorld(t);
+  Vector3d pos_hip_W = w_R_b*(nominal_pos_hip_B_) + base_W;
 
   Vector3d g_deriv = NormDerivative(pos_ee_W - pos_hip_W);
 
@@ -94,7 +94,7 @@ WheelsMotionConstraint::UpdateJacobianAtInstance (double t, int k,
 	double sum = 0.0;
 	for (auto dim: {X, Y, Z}) {
 	  int col = GetCol(k, dim);
-	  jac.coeffRef(k, col) = -g_deriv.transpose() * base_angular_.DerivOfRotVecMult(t,nominal_pos_hip_B_, true).col(col);
+	  jac.coeffRef(k, col) = -g_deriv.transpose() * base_angular_.DerivOfRotVecMult(t,nominal_pos_hip_B_, false).col(col);
 	}
   }
 
