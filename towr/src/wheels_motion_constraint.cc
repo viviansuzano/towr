@@ -16,7 +16,7 @@ namespace towr {
 WheelsMotionConstraint::WheelsMotionConstraint (const KinematicModel::Ptr& model,
 												double T, double dt, const EE& ee,
                                                 const SplineHolderDrive& spline_holder)
-    :TimeDiscretizationConstraint(T, dt, "wheels_motion-" + std::to_string(ee))
+    :TimeDiscretizationConstraint(T, dt, "wheels-motion-" + std::to_string(ee))
 {
   base_linear_  = spline_holder.base_linear_;
   base_angular_ = EulerConverter(spline_holder.base_angular_);

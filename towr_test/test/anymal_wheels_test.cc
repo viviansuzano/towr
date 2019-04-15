@@ -27,10 +27,10 @@ using namespace towr;
 */
 bool SetTowrParameters(NlpFormulationDrive *formulation, const std::string& filename, const std::string terrain)
 {
-  yaml_tools::YamlNode basenode = yaml_tools::YamlNode::FromFile(filename);
+  yaml_tools::YamlNode basenode = yaml_tools::YamlNode::fromFile(filename);
   Eigen::Vector3d initial_position_, final_position_;
 
-  if (basenode.IsNull())
+  if (basenode.isNull())
 	throw std::runtime_error("CONFIGURATION LOADING FAILED");
 
   initial_position_.x() = basenode[terrain]["initial_pose"]["x"].as<double>();
@@ -123,7 +123,7 @@ int main(int argc, char **argv)
 
   // Print NLP information and some nodes solution
   nlp.PrintCurrent();
-//  formulation.PrintSolution(solution, 0.1);
+  formulation.PrintSolution(solution, 0.5);
 
   // save entire trajectory (to send to the controller)
   std::string bag_file = ros::package::getPath("towr_test") + "/bags/anymal_wheels_traj.bag";

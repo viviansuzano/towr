@@ -151,6 +151,7 @@ public:
 						BaseAccLimits,
 						ForceWheels,
 						WheelsMotion,
+						Stability,
   };
 
   /**

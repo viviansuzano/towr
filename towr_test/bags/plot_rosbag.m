@@ -129,10 +129,10 @@ J = [Ixx Ixy Ixz;
      Ixy Iyy Iyz;
      Ixz Iyz Izz];  % inertia
 n_ee = 4;
-g = [0; 0; 9.81]; % gravity acceleration
+g = [0; 0; -9.81]; % gravity acceleration
 
 % linear
-acc_lin_dyn = (1/m)*(force_LF' + force_RF' + force_LH' + force_RH') - g;
+acc_lin_dyn = (1/m)*(force_LF' + force_RF' + force_LH' + force_RH') + g;
 
 figure()
 subplot(3,1,1)
@@ -151,14 +151,14 @@ grid on; xlabel('t [s]'); ylabel('a_z [m/s^2]'); legend('from opt','from forces'
 
 % angular
 n = size(base_acc_ang,1);
-forces(:,:,1) = force_LF;
-forces(:,:,2) = force_RF;
-forces(:,:,3) = force_LH;
-forces(:,:,4) = force_RH;
-pos(:,:,1) = pos_LF;
-pos(:,:,2) = pos_RF;
-pos(:,:,3) = pos_LH;
-pos(:,:,4) = pos_RH;
+forces_ee(:,:,1) = force_LF;
+forces_ee(:,:,2) = force_RF;
+forces_ee(:,:,3) = force_LH;
+forces_ee(:,:,4) = force_RH;
+pos_ee(:,:,1) = pos_LF;
+pos_ee(:,:,2) = pos_RF;
+pos_ee(:,:,3) = pos_LH;
+pos_ee(:,:,4) = pos_RH;
 
 acc_ang_dyn = zeros(size(base_acc_ang));
 for i = 1:n
@@ -166,7 +166,7 @@ for i = 1:n
     w_R_b = quat2rotm(base_quat(i,:));
     J_b = w_R_b*J*w_R_b;
     for j = 1:n_ee
-        sum = sum + cross(forces(i,:,j),base_pos(i,:)-pos(i,:,j));
+        sum = sum + cross(forces_ee(i,:,j),base_pos(i,:)-pos_ee(i,:,j));
     end
     dyn = inv(J_b)*(sum - cross(base_vel_ang(i,:),J_b*(base_vel_ang(i,:)')))';
     acc_ang_dyn(i,:) = dyn';
@@ -361,8 +361,8 @@ xlabel('t [s]'); ylabel('f_y [N]')
 subplot(3,4,12); plot(t,force_RH(:,3)); grid on;
 xlabel('t [s]'); ylabel('f_z [N]')
 
-
-
+base_ang = [base_roll, base_pitch, base_yaw];
+plot_stability_measure(base_pos, base_ang, pos_ee, base_acc_lin, base_acc_ang, base_vel_ang, J, m ,g, t);
 
 
 

@@ -37,6 +37,7 @@ ParametersDrive::ParametersDrive()
   constraints_.push_back(WheelsAccLimits); // constrain the acceleration on the wheels
   constraints_.push_back(BaseAccLimits);   // constrain the acceleration of the base
   constraints_.push_back(WheelsMotion);    // constrain minimum and maximum legs extension
+  constraints_.push_back(Stability);       // ensure stability margin
 
 }
 

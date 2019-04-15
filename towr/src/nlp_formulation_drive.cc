@@ -22,8 +22,7 @@
 #include <towr/constraints/wheels_acc_limits_constraint.h>
 #include <towr/constraints/base_acc_limits_constraint.h>
 #include <towr/constraints/wheels_motion_constraint.h>
-
-#include <towr/models/endeffector_mappings.h>
+#include <towr/constraints/stability_constraint.h>
 
 namespace towr {
 
@@ -173,6 +172,7 @@ NlpFormulationDrive::GetConstraint (Parameters::ConstraintName name,
     case Parameters::BaseAccLimits:  		return MakeBaseAccLimitsConstraint(s);
     case Parameters::WheelsAccLimits:  		return MakeWheelsAccLimitsConstraint(s);
     case Parameters::WheelsMotion: 			return MakeWheelsMotionConstraint(s);
+    case Parameters::Stability: 			return MakeStabilityConstraint(s);
     default: throw std::runtime_error("constraint not defined!");
   }
 }
@@ -285,8 +285,8 @@ NlpFormulationDrive::ContraintPtrVec
 NlpFormulationDrive::MakeBaseAccLimitsConstraint(const SplineHolderDrive& s) const
 {
   std::vector<Vector3d> max_base_acc;
-  max_base_acc.push_back(Vector3d(params_drive_.max_base_acc_lin_.data()));
-  max_base_acc.push_back(Vector3d(params_drive_.max_base_acc_ang_.data()));
+  max_base_acc.push_back(Vector3d(params_drive_.max_base_acc_lin_.data()));  // linear acc limits
+  max_base_acc.push_back(Vector3d(params_drive_.max_base_acc_ang_.data()));  // angular acc limits
 
   return {std::make_shared<BaseAccLimitsConstraint>(max_base_acc,
     											    params_drive_.GetTotalTime(),
@@ -309,6 +309,37 @@ NlpFormulationDrive::MakeWheelsMotionConstraint (const SplineHolderDrive& s) con
   return c;
 }
 
+NlpFormulationDrive::ConstraintPtrVec
+NlpFormulationDrive::MakeStabilityConstraint (const SplineHolderDrive& s) const
+{
+  auto constraint = std::make_shared<StabilityConstraint>(model_.dynamic_model_,
+		  	  	  	  	  	  	  	  	  	  	  	    params_drive_.GetTotalTime(),
+														params_drive_.dt_constraint_dynamic_,
+                                                        s);
+  return {constraint};
+}
+
+void
+NlpFormulationDrive::UpdateDynamicsModel (const SplineHolderDrive& solution, double t) const
+{
+  auto com = solution.base_linear_->GetPoint(t);
+  EulerConverter base_angular_ = EulerConverter(solution.base_angular_);
+
+  Eigen::Matrix3d w_R_b = base_angular_.GetRotationMatrixBaseToWorld(t);
+  Eigen::Vector3d omega = base_angular_.GetAngularVelocityInWorld(t);
+  Eigen::Vector3d omega_dot = base_angular_.GetAngularAccelerationInWorld(t);
+
+  int n_ee = model_.dynamic_model_->GetEECount();
+  std::vector<Eigen::Vector3d> ee_pos;
+  std::vector<Eigen::Vector3d> ee_force;
+  for (int ee=0; ee<n_ee; ++ee) {
+    ee_force.push_back(solution.ee_wheels_force_.at(ee)->GetPoint(t).p());
+    ee_pos.push_back(solution.ee_wheels_motion_.at(ee)->GetPoint(t).p());
+  }
+
+  model_.dynamic_model_->SetCurrent(com.p(), com.a(), w_R_b, omega, omega_dot, ee_force, ee_pos);
+}
+
 void
 NlpFormulationDrive::PrintSolution (const SplineHolderDrive& solution, double dt) const
 {
@@ -323,14 +354,26 @@ NlpFormulationDrive::PrintSolution (const SplineHolderDrive& solution, double dt
 	std::cout << (rad/M_PI*180).transpose() << "\t[deg]" << std::endl;
 
 	for (int ee=0; ee<solution.ee_wheels_motion_.size(); ee++) {
-      std::cout << "Foot position x,y,z (" << ee << "):\t";
+	  std::string ee_name = ee_names.find(ee)->second;
+      std::cout << "Foot position x,y,z (" << ee_name << "):\t";
 	  std::cout << solution.ee_wheels_motion_.at(ee)->GetPoint(t).p().transpose() << "\t[m]" << std::endl;
 	}
 
 	for (int ee=0; ee<solution.ee_wheels_force_.size(); ee++) {
-	  std::cout << "Contact force x,y,z (" << ee << "):\t";
+	  std::string ee_name = ee_names.find(ee)->second;
+	  std::cout << "Contact force x,y,z (" << ee_name << "):\t";
 	  std::cout << solution.ee_wheels_force_.at(ee)->GetPoint(t).p().transpose() << "\t[N]" << std::endl;
 	}
+
+	UpdateDynamicsModel (solution, t);
+	std::pair<int, double> stab_angle = model_.dynamic_model_->GetStabilityMeasure();
+	std::cout << "Stability Measure: " << stab_angle.second/M_PI*180 << " [deg]" << std::endl;
+//	std::vector<double> stab_angle = model_.dynamic_model_->GetStabilityMeasure();
+//	std::cout << "Stability Measure (LF,RF,RH,LH): \t";
+//	for (int ee=0; ee<solution.ee_wheels_force_.size(); ee++) {
+//	  std::cout << stab_angle.at(ee)/M_PI*180 << " ";
+//	}
+//	std::cout << "\t[deg]" << std::endl;
 
     std::cout << std::endl;
 
