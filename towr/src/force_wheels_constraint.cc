@@ -78,66 +78,78 @@ ForceWheelsConstraint::UpdateBoundsAtInstance (double t, int k, VecBound& bounds
 Eigen::Matrix3d
 ForceWheelsConstraint::GetJacobianTerrainBasis(HeightMap::Direction basis, double x, double y) const
 {
-  Eigen::Matrix3d jac = Eigen::Matrix3d::Zero();
+  Eigen::Matrix3d jac = Eigen::Matrix3d::Ones() * 1e-10;
 
-  jac.col(X_) = terrain_->GetDerivativeOfNormalizedBasisWrt(basis, X_, x, y);
-  jac.col(Y_) = terrain_->GetDerivativeOfNormalizedBasisWrt(basis, Y_, x, y);
+  jac.col(X_) += terrain_->GetDerivativeOfNormalizedBasisWrt(basis, X_, x, y);
+  jac.col(Y_) += terrain_->GetDerivativeOfNormalizedBasisWrt(basis, Y_, x, y);
 
   return jac;
 }
 
 // Using this approach gives a problem with the sparsity structure of the Jacobian when building TOWR in Degug mode.
-// Filling the columns individually doesn't cause this problem!!
-//void
-//ForceWheelsConstraint::UpdateJacobianAtInstance(double t, int k, std::string var_set, Jacobian& jac) const
-//{
-//  if (var_set == id::EEWheelsMotionNodes(ee_)) {
-//	Vector3d f = ee_wheels_force_->GetPoint(t).p();
-//	Vector3d p = ee_wheels_motion_->GetPoint(t).p();
-//
-//	Jacobian jac_n  = (f.transpose()*GetJacobianTerrainBasis(HeightMap::Normal, p.x(), p.y())).sparseView();
-//	Jacobian jac_t1 = (f.transpose()*GetJacobianTerrainBasis(HeightMap::Tangent1, p.x(), p.y())).sparseView();
-//	Jacobian jac_t2 = (f.transpose()*GetJacobianTerrainBasis(HeightMap::Tangent2, p.x(), p.y())).sparseView();
-//
-//	int row = k*n_constraints_per_node_;
-//
-////	jac.middleRows(row, 3) = GetJacobianTerrainBasis(HeightMap::Normal, p.x(), p.y()).sparseView() *
-////							 ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
-//
-//	// unilateral force
-//	jac.row(row++) = jac_n * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
-//
-//	// traction force
-//	jac.row(row++) = jac_t1 * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
-//
-//	// friction force tangent 1 derivative
-//	jac.row(row++) = (jac_t1-mu_*jac_n) * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
-//	jac.row(row++) = (jac_t1+mu_*jac_n) * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
-//
-//	// friction force tangent 2 derivative
-//	jac.row(row++) = (jac_t2-mu_*jac_n) * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
-//	jac.row(row++) = (jac_t2+mu_*jac_n) * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
-//
-//  }
-//
-//  if (var_set == id::EEWheelsForceNodes(ee_)) {
-//	Vector3d p  = ee_wheels_motion_->GetPoint(t).p();
-//
-//	Jacobian n  = terrain_->GetNormalizedBasis(HeightMap::Normal, p.x(), p.y()).transpose().sparseView();
-//	Jacobian t1 = terrain_->GetNormalizedBasis(HeightMap::Tangent1, p.x(), p.y()).transpose().sparseView();
-//	Jacobian t2 = terrain_->GetNormalizedBasis(HeightMap::Tangent2, p.x(), p.y()).transpose().sparseView();
-//
-//	int row = k*n_constraints_per_node_;
-//
-//	jac.row(row++) = n * ee_wheels_force_->GetJacobianWrtNodes(t, kPos);  // normal force
-//	jac.row(row++) = t1 * ee_wheels_force_->GetJacobianWrtNodes(t, kPos); // traction force
-//	jac.row(row++) = (t1-mu_*n) * ee_wheels_force_->GetJacobianWrtNodes(t, kPos);  // f_t1 <  mu*n
-//	jac.row(row++) = (t1+mu_*n) * ee_wheels_force_->GetJacobianWrtNodes(t, kPos);  // f_t1 > -mu*n
-//	jac.row(row++) = (t2-mu_*n) * ee_wheels_force_->GetJacobianWrtNodes(t, kPos);  // f_t2 <  mu*n
-//	jac.row(row++) = (t2+mu_*n) * ee_wheels_force_->GetJacobianWrtNodes(t, kPos);  // f_t2 > -mu*n
-//
-//  }
-//}
+// FIXED: if any of the basis vector have zeros, the number of nonZero elements of the Jacobian is not compatible to the
+// one defined in the original sparsity structure, which is not allowed by IFOPT, that's why the 1e-10 added to the derivatives.
+void
+ForceWheelsConstraint::UpdateJacobianAtInstance(double t, int k, std::string var_set, Jacobian& jac) const
+{
+  if (var_set == id::EEWheelsMotionNodes(ee_)) {
+	Vector3d f = ee_wheels_force_->GetPoint(t).p();
+	Vector3d p = ee_wheels_motion_->GetPoint(t).p();
+
+	Jacobian jac_n  = (f.transpose()*GetJacobianTerrainBasis(HeightMap::Normal, p.x(), p.y())).sparseView();
+	Jacobian jac_t1 = (f.transpose()*GetJacobianTerrainBasis(HeightMap::Tangent1, p.x(), p.y())).sparseView();
+	Jacobian jac_t2 = (f.transpose()*GetJacobianTerrainBasis(HeightMap::Tangent2, p.x(), p.y())).sparseView();
+
+	int row = k*n_constraints_per_node_;
+
+//	jac.middleRows(row, 3) = GetJacobianTerrainBasis(HeightMap::Normal, p.x(), p.y()).sparseView() *
+//							 ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
+
+	// unilateral force
+	jac.row(row++) = jac_n * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
+
+	// traction force
+	jac.row(row++) = jac_t1 * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
+
+	// friction force tangent 1 derivative
+	jac.row(row++) = (jac_t1-mu_*jac_n) * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
+	jac.row(row++) = (jac_t1+mu_*jac_n) * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
+
+	// friction force tangent 2 derivative
+	jac.row(row++) = (jac_t2-mu_*jac_n) * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
+	jac.row(row++) = (jac_t2+mu_*jac_n) * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
+
+  }
+
+  if (var_set == id::EEWheelsForceNodes(ee_)) {
+	Vector3d p  = ee_wheels_motion_->GetPoint(t).p();
+
+	Vector3d n  = terrain_->GetNormalizedBasis(HeightMap::Normal, p.x(), p.y()) + Vector3d::Constant(1e-10);
+	Vector3d t1 = terrain_->GetNormalizedBasis(HeightMap::Tangent1, p.x(), p.y()) + Vector3d::Constant(1e-10);
+	Vector3d t2 = terrain_->GetNormalizedBasis(HeightMap::Tangent2, p.x(), p.y()) + Vector3d::Constant(1e-10);
+
+	Jacobian jac_n  = n.transpose().sparseView();
+	Jacobian jac_t1 = t1.transpose().sparseView();
+	Jacobian jac_t2 = t2.transpose().sparseView();
+
+	int row = k*n_constraints_per_node_;
+
+	// unilateral force
+	jac.row(row++) = jac_n * ee_wheels_force_->GetJacobianWrtNodes(t, kPos);
+
+	// traction force
+	jac.row(row++) = jac_t1 * ee_wheels_force_->GetJacobianWrtNodes(t, kPos);
+
+	// friction force tangent 1 derivative
+	jac.row(row++) = (jac_t1-mu_*jac_n) * ee_wheels_force_->GetJacobianWrtNodes(t, kPos);
+	jac.row(row++) = (jac_t1+mu_*jac_n) * ee_wheels_force_->GetJacobianWrtNodes(t, kPos);
+
+	// friction force tangent 2 derivative
+	jac.row(row++) = (jac_t2-mu_*jac_n) * ee_wheels_force_->GetJacobianWrtNodes(t, kPos);
+	jac.row(row++) = (jac_t2+mu_*jac_n) * ee_wheels_force_->GetJacobianWrtNodes(t, kPos);
+
+  }
+}
 
 
 int
@@ -152,62 +164,62 @@ ForceWheelsConstraint::GetCol(int node, int dim) const
   return col;
 }
 
-void
-ForceWheelsConstraint::UpdateJacobianAtInstance(double t, int k, std::string var_set, Jacobian& jac) const
-{
-  if (var_set == id::EEWheelsMotionNodes(ee_)) {
-	Vector3d f = ee_wheels_force_->GetPoint(t).p();
-	Vector3d p = ee_wheels_motion_->GetPoint(t).p();
-	int row_reset = k*n_constraints_per_node_;
-	int row = row_reset;
-	for (auto dim : {X_,Y_}) {
-	  Vector3d dn  = terrain_->GetDerivativeOfNormalizedBasisWrt(HeightMap::Normal, dim, p.x(), p.y());
-	  Vector3d dt1 = terrain_->GetDerivativeOfNormalizedBasisWrt(HeightMap::Tangent1, dim, p.x(), p.y());
-	  Vector3d dt2 = terrain_->GetDerivativeOfNormalizedBasisWrt(HeightMap::Tangent2, dim, p.x(), p.y());
-
-	  int col = GetCol(k, dim);
-
-	  // unilateral force
-	  jac.coeffRef(row++, col) = f.transpose()*dn;
-
-	  // traction force
-	  jac.coeffRef(row++, col) = f.transpose()*dt1;
-
-	  // friction force tangent 1 derivative
-	  jac.coeffRef(row++, col) = f.transpose()*(dt1-mu_*dn);
-	  jac.coeffRef(row++, col) = f.transpose()*(dt1+mu_*dn);
-
-	  // friction force tangent 2 derivative
-	  jac.coeffRef(row++, col) = f.transpose()*(dt2-mu_*dn);
-	  jac.coeffRef(row++, col) = f.transpose()*(dt2+mu_*dn);
-
-	  row = row_reset;
-	}
-
-//	jac.middleRows(row, 3) = GetJacobianTerrainBasis(HeightMap::Normal, p.x(), p.y()).sparseView() *
-//							 ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
-  }
-
-  if (var_set == id::EEWheelsForceNodes(ee_)) {
-	Vector3d p  = ee_wheels_motion_->GetPoint(t).p();
-	Vector3d n  = terrain_->GetNormalizedBasis(HeightMap::Normal, p.x(), p.y());
-	Vector3d t1 = terrain_->GetNormalizedBasis(HeightMap::Tangent1, p.x(), p.y());
-	Vector3d t2 = terrain_->GetNormalizedBasis(HeightMap::Tangent2, p.x(), p.y());
-
-	int row_reset = k*n_constraints_per_node_;
-	int row = row_reset;
-	for (auto dim : {X,Y,Z}) {
-	  int col = GetCol(k, dim);
-	  jac.coeffRef(row++, col) = n(dim);              // normal force
-	  jac.coeffRef(row++, col) = t1(dim);             // traction force
-	  jac.coeffRef(row++, col) = t1(dim)-mu_*n(dim);  // f_t1 <  mu*n
-	  jac.coeffRef(row++, col) = t1(dim)+mu_*n(dim);  // f_t1 > -mu*n
-	  jac.coeffRef(row++, col) = t2(dim)-mu_*n(dim);  // f_t2 <  mu*n
-	  jac.coeffRef(row++, col) = t2(dim)+mu_*n(dim);  // f_t2 > -mu*n
-	  row = row_reset;
-	}
-  }
-}
+//void
+//ForceWheelsConstraint::UpdateJacobianAtInstance(double t, int k, std::string var_set, Jacobian& jac) const
+//{
+//  if (var_set == id::EEWheelsMotionNodes(ee_)) {
+//	Vector3d f = ee_wheels_force_->GetPoint(t).p();
+//	Vector3d p = ee_wheels_motion_->GetPoint(t).p();
+//	int row_reset = k*n_constraints_per_node_;
+//	int row = row_reset;
+//	for (auto dim : {X_,Y_}) {
+//	  Vector3d dn  = terrain_->GetDerivativeOfNormalizedBasisWrt(HeightMap::Normal, dim, p.x(), p.y());
+//	  Vector3d dt1 = terrain_->GetDerivativeOfNormalizedBasisWrt(HeightMap::Tangent1, dim, p.x(), p.y());
+//	  Vector3d dt2 = terrain_->GetDerivativeOfNormalizedBasisWrt(HeightMap::Tangent2, dim, p.x(), p.y());
+//
+//	  int col = GetCol(k, dim);
+//
+//	  // unilateral force
+//	  jac.coeffRef(row++, col) = f.transpose()*dn;
+//
+//	  // traction force
+//	  jac.coeffRef(row++, col) = f.transpose()*dt1;
+//
+//	  // friction force tangent 1 derivative
+//	  jac.coeffRef(row++, col) = f.transpose()*(dt1-mu_*dn);
+//	  jac.coeffRef(row++, col) = f.transpose()*(dt1+mu_*dn);
+//
+//	  // friction force tangent 2 derivative
+//	  jac.coeffRef(row++, col) = f.transpose()*(dt2-mu_*dn);
+//	  jac.coeffRef(row++, col) = f.transpose()*(dt2+mu_*dn);
+//
+//	  row = row_reset;
+//	}
+//
+////	jac.middleRows(row, 3) = GetJacobianTerrainBasis(HeightMap::Normal, p.x(), p.y()).sparseView() *
+////							 ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
+//  }
+//
+//  if (var_set == id::EEWheelsForceNodes(ee_)) {
+//	Vector3d p  = ee_wheels_motion_->GetPoint(t).p();
+//	Vector3d n  = terrain_->GetNormalizedBasis(HeightMap::Normal, p.x(), p.y());
+//	Vector3d t1 = terrain_->GetNormalizedBasis(HeightMap::Tangent1, p.x(), p.y());
+//	Vector3d t2 = terrain_->GetNormalizedBasis(HeightMap::Tangent2, p.x(), p.y());
+//
+//	int row_reset = k*n_constraints_per_node_;
+//	int row = row_reset;
+//	for (auto dim : {X,Y,Z}) {
+//	  int col = GetCol(k, dim);
+//	  jac.coeffRef(row++, col) = n(dim);              // normal force
+//	  jac.coeffRef(row++, col) = t1(dim);             // traction force
+//	  jac.coeffRef(row++, col) = t1(dim)-mu_*n(dim);  // f_t1 <  mu*n
+//	  jac.coeffRef(row++, col) = t1(dim)+mu_*n(dim);  // f_t1 > -mu*n
+//	  jac.coeffRef(row++, col) = t2(dim)-mu_*n(dim);  // f_t2 <  mu*n
+//	  jac.coeffRef(row++, col) = t2(dim)+mu_*n(dim);  // f_t2 > -mu*n
+//	  row = row_reset;
+//	}
+//  }
+//}
 
 } /* namespace towr */
 
