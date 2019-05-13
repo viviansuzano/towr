@@ -76,8 +76,8 @@ NlpFormulationDrive::MakeBaseVariables () const
   spline_ang->SetByLinearInterpolation(initial_base_.ang.p(), final_base_.ang.p(), params_drive_.GetTotalTime());
 
   // limits all angles displacement to 30 degrees (optional)
-  double ang_limit_ = 20.0*M_PI/180;
-  spline_ang->AddAllNodesBounds(kPos, {X,Y,Z}, Vector3d::Constant(-ang_limit_), Vector3d::Constant(ang_limit_));
+  Vector3d ang_limit_ = Vector3d(30, 30, 30) * (M_PI/180);
+//  spline_ang->AddAllNodesBounds(kPos, {X,Y,Z}, -ang_limit_, ang_limit_);
 
   spline_ang->AddStartBound(kPos, {X,Y,Z}, initial_base_.ang.p());
   spline_ang->AddStartBound(kVel, {X,Y,Z}, initial_base_.ang.v());
@@ -111,13 +111,12 @@ NlpFormulationDrive::MakeEEWheelsMotionVariables () const
     double z = terrain_->GetHeight(x,y);
     nodes->SetByLinearInterpolation(initial_ee_W_.at(ee), Vector3d(x,y,z), T);
 
-//    nodes->AddStartBound(kPos, {X,Y,Z}, initial_ee_W_.at(ee));
-
     // initial and final wheel's speed = 0 (optional)
 //    nodes->AddStartBound(kVel, {X,Y,Z}, Vector3d(0.0, 0.0, 0.0));  // wheels vel zero at the beginning
 //    nodes->AddFinalBound(kVel, {X,Y,Z}, Vector3d(0.0, 0.0, 0.0));  // wheels vel zero at the end
 
     // wheels non-holonomic constraint (v_y = 0) -> IMPORTANT!
+    nodes->AddStartBound(kPos, {Y}, initial_ee_W_.at(ee));
     nodes->AddAllNodesBounds(kVel, {Y}, Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0));
 
     vars.push_back(nodes);

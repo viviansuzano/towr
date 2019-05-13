@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <fstream>
 
 #include <ros/ros.h>
 #include <ros/package.h>
@@ -59,6 +60,13 @@ bool SetTowrParameters(NlpFormulationDrive *formulation, const std::string& file
 	  Eigen::Vector3d ee_pos = formulation->initial_ee_W_.at(ee);
 	  formulation->initial_ee_W_.at(ee)(Z) = formulation->terrain_->GetHeight(ee_pos.x(), ee_pos.y());
   }
+  // hack to initialize right foot ahead of the left
+//  Eigen::Vector3d pos_phase (0.15, 0.0, 0.0);
+//  formulation->initial_ee_W_.at(LF) += pos_phase;
+//  formulation->initial_ee_W_.at(LH) += pos_phase;
+//  formulation->initial_ee_W_.at(RF) -= pos_phase;
+//  formulation->initial_ee_W_.at(RH) -= pos_phase;
+
 //  formulation->initial_ee_W_ = nominal_stance_B;
 //  std::for_each(formulation->initial_ee_W_.begin(), formulation->initial_ee_W_.end(),
 //				[&](Eigen::Vector3d& p){ p.z() = 0.0; } // feet at 0 height
@@ -67,6 +75,14 @@ bool SetTowrParameters(NlpFormulationDrive *formulation, const std::string& file
   // Time duration of the motion.
   double total_duration = basenode[terrain]["total_time"].as<double>();
   formulation->params_drive_.total_time_ = total_duration;
+
+  bool use_wheels_motion_constraint = basenode[terrain]["use_wheels_motion_constraint"].as<bool>();
+  if (use_wheels_motion_constraint)
+	formulation->params_drive_.SetWheelsMotionConstraint();
+  else
+	formulation->params_drive_.SetEndeffectorRomConstraint();
+
+  formulation->params_drive_.force_limit_in_x_direction_ = basenode[terrain]["traction_limit"].as<double>();
 
   return basenode["run_derivative_test"].as<bool>();
 
@@ -81,7 +97,7 @@ int main(int argc, char **argv)
   NlpFormulationDrive formulation;
 
   // terrain
-  HeightMap::TerrainID terrain_id = HeightMap::StepID;
+  HeightMap::TerrainID terrain_id = HeightMap::RoughID;
   formulation.terrain_ = HeightMap::MakeTerrain(terrain_id);
 
   // Robot Model
@@ -123,10 +139,11 @@ int main(int argc, char **argv)
 
   // Print NLP information and some nodes solution
   nlp.PrintCurrent();
-  formulation.PrintSolution(solution, 0.5);
+//  formulation.PrintSolution(solution, 0.5);
 
   // save entire trajectory (to send to the controller)
-  std::string bag_file = ros::package::getPath("towr_test") + "/bags/anymal_wheels_traj.bag";
+//  std::string bag_file = ros::package::getPath("towr_test") + "/bags/anymal_wheels_traj.bag";
+  std::string bag_file = ros::package::getPath("anymal_wheels_ctrl_track_ros") + "/data/anymal_wheels_traj.bag";
   SaveDrivingTrajectoryInRosbag (solution, bag_file);
 
   // save trajectory as collection of states (for plots)
@@ -135,6 +152,10 @@ int main(int argc, char **argv)
 
   // Create a new bag with geometry messages to plot in MATLAB
   ExtractGeometryMessagesFromTrajectoryBag(bag_file);
+
+  // Create a map of terrain normals in a txt file
+  std::string filename = ros::package::getPath("anymal_wheels_ctrl_track") + "/data/terrain_normals.txt";
+  SaveTerrainNormalsInFile(solution, terrain_id, filename);
 
   return 0;
 }

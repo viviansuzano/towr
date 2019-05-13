@@ -88,7 +88,9 @@ void SaveTrajectoryInRosbag (const SplineHolder& solution, const std::string &ba
   ::ros::Time t0(1e-6);
   bag.write(xpp_msgs::robot_trajectory_desired, t0, msg);
 
+  std::cout << "Successfully created bag  " << bag.getFileName() << std::endl;
   bag.close();
+
 }
 
 void SaveDrivingTrajectoryInRosbag (const SplineHolderDrive& solution, const std::string &bag_file)
@@ -102,6 +104,7 @@ void SaveDrivingTrajectoryInRosbag (const SplineHolderDrive& solution, const std
   ::ros::Time t0(1e-6);
   bag.write(xpp_msgs::robot_trajectory_desired, t0, msg);
 
+  std::cout << "Successfully created bag  " << bag.getFileName() << std::endl;
   bag.close();
 }
 
@@ -122,7 +125,36 @@ SaveDrivingTrajectoryStatesInRosbag (const SplineHolderDrive& solution, const st
 	bag.write(topic, timestamp, msg);
   }
 
+  std::cout << "Successfully created bag  " << bag.getFileName() << std::endl;
   bag.close();
+}
+
+void SaveTerrainNormalsInFile (const SplineHolderDrive& solution, int terrain, const std::string &filename)
+{
+  double t = 0.0;
+  double T = solution.base_linear_->GetTotalTime();
+
+  auto terrain_id = static_cast<HeightMap::TerrainID>(terrain);
+  auto terrain_ = HeightMap::MakeTerrain(terrain_id);
+
+  std::ofstream file;
+  file.open(filename);
+  while (t<=T+1e-5) {
+	int n_ee = solution.ee_wheels_motion_.size();
+	file << t << " ";
+
+	for (int ee=0; ee<n_ee; ++ee) {
+	  Eigen::Vector3d ee_pos = solution.ee_wheels_motion_.at(ee)->GetPoint(t).p();
+	  Eigen::Vector3d n = terrain_->GetNormalizedBasis(HeightMap::Normal,ee_pos(X),ee_pos(Y));
+	  file << n.transpose() << " ";
+	}
+
+	file << "\n";
+	t += 0.0025;
+  }
+
+  file.close();
+  std::cout << "Successfully created file " + filename << std::endl;
 }
 
 void
@@ -130,7 +162,7 @@ ExtractGeometryMessagesFromTrajectoryBag (const std::string bag_file)
 {
 	rosbag::Bag bag_r;
 	bag_r.open(bag_file, rosbag::bagmode::Read);
-	std::cout << "Reading from bag " + bag_r.getFileName() << std::endl;
+//	std::cout << "Reading from bag " << bag_r.getFileName() << std::endl;
 
 	// select which iterations (message topics) to be included in bag file
 	std::string topic = "/xpp/state_des";
@@ -165,7 +197,7 @@ ExtractGeometryMessagesFromTrajectoryBag (const std::string bag_file)
 	}
 
 	bag_r.close();
-	std::cout << "Successfully created bag " + bag_w.getFileName() << std::endl;
+	std::cout << "Successfully created bag  " << bag_w.getFileName() << std::endl;
 	bag_w.close();
 }
 

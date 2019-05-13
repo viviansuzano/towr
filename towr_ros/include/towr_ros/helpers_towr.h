@@ -20,8 +20,8 @@
 #include <xpp_msgs/RobotStateCartesianTrajectory.h>
 
 #include "towr/variables/euler_converter.h"
-#include "towr/variables/spline_holder.h"
 #include "towr/variables/spline_holder_drive.h"
+#include "towr/terrain/height_map.h"
 
 #include <towr_ros/towr_xpp_ee_map.h>
 
@@ -33,6 +33,8 @@ std::vector<xpp::RobotStateCartesian> GetDrivingTrajectoryFromSolution (const Sp
 void SaveTrajectoryInRosbag (const SplineHolder& solution, const std::string &bag_file);
 void SaveDrivingTrajectoryInRosbag (const SplineHolderDrive& solution, const std::string &bag_file);
 void SaveDrivingTrajectoryStatesInRosbag (const SplineHolderDrive& solution, const std::string &bag_file);
+
+void SaveTerrainNormalsInFile (const SplineHolderDrive& solution, int terrain_id, const std::string &bag_file);
 
 void ExtractGeometryMessagesFromTrajectoryBag (const std::string bag_file);
 
