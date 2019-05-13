@@ -90,6 +90,7 @@ public:
   Jac GetJacobianWrtEEPos(const Jac& jac_ee_pos, EE) const override;
 
   // Stability
+  // TODO: move the stability related methods to a specific class.
   std::pair<int, double> GetStabilityMeasure() const override;
   Vector3d GetStabilityDerivativeWrtBaseLinAcc () const override;
   Vector3d GetStabilityDerivativeWrtBaseLinPos () const override;
