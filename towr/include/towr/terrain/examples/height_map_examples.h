@@ -94,14 +94,16 @@ public:
   double GetHeightDerivWrtXX(double x, double y) const override;
 
 private:
-  const double gap_start_ = 1.0;
-  const double w = 0.5;
-  const double h = 1.5;
+  const double gap_start_ = 0.5; // 1.0;
+  const double w = 2.0; //0.5;
+  const double h = 0.5; //1.5;
 
   const double slope_ = h/w;
   const double dx = w/2.0;
   const double xc = gap_start_ + dx; // gap center
   const double gap_end_x = gap_start_ + w;
+
+  const double h_offset_ = 0.5;
 
   // generated with matlab
   // see matlab/gap_height_map.m
@@ -182,7 +184,34 @@ private:
   double step_end   = 1.1;
   double height     = 0.2;
 
+  double slope = 2;
+
   Eigen::Vector4d coeff {-400, 1260, -1320, 460}; // block from 1.0 to 1.1
+};
+
+/**
+ * @brief Sample terrain with two steps in height with a cubic transition.
+ */
+class TwoStep : public HeightMap {
+public:
+  double GetHeight(double x, double y) const override;
+  double GetHeightDerivWrtX(double x, double y) const override;
+  double GetHeightDerivWrtXX(double x, double y) const override;
+
+private:
+  double dx = 0.025; //0.0326352;
+  double dh = 0.05;  //0.05;
+
+  double step_up_start   = 1.0;
+  double step_up_end     = 1.1 - dx;
+  double step_down_start = 1.2 - dx;
+  double step_down_end   = 1.3 - 2*dx;
+  double height          = 0.2 - dh;
+  double dist_steps		 = 1.0;
+
+  double slope = 2;
+//  Eigen::Vector4d coeff {-400, 1260, -1320, 460}; // block from 1.0 to 1.1
+//  Eigen::Vector4d coeff {-400, 60, 0, 0};
 };
 
 /**
@@ -197,13 +226,36 @@ private:
   const double slope_start_   = 0.5;
   const double up_length_     = 2.0;
   const double down_length_   = 2.0;
-  const double plat_length_   = 1.0;
+  const double plat_length_   = 0.0; //1.0;
   const double slope_		  = 0.3;
   const double height_center_ = up_length_*sin(slope_);
 
   const double x_plat_start_ = slope_start_ + up_length_*cos(slope_);
   const double x_down_start_ = x_plat_start_ + plat_length_;
   const double x_flat_start_ = x_down_start_ + down_length_*cos(slope_);
+};
+
+/**
+ * @brief Sample terrain with an increasing and then decreasing slope.
+ */
+class MultipleSlopes : public HeightMap {
+public:
+  double GetHeight(double x, double y) const override;
+  double GetHeightDerivWrtX(double x, double y) const override;
+
+private:
+  const double slope_start_   = 0.5;
+  const double up_length_     = 0.676772672364825;
+  const double down_length_   = up_length_;
+  const double plat_length_   = 0.5;
+  const double slope_		  = 0.3;
+  const double height_center_ = up_length_*sin(slope_);
+
+  const double x_plat_start_ = slope_start_ + up_length_*cos(slope_);
+  const double x_down_start_ = x_plat_start_ + plat_length_;
+  const double x_flat_start_ = x_down_start_ + down_length_*cos(slope_);
+
+  const double dist_slopes_ = 2.0;
 };
 
 /**

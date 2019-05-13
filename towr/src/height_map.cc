@@ -38,18 +38,20 @@ HeightMap::Ptr
 HeightMap::MakeTerrain (TerrainID type)
 {
   switch (type) {
-    case FlatID:      	  return std::make_shared<FlatGround>(); break;
-    case BlockID:     	  return std::make_shared<Block>(); break;
-    case StairsID:    	  return std::make_shared<Stairs>(); break;
-    case GapID:       	  return std::make_shared<Gap>(); break;
-    case SlopeID:     	  return std::make_shared<Slope>(); break;
-    case ChimneyID:   	  return std::make_shared<Chimney>(); break;
-    case ChimneyLRID: 	  return std::make_shared<ChimneyLR>(); break;
-    case SlopePlatID:  	  return std::make_shared<SlopePlat>(); break;
-    case StepID:		  return std::make_shared<Step>(); break;
-    case SineLowFreqID:	  return std::make_shared<SineLowFreq>(); break;
-    case SineHighFreqID:  return std::make_shared<SineHighFreq>(); break;
-    case RoughID:		  return std::make_shared<Rough>(); break;
+    case FlatID:      	   return std::make_shared<FlatGround>(); break;
+    case BlockID:     	   return std::make_shared<Block>(); break;
+    case StairsID:    	   return std::make_shared<Stairs>(); break;
+    case GapID:       	   return std::make_shared<Gap>(); break;
+    case SlopeID:     	   return std::make_shared<Slope>(); break;
+    case ChimneyID:   	   return std::make_shared<Chimney>(); break;
+    case ChimneyLRID: 	   return std::make_shared<ChimneyLR>(); break;
+    case SlopePlatID:  	   return std::make_shared<SlopePlat>(); break;
+    case MultipleSlopesID: return std::make_shared<MultipleSlopes>(); break;
+    case StepID:		   return std::make_shared<Step>(); break;
+    case TwoStepID:		   return std::make_shared<TwoStep>(); break;
+    case SineLowFreqID:	   return std::make_shared<SineLowFreq>(); break;
+    case SineHighFreqID:   return std::make_shared<SineHighFreq>(); break;
+    case RoughID:		   return std::make_shared<Rough>(); break;
     default: assert(false); break;
   }
 }

@@ -85,7 +85,9 @@ public:
                    ChimneyID,
                    ChimneyLRID,
 				   SlopePlatID,
+				   MultipleSlopesID,
 				   StepID,
+				   TwoStepID,
 				   SineLowFreqID,
 				   SineHighFreqID,
 				   RoughID,
@@ -181,18 +183,20 @@ private:
 
 const static std::map<HeightMap::TerrainID, std::string> terrain_names =
 {
-  {HeightMap::FlatID,         "Flat"         },
-  {HeightMap::BlockID,        "Block"        },
-  {HeightMap::StairsID,       "Stairs"       },
-  {HeightMap::GapID,          "Gap"          },
-  {HeightMap::SlopeID,        "Slope"        },
-  {HeightMap::ChimneyID,      "Chimney"    	 },
-  {HeightMap::ChimneyLRID,    "ChimenyLR"  	 },
-  {HeightMap::SlopePlatID,    "SlopePlat"    },
-  {HeightMap::StepID,         "Step"         },
-  {HeightMap::SineLowFreqID,  "SineLowFreq"  },
-  {HeightMap::SineHighFreqID, "SineHighFreq" },
-  {HeightMap::RoughID,        "Rough"      	 }
+  {HeightMap::FlatID,         	"Flat"           },
+  {HeightMap::BlockID,        	"Block"          },
+  {HeightMap::StairsID,       	"Stairs"         },
+  {HeightMap::GapID,          	"Gap"            },
+  {HeightMap::SlopeID,        	"Slope"          },
+  {HeightMap::ChimneyID,      	"Chimney"        },
+  {HeightMap::ChimneyLRID,    	"ChimenyLR"      },
+  {HeightMap::SlopePlatID,    	"SlopePlat"      },
+  {HeightMap::MultipleSlopesID, "MultipleSlopes" },
+  {HeightMap::StepID,         	"Step"           },
+  {HeightMap::TwoStepID,      	"TwoStep"        },
+  {HeightMap::SineLowFreqID,  	"SineLowFreq"    },
+  {HeightMap::SineHighFreqID, 	"SineHighFreq"   },
+  {HeightMap::RoughID,        	"Rough"      	 }
 };
 
 } /* namespace towr */
