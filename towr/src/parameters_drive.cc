@@ -13,16 +13,14 @@ namespace towr {
 ParametersDrive::ParametersDrive()
 {
   duration_ee_polynomial_ = duration_base_polynomial_;
-  wheels_torque_limit_ = 3.0;
-  max_wheels_acc_ = {3.0, 0.0, 5.0};
-  max_base_acc_lin_ = {3.0, 3.0, 3.0};
-  max_base_acc_ang_ = {1.0, 1.0, 1.0};
+  wheels_torque_limit_ = 32.0;
+  max_wheels_acc_ = {6.0, 0.0, 6.0};
+  max_base_acc_lin_ = {8.0, 8.0, 8.0};
+  max_base_acc_ang_ = {5.0, 5.0, 5.0};
   wheels_radius_ = 0.08;
-  force_limit_in_x_direction_ = 11.0;
+  force_limit_in_x_direction_ = 400.0;
 
-  dt_constraint_range_of_motion_ = 0.1;
-
-  bounds_final_lin_pos_ = {X,Y,Z};   // adds the bound on the final z-position of the base
+//  bounds_final_lin_pos_ = {X,Y,Z};   // adds the bound on the final z-position of the base
 
   DeleteAllConstraints();  // clear the constraints initialized in the base class
 
@@ -31,14 +29,25 @@ ParametersDrive::ParametersDrive()
   constraints_.push_back(DynamicWheels);   // ensures that the dynamic model is fullfilled at discrete times.
   constraints_.push_back(BaseAcc); 		   // so accelerations don't jump between polynomials
   constraints_.push_back(EndeffectorAcc);  // so accelerations don't jump between polynomial
-  constraints_.push_back(EndeffectorRom);  // ensures that the range of motion of the wheels is respected at discrete times.
-//  constraints_.push_back(BaseRom); 	  	   // ensures that the range of motion of the base is respected at discrete times.
   constraints_.push_back(ForceWheels); 	   //  ensures unilateral forces and inside the friction cone
   constraints_.push_back(WheelsAccLimits); // constrain the acceleration on the wheels
   constraints_.push_back(BaseAccLimits);   // constrain the acceleration of the base
-  constraints_.push_back(WheelsMotion);    // constrain minimum and maximum legs extension
-  constraints_.push_back(Stability);       // ensure stability margin
+  constraints_.push_back(Stability);       // ensure stability margin (weird roll angles)
 
+  // only one of these constraints are defined according to the config file
+//  constraints_.push_back(WheelsMotion);    // constrain minimum and maximum legs extension
+//  constraints_.push_back(EndeffectorRom);  // ensures that the range of motion of the wheels is respected at discrete times.
+
+}
+
+void
+ParametersDrive::SetWheelsMotionConstraint () {
+  constraints_.push_back(WheelsMotion);
+}
+
+void
+ParametersDrive::SetEndeffectorRomConstraint () {
+  constraints_.push_back(EndeffectorRom);
 }
 
 ParametersDrive::VecTimes

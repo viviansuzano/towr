@@ -34,7 +34,7 @@ void
 StabilityConstraint::UpdateConstraintAtInstance(double t, int k, VectorXd& g) const
 {
   UpdateModel(t);
-  g(k) = model_->GetStabilityMeasure().second;
+  g(k) = model_->GetStabilityMeasure().second;// - 0.1745; // 10 deg minimum
 }
 
 void

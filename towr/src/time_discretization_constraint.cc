@@ -49,7 +49,7 @@ TimeDiscretizationConstraint::TimeDiscretizationConstraint (double T, double dt,
 
   // it repeats the last node if T is multiple of dt
   // TODO: fix this..
-//  dts_.push_back(T); // also ensure constraints at very last node/time.
+  dts_.push_back(T); // also ensure constraints at very last node/time.
 
 //  for (int i = 0; i < dts_.size(); ++i) {
 //    std::cout << dts_.at(i) << " ";

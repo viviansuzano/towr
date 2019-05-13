@@ -68,6 +68,9 @@ public:
   /// Clear the constraints initialized by the Base class
   void DeleteAllConstraints();
 
+  void SetWheelsMotionConstraint ();
+  void SetEndeffectorRomConstraint ();
+
 };
 
 } // namespace towr
