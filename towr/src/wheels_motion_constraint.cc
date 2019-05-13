@@ -24,12 +24,16 @@ WheelsMotionConstraint::WheelsMotionConstraint (const KinematicModel::Ptr& model
 
   ee_wheels_motion_ = spline_holder.ee_wheels_motion_.at(ee_);
 
-  max_leg_extension_ = 0.45;
+  max_leg_extension_ = 0.50;
   min_leg_extension_ = 0.35;
 
-  nominal_pos_hip_B_ = model->GetHipPositionInBaseFrame().at(ee);
+  nominal_pos_hip_B_ 		  = model->GetHipPositionInBaseFrame().at(ee);
+  max_deviation_from_nominal_ = model->GetMaximumDeviationFromNominal();
+  nominal_ee_pos_B_           = model->GetNominalStanceInBase().at(ee);
 
-  SetRows(GetNumberOfNodes());   // one constraint per node
+  n_constraints_per_node_ = 3;  // 3 constraints per node: leg extension + (x,y) displacement
+
+  SetRows(GetNumberOfNodes()*n_constraints_per_node_);
 }
 
 void
@@ -41,13 +45,24 @@ WheelsMotionConstraint::UpdateConstraintAtInstance (double t, int k,
   EulerConverter::MatrixSXd w_R_b = base_angular_.GetRotationMatrixBaseToWorld(t);
   Vector3d pos_hip_W = w_R_b*(nominal_pos_hip_B_) + base_W;
 
-  g(k) = (pos_ee_W - pos_hip_W).norm();
+  Vector3d vector_base_to_ee_W = pos_ee_W - base_W;
+  Vector3d vector_base_to_ee_B = w_R_b.transpose()*(vector_base_to_ee_W);
+
+  int row = k*n_constraints_per_node_;
+  g(row++) = (pos_ee_W - pos_hip_W).norm();
+  g(row++) = vector_base_to_ee_B(X);
+  g(row++) = vector_base_to_ee_B(Y);
 }
 
 void
 WheelsMotionConstraint::UpdateBoundsAtInstance (double t, int k, VecBound& bounds) const
 {
-  bounds.at(k) = ifopt::Bounds(min_leg_extension_,  max_leg_extension_);
+  int row = k*n_constraints_per_node_;
+
+  bounds.at(row++) = ifopt::Bounds(min_leg_extension_,  max_leg_extension_);
+
+  bounds.at(row++) = ifopt::Bounds(nominal_ee_pos_B_(X) - max_deviation_from_nominal_(X), nominal_ee_pos_B_(X) + max_deviation_from_nominal_(X));
+  bounds.at(row++) = ifopt::Bounds(nominal_ee_pos_B_(Y) - max_deviation_from_nominal_(Y), nominal_ee_pos_B_(Y) + max_deviation_from_nominal_(Y));
 }
 
 WheelsMotionConstraint::Vector3d
@@ -79,30 +94,32 @@ WheelsMotionConstraint::UpdateJacobianAtInstance (double t, int k,
   Vector3d base_W  = base_linear_->GetPoint(t).p();
   Vector3d pos_ee_W = ee_wheels_motion_->GetPoint(t).p();
   EulerConverter::MatrixSXd w_R_b = base_angular_.GetRotationMatrixBaseToWorld(t);
+  EulerConverter::MatrixSXd b_R_w = w_R_b.transpose();
   Vector3d pos_hip_W = w_R_b*(nominal_pos_hip_B_) + base_W;
 
-  Vector3d g_deriv = NormDerivative(pos_ee_W - pos_hip_W);
+  Vector3d Dg = NormDerivative(pos_ee_W - pos_hip_W) + Vector3d::Constant(1e-10);
+  Jacobian g_deriv = Dg.transpose().sparseView();
 
   if (var_set == id::base_lin_nodes) {
-    for (auto dim: {X, Y, Z}) {
-	  int col = GetCol(k, dim);
-	  jac.coeffRef(k, col) = -g_deriv(dim);
-    }
+    int row = k*n_constraints_per_node_;
+    jac.row(row++) = -g_deriv * base_linear_->GetJacobianWrtNodes(t, kPos);
+    jac.row(row++) = -1*(b_R_w*base_linear_->GetJacobianWrtNodes(t, kPos)).row(X);
+    jac.row(row++) = -1*(b_R_w*base_linear_->GetJacobianWrtNodes(t, kPos)).row(Y);
   }
 
   if (var_set == id::base_ang_nodes) {
-	double sum = 0.0;
-	for (auto dim: {X, Y, Z}) {
-	  int col = GetCol(k, dim);
-	  jac.coeffRef(k, col) = -g_deriv.transpose() * base_angular_.DerivOfRotVecMult(t,nominal_pos_hip_B_, false).col(col);
-	}
+    int row = k*n_constraints_per_node_;
+    jac.row(row++) = -g_deriv * base_angular_.DerivOfRotVecMult(t,nominal_pos_hip_B_, false);
+    Vector3d r_W = pos_ee_W - base_W;
+    jac.row(row++) = base_angular_.DerivOfRotVecMult(t,r_W, true).row(X);
+    jac.row(row++) = base_angular_.DerivOfRotVecMult(t,r_W, true).row(Y);
   }
 
   if (var_set == id::EEWheelsMotionNodes(ee_)) {
-	for (auto dim: {X, Y, Z}) {
-	  int col = GetCol(k, dim);
-	  jac.coeffRef(k, col) = g_deriv(dim);
-	}
+	int row = k*n_constraints_per_node_;
+	jac.row(row++) = g_deriv * ee_wheels_motion_->GetJacobianWrtNodes(t, kPos);
+	jac.row(row++) = (b_R_w*ee_wheels_motion_->GetJacobianWrtNodes(t,kPos)).row(X);
+	jac.row(row++) = (b_R_w*ee_wheels_motion_->GetJacobianWrtNodes(t,kPos)).row(Y);
   }
 }
 

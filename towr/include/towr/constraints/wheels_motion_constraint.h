@@ -40,6 +40,9 @@ private:
   double max_leg_extension_;
   double min_leg_extension_;
   Vector3d nominal_pos_hip_B_;
+  Vector3d max_deviation_from_nominal_;
+  Vector3d nominal_ee_pos_B_;
+  int n_constraints_per_node_;
   EE ee_;
 
   Vector3d NormDerivative (const Vector3d& v) const;
