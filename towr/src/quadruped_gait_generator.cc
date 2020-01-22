@@ -226,9 +226,9 @@ QuadrupedGaitGenerator::GetStrideWalkTest () const
 QuadrupedGaitGenerator::GaitInfo
 QuadrupedGaitGenerator::GetStrideWalkOverlap () const
 {
-  double three    = 0.25; //0.3; //0.25;
-  double lateral  = 0.13; //0.2; //0.13;
-  double diagonal = 0.13; //0.1; //0.13;
+  double three    = 0.3; //0.25;
+  double lateral  = 0.2; //0.13;
+  double diagonal = 0.1; //0.13;
 
   auto times =
   {
