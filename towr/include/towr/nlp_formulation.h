@@ -77,6 +77,7 @@ public:
   using CostPtrVec       = std::vector<ifopt::CostTerm::Ptr>;
   using EEPos            = std::vector<Eigen::Vector3d>;
   using Vector3d         = Eigen::Vector3d;
+  using VecTimes         = std::vector<double>;
 
   NlpFormulation ();
   virtual ~NlpFormulation () = default;
@@ -117,11 +118,14 @@ private:
   ContraintPtrVec MakeDynamicConstraint(const SplineHolder& s) const;
   ContraintPtrVec MakeRangeOfMotionBoxConstraint(const SplineHolder& s) const;
   ContraintPtrVec MakeTotalTimeConstraint() const;
-  ContraintPtrVec MakeTerrainConstraint() const;
-  ContraintPtrVec MakeForceConstraint() const;
+  ContraintPtrVec MakeTerrainConstraint(const SplineHolder& s) const;
+  ContraintPtrVec MakeForceConstraint(const SplineHolder& s) const;
   ContraintPtrVec MakeSwingConstraint() const;
   ContraintPtrVec MakeBaseRangeOfMotionConstraint(const SplineHolder& s) const;
   ContraintPtrVec MakeBaseAccConstraint(const SplineHolder& s) const;
+  ContraintPtrVec MakeBaseAccLimitsConstraint(const SplineHolder& s) const;
+  ContraintPtrVec MakeEENodesAccConstraint(const SplineHolder& s) const;
+  ContraintPtrVec MakeEEAccLimitsConstraint(const SplineHolder& s) const;
 
   // costs
   CostPtrVec GetCost(const Parameters::CostName& id, double weight) const;

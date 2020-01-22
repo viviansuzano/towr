@@ -1,0 +1,64 @@
+terrain: "Block"
+run_derivative_test: false
+plot_trajectory: false
+play_initialization: false
+init_state_from_file: true  # 'true' if initial_pose for base is read from this file, 'false' if it is set by the current anymal state
+
+# Possible gaits: 0 (C0), 1 (C1), 2 (C2), 3 (C3), 4 (C4), 5 (DRIVE), 6 (FlatSim), 7 (BlockCross)
+
+Flat:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.48
+   
+  final_pose: 
+    x: 2.0 
+    y: 0.0
+    z: 0.5
+
+  total_time: 3.0 # from combo FlatSim
+  gait: 0
+
+Gap:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.48
+   
+  final_pose: 
+    x: 2.0
+    y: 0.0
+    z: 0.5
+
+  total_time: 3.0
+  gait: 0
+
+Block:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.48
+   
+  final_pose: 
+    x: 1.5 
+    y: 0.0
+    z: 0.5
+
+  total_time: 2.0 # 2.0
+  gait: 7
+
+Slope:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.48
+   
+  final_pose: 
+    x: 3.0 #2.0
+    y: 0.0
+    z: 0.5
+
+  total_time: 3.0 #6.0
+  gait: 0
+

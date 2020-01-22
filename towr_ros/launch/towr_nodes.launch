@@ -2,15 +2,6 @@
   <!-- must be passed in when calling this launch file -->
   <arg name="gdb" />
   
-  <!-- translate keyboard input to TOWR commands -->
-  <node 
-    name="user_interface" 
-    pkg="towr_ros" 
-    type="towr_user_interface" 
-    output="screen"
-    launch-prefix="xterm -e">  <!-- open in new window -->
-  </node>
-  
   <!-- draw the different terrains in RVIZ -->
   <node 
     name="rviz_terrain_publisher" 

@@ -40,6 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <towr/constraints/terrain_constraint.h>
 #include <towr/constraints/total_duration_constraint.h>
 #include <towr/constraints/spline_acc_constraint.h>
+#include <towr/constraints/base_acc_limits_constraint.h>
+#include <towr/constraints/ee_acc_constraint.h>
+#include <towr/constraints/ee_acc_limits_constraint.h>
 
 #include <towr/costs/node_cost.h>
 #include <towr/variables/nodes_variables_all.h>
@@ -106,6 +109,8 @@ NlpFormulation::MakeBaseVariables () const
   double z = terrain_->GetHeight(x,y) - model_.kinematic_model_->GetNominalStanceInBase().front().z();
   Vector3d final_pos(x, y, z);
 
+//  std::cout << "Base: " << std::endl;
+
   spline_lin->SetByLinearInterpolation(initial_base_.lin.p(), final_pos, params_.GetTotalTime());
   spline_lin->AddStartBound(kPos, {X,Y,Z}, initial_base_.lin.p());
   spline_lin->AddStartBound(kVel, {X,Y,Z}, initial_base_.lin.v());
@@ -131,12 +136,17 @@ NlpFormulation::MakeEndeffectorVariables () const
 
   // Endeffector Motions
   double T = params_.GetTotalTime();
+//  std::cout << "Total time: " << T << std::endl;
+
   for (int ee=0; ee<params_.GetEECount(); ee++) {
+
+	std::cout << "OptIdxMap EE_motion " << ee << std::endl;
     auto nodes = std::make_shared<NodesVariablesEEMotion>(
                                               params_.GetPhaseCount(ee),
                                               params_.ee_in_contact_at_start_.at(ee),
                                               id::EEMotionNodes(ee),
-                                              params_.ee_polynomials_per_swing_phase_);
+											  params_.n_polynomials_per_swing_phase_,
+											  params_.motion_polynomials_per_stance_phase_);
 
     // initialize towards final footholds
     double yaw = final_base_.ang.p().z();
@@ -146,9 +156,21 @@ NlpFormulation::MakeEndeffectorVariables () const
     double x = final_ee_pos_W.x();
     double y = final_ee_pos_W.y();
     double z = terrain_->GetHeight(x,y);
+
+//    std::cout << "ee: " << ee << ", phase count: " << params_.GetPhaseCount(ee);
+//    std::cout << ", poly count: " << nodes->GetPolynomialCount();
+//    std::cout << ", initial pos: " << initial_ee_W_.at(ee).transpose();
+//    std::cout << ", final pos: " << x << ", " << y << std::endl;
+
     nodes->SetByLinearInterpolation(initial_ee_W_.at(ee), Vector3d(x,y,z), T);
 
     nodes->AddStartBound(kPos, {X,Y,Z}, initial_ee_W_.at(ee));
+    nodes->AddStartBound(kVel, {X,Y,Z}, Vector3d(0, 0, 0));
+    nodes->AddFinalBound(kVel, {X,Y,Z}, Vector3d(0, 0, 0));
+
+    // bound on the final ee_pos
+    // nodes->AddFinalBound(kPos, {X,Y,Z}, Vector3d(x,y,z));
+
     vars.push_back(nodes);
   }
 
@@ -160,17 +182,24 @@ NlpFormulation::MakeForceVariables () const
 {
   std::vector<NodesVariablesPhaseBased::Ptr> vars;
 
+  // force is still constant and zero on swing phase!!
+  int force_polynomials_per_swing_phase_ = 1;
+
   double T = params_.GetTotalTime();
   for (int ee=0; ee<params_.GetEECount(); ee++) {
+	std::cout << "OptIdxMap EE_force " << ee << std::endl;
     auto nodes = std::make_shared<NodesVariablesEEForce>(
                                               params_.GetPhaseCount(ee),
                                               params_.ee_in_contact_at_start_.at(ee),
                                               id::EEForceNodes(ee),
-                                              params_.force_polynomials_per_stance_phase_);
+											  force_polynomials_per_swing_phase_,
+											  params_.force_polynomials_per_stance_phase_);
 
     // initialize with mass of robot distributed equally on all legs
     double m = model_.dynamic_model_->m();
     double g = model_.dynamic_model_->g();
+
+//    std::cout << "EE force: " << std::endl;
 
     Vector3d f_stance(0.0, 0.0, m*g/params_.GetEECount());
     nodes->SetByLinearInterpolation(f_stance, f_stance, T); // stay constant
@@ -217,10 +246,13 @@ NlpFormulation::GetConstraint (Parameters::ConstraintName name,
     case Parameters::EndeffectorRom: return MakeRangeOfMotionBoxConstraint(s);
     case Parameters::BaseRom:        return MakeBaseRangeOfMotionConstraint(s);
     case Parameters::TotalTime:      return MakeTotalTimeConstraint();
-    case Parameters::Terrain:        return MakeTerrainConstraint();
-    case Parameters::Force:          return MakeForceConstraint();
+    case Parameters::Terrain:        return MakeTerrainConstraint(s);
+    case Parameters::Force:          return MakeForceConstraint(s);
     case Parameters::Swing:          return MakeSwingConstraint();
     case Parameters::BaseAcc:        return MakeBaseAccConstraint(s);
+    case Parameters::BaseAccLimits:  return MakeBaseAccLimitsConstraint(s);
+    case Parameters::EndeffectorAcc: return MakeEENodesAccConstraint(s);
+    case Parameters::EEAccLimits:	 return MakeEEAccLimitsConstraint(s);
     default: throw std::runtime_error("constraint not defined!");
   }
 }
@@ -276,12 +308,14 @@ NlpFormulation::MakeTotalTimeConstraint () const
 }
 
 NlpFormulation::ContraintPtrVec
-NlpFormulation::MakeTerrainConstraint () const
+NlpFormulation::MakeTerrainConstraint (const SplineHolder& s) const
 {
   ContraintPtrVec constraints;
 
   for (int ee=0; ee<params_.GetEECount(); ee++) {
-    auto c = std::make_shared<TerrainConstraint>(terrain_, id::EEMotionNodes(ee));
+    auto c = std::make_shared<TerrainConstraint>(terrain_, s.ee_motion_.at(ee),
+    											 id::EEMotionNodes(ee),
+												 params_.dt_drive_constraint_);
     constraints.push_back(c);
   }
 
@@ -289,14 +323,14 @@ NlpFormulation::MakeTerrainConstraint () const
 }
 
 NlpFormulation::ContraintPtrVec
-NlpFormulation::MakeForceConstraint () const
+NlpFormulation::MakeForceConstraint (const SplineHolder& s) const
 {
   ContraintPtrVec constraints;
 
   for (int ee=0; ee<params_.GetEECount(); ee++) {
     auto c = std::make_shared<ForceConstraint>(terrain_,
                                                params_.force_limit_in_normal_direction_,
-                                               ee);
+                                               ee, params_.dt_drive_constraint_, s);
     constraints.push_back(c);
   }
 
@@ -321,13 +355,56 @@ NlpFormulation::MakeBaseAccConstraint (const SplineHolder& s) const
 {
   ContraintPtrVec constraints;
 
+  std::vector<int> dim = {X, Y, Z};
   constraints.push_back(std::make_shared<SplineAccConstraint>
-                        (s.base_linear_, id::base_lin_nodes));
+                        (s.base_linear_, id::base_lin_nodes, dim));
 
-  constraints.push_back(std::make_shared<SplineAccConstraint>
-                        (s.base_angular_, id::base_ang_nodes));
+  constraints.push_back(std::make_shared<SplineAccConstraint>(s.base_angular_, id::base_ang_nodes, dim));
 
   return constraints;
+}
+
+NlpFormulation::ContraintPtrVec
+NlpFormulation::MakeBaseAccLimitsConstraint(const SplineHolder& s) const
+{
+  std::vector<Vector3d> max_base_acc;
+  max_base_acc.push_back(Vector3d(params_.max_base_acc_lin_.data()));  // linear acc limits
+  max_base_acc.push_back(Vector3d(params_.max_base_acc_ang_.data()));  // angular acc limits
+
+  return {std::make_shared<BaseAccLimitsConstraint>(max_base_acc,
+    											    params_.GetTotalTime(),
+												    params_.dt_constraint_dynamic_, s)};
+}
+
+NlpFormulation::ContraintPtrVec
+NlpFormulation::MakeEENodesAccConstraint (const SplineHolder& s) const
+{
+  ContraintPtrVec constraints;
+
+  std::vector<int> dim = {X};
+  for (int ee=0; ee<params_.GetEECount(); ee++) {
+
+//    auto ee_acc = std::make_shared<EEAccConstraint>(s.ee_motion_.at(ee), id::EEMotionNodes(ee));
+    auto ee_acc = std::make_shared<SplineAccConstraint>(s.ee_motion_.at(ee), id::EEMotionNodes(ee), dim);
+
+    constraints.push_back(ee_acc);
+  }
+
+  return constraints;
+}
+
+NlpFormulation::ContraintPtrVec
+NlpFormulation::MakeEEAccLimitsConstraint (const SplineHolder& s) const
+{
+  ContraintPtrVec c;
+
+  for (int ee=0; ee<params_.GetEECount(); ee++) {
+    auto constraint = std::make_shared<EEAccLimitsConstraint>(Vector3d(params_.max_wheels_acc_.data()),
+    														  params_.GetTotalTime(),
+														  	  params_.dt_constraint_dynamic_, ee, s);
+    c.push_back(constraint);
+  }
+  return c;
 }
 
 NlpFormulation::ContraintPtrVec

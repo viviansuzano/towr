@@ -35,10 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ros/ros.h>
 #include <rosbag/bag.h>
 
+#include <std_srvs/Empty.h>
+#include <std_srvs/Trigger.h>
+
 #include <xpp_states/robot_state_cartesian.h>
 #include <xpp_msgs/RobotStateCartesian.h>
 #include <xpp_msgs/RobotParameters.h>
 #include <towr_ros/TowrCommand.h>
+#include <towr_ros/helpers_towr.h>
 
 #include <towr/nlp_formulation.h>
 #include <ifopt/ipopt_solver.h>
@@ -65,11 +69,6 @@ protected:
   virtual ~TowrRosInterface () = default;
 
   /**
-   * @brief Sets the base state and end-effector position.
-   */
-  virtual void SetTowrInitialState() = 0;
-
-  /**
    * @brief Formulates the actual TOWR problem to be solved
    * @param msg User message to adjust the parameters dynamically.
    *
@@ -84,6 +83,8 @@ protected:
    */
   virtual void SetIpoptParameters(const TowrCommandMsg& msg) = 0;
 
+  virtual TowrCommandMsg BuildTowrCommandMsg () = 0;
+
   NlpFormulation formulation_;         ///< the default formulation, can be adapted
   ifopt::IpoptSolver::Ptr solver_; ///< NLP solver, could also use SNOPT.
 
@@ -95,8 +96,15 @@ private:
   ::ros::Subscriber user_command_sub_;
   ::ros::Publisher initial_state_pub_;
   ::ros::Publisher robot_parameters_pub_;
+  ::ros::Publisher  towr_command_pub_;
 
-  void UserCommandCallback(const TowrCommandMsg& msg);
+  ::ros::ServiceServer plan_service_;
+  ::ros::ServiceServer replay_service_;
+
+  bool planServiceCallback(std_srvs::Trigger::Request  &req,
+	   	   	   	   	   	   std_srvs::Trigger::Response &res);
+  bool replayServiceCallback(std_srvs::Trigger::Request  &req,
+	   	   	   	   	   	     std_srvs::Trigger::Response &res);
   XppVec GetTrajectory() const;
   virtual BaseState GetGoalState(const TowrCommandMsg& msg) const;
   void PublishInitialState();
@@ -109,6 +117,9 @@ private:
   void SaveTrajectoryInRosbag (rosbag::Bag&,
                                const std::vector<xpp::RobotStateCartesian>& traj,
                                const std::string& topic) const;
+  void SaveTrajectoryAsRosbag (const std::string& bag_name,
+                               const XppVec& traj,
+  							   const std::string& topic) const;
 };
 
 } /* namespace towr */

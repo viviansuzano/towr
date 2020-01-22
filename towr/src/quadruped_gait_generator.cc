@@ -77,11 +77,14 @@ void
 QuadrupedGaitGenerator::SetCombo (Combos combo)
 {
   switch (combo) {
-    case C0: SetGaits({Stand, Walk2, Walk2, Walk2, Walk2E, Stand}); break; // overlap-walk
-    case C1: SetGaits({Stand, Run2, Run2, Run2, Run2E, Stand});     break; // fly trot
-    case C2: SetGaits({Stand, Run3, Run3, Run3, Run3E, Stand}); break; // pace
-    case C3: SetGaits({Stand, Hop1, Hop1, Hop1, Hop1E, Stand}); break; // bound
-    case C4: SetGaits({Stand, Hop3, Hop3, Hop3, Hop3E, Stand}); break; // gallop
+    case C0: 		SetGaits({Stand, Walk2, Walk2, Walk2, Walk2E, Stand}); break; // overlap-walk
+    case C1: 		SetGaits({Stand, Run2, Run2, Run2, Run2E, Stand});     break; // fly trot
+    case C2: 		SetGaits({Stand, Run3, Run3, Run3, Run3E, Stand}); break; // pace
+    case C3: 		SetGaits({Stand, Hop1, Hop1, Hop1, Hop1E, Stand}); break; // bound
+    case C4:  		SetGaits({Stand, Hop3, Hop3, Hop3, Hop3E, Stand}); break; // gallop
+    case DRIVE: 	SetGaits({Stand}); break;
+    case FlatSim:	SetGaits({Drive, Run2, Run2, Run2, Run2E, Drive}); break;
+    case BlockCross:  SetGaits({Stand, Walk2, Walk2E, Stand}); break;
     default: assert(false); std::cout << "Gait not defined\n"; break;
   }
 }
@@ -95,6 +98,8 @@ QuadrupedGaitGenerator::GetGait(Gaits gait) const
     case Walk1:   return GetStrideWalk();
     case Walk2:   return GetStrideWalkOverlap();
     case Walk2E:  return RemoveTransition(GetStrideWalkOverlap());
+    case Walk3:   return GetStrideWalkTest();
+    case Walk3E:  return RemoveTransition(GetStrideWalkTest());
     case Run1:    return GetStrideTrot();
     case Run2:    return GetStrideTrotFly();
     case Run2E:   return GetStrideTrotFlyEnd();
@@ -106,8 +111,27 @@ QuadrupedGaitGenerator::GetGait(Gaits gait) const
     case Hop3:    return GetStrideGallop();
     case Hop3E:   return RemoveTransition(GetStrideGallop());
     case Hop5:    return GetStrideLimp();
+
+    // specific for wheels
+    case Drive: return GetDriveGait();
+
     default: assert(false); // gait not implemented
   }
+}
+
+QuadrupedGaitGenerator::GaitInfo
+QuadrupedGaitGenerator::GetDriveGait () const
+{
+  auto times =
+  {
+      0.5,
+  };
+  auto contacts =
+  {
+      BB_,
+  };
+
+  return std::make_pair(times, contacts);
 }
 
 QuadrupedGaitGenerator::GaitInfo
@@ -179,11 +203,32 @@ QuadrupedGaitGenerator::GetStrideWalk () const
 }
 
 QuadrupedGaitGenerator::GaitInfo
+QuadrupedGaitGenerator::GetStrideWalkTest () const
+{
+  double three    = 0.3;
+  double lateral  = 0.2;
+  double diagonal = 0.1;
+
+  auto times =
+  {
+	  three, lateral, three, three, lateral, three, three,
+  };
+  auto phase_contacts =
+  {
+	//bB_, bb_, Bb_, Pb_, PB_, PP_, BP_, bP_,
+	  Bb_, BI_, BP_, bB_, IB_, PB_, BB_,
+	  // melhorar subida traseira!!
+  };
+
+  return std::make_pair(times, phase_contacts);
+}
+
+QuadrupedGaitGenerator::GaitInfo
 QuadrupedGaitGenerator::GetStrideWalkOverlap () const
 {
-  double three    = 0.25;
-  double lateral  = 0.13;
-  double diagonal = 0.13;
+  double three    = 0.25; //0.3; //0.25;
+  double lateral  = 0.13; //0.2; //0.13;
+  double diagonal = 0.13; //0.1; //0.13;
 
   auto times =
   {

@@ -37,8 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <towr/terrain/height_map.h>
 #include <towr/variables/euler_converter.h>
+
 #include <towr_ros/topic_names.h>
 #include <towr_ros/towr_xpp_ee_map.h>
+#include <towr_ros/helpers_towr.h>
 
 
 namespace towr {
@@ -48,18 +50,20 @@ TowrRosInterface::TowrRosInterface ()
 {
   ::ros::NodeHandle n;
 
-  user_command_sub_ = n.subscribe(towr_msgs::user_command, 1,
-                                  &TowrRosInterface::UserCommandCallback, this);
-
   initial_state_pub_  = n.advertise<xpp_msgs::RobotStateCartesian>
                                           (xpp_msgs::robot_state_desired, 1);
 
   robot_parameters_pub_  = n.advertise<xpp_msgs::RobotParameters>
                                     (xpp_msgs::robot_parameters, 1);
 
+  towr_command_pub_ = n.advertise<towr_ros::TowrCommand>(towr_msgs::user_command, 1);
+
+  plan_service_ = n.advertiseService("towr/plan_motion", &TowrRosInterface::planServiceCallback, this);
+  replay_service_ = n.advertiseService("towr/replay_motion", &TowrRosInterface::replayServiceCallback, this);
+
   solver_ = std::make_shared<ifopt::IpoptSolver>();
 
-  visualization_dt_ = 0.01;
+  visualization_dt_ = 0.0025;
 }
 
 BaseState
@@ -74,60 +78,85 @@ TowrRosInterface::GetGoalState(const TowrCommandMsg& msg) const
   return goal;
 }
 
-void
-TowrRosInterface::UserCommandCallback(const TowrCommandMsg& msg)
+bool
+TowrRosInterface::planServiceCallback(std_srvs::Trigger::Request  &req,
+	   	   	   	   	   	   	   	   	  std_srvs::Trigger::Response &res)
 {
-  // robot model
-  formulation_.model_ = RobotModel(static_cast<RobotModel::Robot>(msg.robot));
-  auto robot_params_msg = BuildRobotParametersMsg(formulation_.model_);
-  robot_parameters_pub_.publish(robot_params_msg);
+	// robot model
+	formulation_.model_ = RobotModel(RobotModel::AnymalWheels);
+	auto robot_params_msg = BuildRobotParametersMsg(formulation_.model_);
+	robot_parameters_pub_.publish(robot_params_msg);
 
-  // terrain
-  auto terrain_id = static_cast<HeightMap::TerrainID>(msg.terrain);
-  formulation_.terrain_ = HeightMap::MakeTerrain(terrain_id);
+	// set initial and goal position for TOWR + towr command message
+	TowrCommandMsg msg = BuildTowrCommandMsg();
+	towr_command_pub_.publish(msg);
 
-  int n_ee = formulation_.model_.kinematic_model_->GetNumberOfEndeffectors();
-  formulation_.params_ = GetTowrParameters(n_ee, msg);
-  formulation_.final_base_ = GetGoalState(msg);
+	int n_ee = formulation_.model_.kinematic_model_->GetNumberOfEndeffectors();
+	formulation_.params_ = GetTowrParameters(n_ee, msg);
+	formulation_.final_base_ = GetGoalState(msg);
 
-  SetTowrInitialState();
+	// solver parameters
+	SetIpoptParameters(msg);
 
-  // solver parameters
-  SetIpoptParameters(msg);
+	// visualization
+	PublishInitialState();
 
-  // visualization
-  PublishInitialState();
+	// Defaults to /home/user/.ros/
+	std::string bag_file = "towr_trajectory.bag";
+	if (msg.optimize || msg.play_initialization) {
+		nlp_ = ifopt::Problem();
+		for (auto c : formulation_.GetVariableSets(solution))
+			nlp_.AddVariableSet(c);
+		for (auto c : formulation_.GetConstraints(solution))
+			nlp_.AddConstraintSet(c);
+		for (auto c : formulation_.GetCosts())
+			nlp_.AddCostSet(c);
 
-  // Defaults to /home/user/.ros/
+		solver_->Solve(nlp_);
+		SaveOptimizationAsRosbag(bag_file, robot_params_msg, msg, false);
+	}
+
+	nlp_.PrintCurrent();
+
+	// playback using terminal commands
+	if (msg.replay_trajectory || msg.play_initialization || msg.optimize) {
+		int success = system(("rosbag play --topics "
+		+ xpp_msgs::robot_state_desired + " "
+		+ xpp_msgs::terrain_info
+		+ " -r " + std::to_string(msg.replay_speed)
+		+ " --quiet " + bag_file).c_str());
+	}
+
+	if (msg.plot_trajectory) {
+		int success = system(("killall rqt_bag; rqt_bag " + bag_file + "&").c_str());
+	}
+
+	// save bags for controller and matlab
+	ExtractGeometryMessagesFromTrajectoryBag(bag_file);
+	std::string bag_name = ros::package::getPath("towr_ros") + "/bags/anymal_hybrid_traj.bag";
+	auto final_trajectory = GetTrajectory();
+	SaveTrajectoryAsRosbag(bag_name, final_trajectory, xpp_msgs::robot_state_desired);
+
+	res.success = true;
+	res.message = "optimization done";
+
+	return true;
+}
+
+bool
+TowrRosInterface::replayServiceCallback(std_srvs::Trigger::Request  &req,
+		  	  	  	       	   	   	   	std_srvs::Trigger::Response &res)
+{
   std::string bag_file = "towr_trajectory.bag";
-  if (msg.optimize || msg.play_initialization) {
-    nlp_ = ifopt::Problem();
-    for (auto c : formulation_.GetVariableSets(solution))
-      nlp_.AddVariableSet(c);
-    for (auto c : formulation_.GetConstraints(solution))
-      nlp_.AddConstraintSet(c);
-    for (auto c : formulation_.GetCosts())
-      nlp_.AddCostSet(c);
+  int success = system(("rosbag play --topics "
+		  	  	  	  + xpp_msgs::robot_state_desired + " "
+					  + xpp_msgs::terrain_info
+					  + " --quiet " + bag_file).c_str());
 
-    solver_->Solve(nlp_);
-    SaveOptimizationAsRosbag(bag_file, robot_params_msg, msg, false);
-  }
+  res.success = true;
+  res.message = "replay done";
 
-  // playback using terminal commands
-  if (msg.replay_trajectory || msg.play_initialization || msg.optimize) {
-    int success = system(("rosbag play --topics "
-        + xpp_msgs::robot_state_desired + " "
-        + xpp_msgs::terrain_info
-        + " -r " + std::to_string(msg.replay_speed)
-        + " --quiet " + bag_file).c_str());
-  }
-
-  if (msg.plot_trajectory) {
-    int success = system(("killall rqt_bag; rqt_bag " + bag_file + "&").c_str());
-  }
-
-  // to publish entire trajectory (e.g. to send to controller)
-  // xpp_msgs::RobotStateCartesianTrajectory xpp_msg = xpp::Convert::ToRos(GetTrajectory());
+  return true;
 }
 
 void
@@ -255,6 +284,33 @@ TowrRosInterface::SaveTrajectoryInRosbag (rosbag::Bag& bag,
                                  const XppVec& traj,
                                  const std::string& topic) const
 {
+  for (const auto state : traj) {
+    auto timestamp = ::ros::Time(state.t_global_ + 1e-6); // t=0.0 throws ROS exception
+
+    xpp_msgs::RobotStateCartesian msg;
+    msg = xpp::Convert::ToRos(state);
+    bag.write(topic, timestamp, msg);
+
+    xpp_msgs::TerrainInfo terrain_msg;
+    for (auto ee : state.ee_motion_.ToImpl()) {
+      Vector3d n = formulation_.terrain_->GetNormalizedBasis(HeightMap::Normal, ee.p_.x(), ee.p_.y());
+      terrain_msg.surface_normals.push_back(xpp::Convert::ToRos<geometry_msgs::Vector3>(n));
+      terrain_msg.friction_coeff = formulation_.terrain_->GetFrictionCoeff();
+    }
+
+    bag.write(xpp_msgs::terrain_info, timestamp, terrain_msg);
+  }
+}
+
+void
+TowrRosInterface::SaveTrajectoryAsRosbag (const std::string& bag_name,
+                                 	 	  const XppVec& traj,
+										  const std::string& topic) const
+{
+  rosbag::Bag bag;
+  bag.open(bag_name, rosbag::bagmode::Write);
+  ::ros::Time t0(1e-6); // t=0.0 throws ROS exception
+
   for (const auto state : traj) {
     auto timestamp = ::ros::Time(state.t_global_ + 1e-6); // t=0.0 throws ROS exception
 

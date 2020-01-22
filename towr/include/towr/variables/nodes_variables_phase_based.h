@@ -58,9 +58,10 @@ namespace towr {
  */
 class NodesVariablesPhaseBased : public NodesVariables {
 public:
-  using Ptr         = std::shared_ptr<NodesVariablesPhaseBased>;
-  using NodeIds     = std::vector<int>;
-  using OptIndexMap = std::map<int, std::vector<NodeValueInfo> >;
+  using Ptr           = std::shared_ptr<NodesVariablesPhaseBased>;
+  using NodeIds       = std::vector<int>;
+  using OptIndexMap   = std::map<int, std::vector<NodeValueInfo> >;
+  using VecDurations  = std::vector<double>;
 
   /**
    * @brief Holds semantic information each polynomial in spline.
@@ -70,7 +71,8 @@ public:
     int poly_in_phase_; ///< is this the 1st, 2nd, ... polynomial or this phase.
     int n_polys_in_phase_; ///< the number of polynomials used for this phase.
     bool is_constant_; ///< Does this polynomial represent a constant phase.
-    PolyInfo(int phase, int poly_in_phase, int n_polys_in_phase, bool is_const);
+    bool is_driving_;  // does this polynomial represent a driving phase.
+    PolyInfo(int phase, int poly_in_phase, int n_polys_in_phase, bool is_const, bool is_drive);
   };
 
   /**
@@ -84,7 +86,8 @@ public:
   NodesVariablesPhaseBased (int phase_count,
                             bool first_phase_constant,
                             const std::string& var_name,
-                            int n_polys_in_changing_phase);
+	                        int n_polys_in_swing_phase,
+							int n_polys_in_stance_phase);
 
   virtual ~NodesVariablesPhaseBased() = default;
 
@@ -110,6 +113,8 @@ public:
    * constant phase.
    */
   virtual bool IsConstantNode(int node_id) const;
+
+  bool AdjacentPolyIdsConstant (int node_id) const;
 
   /**
    * @brief The indices of those nodes that don't belong to a constant phase.
@@ -171,6 +176,8 @@ protected:
 
   void SetNumberOfVariables(int n_variables);
 
+  void PrintOptIdxMap ();
+
 private:
   /** @brief semantic information associated with each polynomial */
   std::vector<PolyInfo> polynomial_info_;
@@ -190,10 +197,11 @@ private:
  */
 class NodesVariablesEEMotion : public NodesVariablesPhaseBased {
 public:
-  NodesVariablesEEMotion(int phase_count,
-                         bool is_in_contact_at_start,
-                         const std::string& name,
-                         int n_polys_in_changing_phase);
+  NodesVariablesEEMotion (int phase_count,
+	                      bool is_in_contact_at_start,
+	                      const std::string& name,
+	                      int n_polys_in_swing_phase,
+					      int n_polys_in_stance_phase);
   virtual ~NodesVariablesEEMotion() = default;
   OptIndexMap GetPhaseBasedEEParameterization ();
 };
@@ -206,10 +214,11 @@ public:
  */
 class NodesVariablesEEForce : public NodesVariablesPhaseBased {
 public:
-  NodesVariablesEEForce(int phase_count,
-                         bool is_in_contact_at_start,
-                         const std::string& name,
-                         int n_polys_in_changing_phase);
+  NodesVariablesEEForce (int phase_count,
+						 bool first_phase_constant,
+						 const std::string& var_name,
+	                     int n_polys_in_swing_phase,
+						 int n_polys_in_stance_phase);
   virtual ~NodesVariablesEEForce() = default;
   OptIndexMap GetPhaseBasedEEParameterization ();
 };

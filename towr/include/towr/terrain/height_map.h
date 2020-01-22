@@ -72,6 +72,7 @@ class HeightMap {
 public:
   using Ptr      = std::shared_ptr<HeightMap>;
   using Vector3d = Eigen::Vector3d;
+  using Matrix3d = Eigen::Matrix3d;
 
   /**
    * @brief Terrains IDs corresponding for factory method.
@@ -159,6 +160,8 @@ private:
   Vector3d GetDerivativeOfNormalizedVectorWrtNonNormalizedIndex(
       const Vector3d& non_normalized, int index) const;
 
+  Matrix3d GetDerivativeOfNormalizedVector (const Vector3d& v) const;
+
   // first derivatives that must be implemented by the user
   virtual double GetHeightDerivWrtX(double x, double y) const { return 0.0; };
   virtual double GetHeightDerivWrtY(double x, double y) const { return 0.0; };
@@ -180,6 +183,17 @@ const static std::map<HeightMap::TerrainID, std::string> terrain_names =
   {HeightMap::SlopeID,       "Slope"      },
   {HeightMap::ChimneyID,     "Chimney"    },
   {HeightMap::ChimneyLRID,   "ChimenyLR"  }
+};
+
+const static std::map<std::string, HeightMap::TerrainID> terrain_ids =
+{
+  {"Flat", 			 HeightMap::FlatID         	  },
+  {"Block", 		 HeightMap::BlockID        	  },
+  {"Stairs", 		 HeightMap::StairsID       	  },
+  {"Gap", 			 HeightMap::GapID          	  },
+  {"Slope", 		 HeightMap::SlopeID        	  },
+  {"Chimney", 		 HeightMap::ChimneyID      	  },
+  {"ChimenyLR", 	 HeightMap::ChimneyLRID       },
 };
 
 } /* namespace towr */

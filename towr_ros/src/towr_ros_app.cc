@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <towr/initialization/gait_generator.h>
 #include <towr_ros/towr_ros_interface.h>
 
+#include "yaml_tools/yaml_tools.hpp"
 
 namespace towr {
 
@@ -41,20 +42,63 @@ namespace towr {
  */
 class TowrRosApp : public TowrRosInterface {
 public:
+
+  using VecTimes = std::vector<double>;
+
+  TowrRosApp (std::string config_file)
+  {
+	config_file_ = config_file;
+
+	initial_position_ = Eigen::Vector3d::Zero();
+
+	goal_geom_.lin.p_.setZero();
+	goal_geom_.ang.p_ << 0.0, 0.0, 0.0; // roll, pitch, yaw angle applied Z->Y'->X''
+
+  }
+
+  void PrintPhaseDurations(std::vector<VecTimes> phase_durations) const
+  {
+    std::cout << "Initial Phase Durations: \n";
+    for (int ee = 0; ee < phase_durations.size(); ++ee) {
+      std::cout << "EE " << ee << " : ";
+      for (int i = 0; i < phase_durations.at(ee).size(); i++)
+        std::cout << phase_durations.at(ee).at(i) << " ";
+      std::cout << std::endl;
+    }
+
+  }
+
+  Eigen::Matrix3d GetRotationMatrixBaseToWorld (const Eigen::Vector3d& xyz)
+  {
+    double x = xyz(X);
+    double y = xyz(Y);
+    double z = xyz(Z);
+
+    Eigen::Matrix3d M;
+    //  http://docs.leggedrobotics.com/kindr/cheatsheet_latest.pdf (Euler ZYX)
+    M << cos(y)*cos(z), cos(z)*sin(x)*sin(y) - cos(x)*sin(z), sin(x)*sin(z) + cos(x)*cos(z)*sin(y),
+         cos(y)*sin(z), cos(x)*cos(z) + sin(x)*sin(y)*sin(z), cos(x)*sin(y)*sin(z) - cos(z)*sin(x),
+               -sin(y),                        cos(y)*sin(x),                        cos(x)*cos(y);
+
+    return M;
+  }
+
   /**
    * @brief Sets the feet to nominal position on flat ground and base above.
    */
-  void SetTowrInitialState() override
+  void SetTowrInitialStateFromFile()
   {
+	formulation_.initial_base_.lin.at(kPos) = initial_position_;
+
+    // initial feet position
+    int n_ee = formulation_.model_.kinematic_model_->GetNumberOfEndeffectors();
     auto nominal_stance_B = formulation_.model_.kinematic_model_->GetNominalStanceInBase();
-
-    double z_ground = 0.0;
-    formulation_.initial_ee_W_ =  nominal_stance_B;
-    std::for_each(formulation_.initial_ee_W_.begin(), formulation_.initial_ee_W_.end(),
-                  [&](Vector3d& p){ p.z() = z_ground; } // feet at 0 height
-    );
-
-    formulation_.initial_base_.lin.at(kPos).z() = - nominal_stance_B.front().z() + z_ground;
+    formulation_.initial_ee_W_.resize(n_ee);
+    for (int ee = 0; ee < n_ee; ++ee) {
+  	  formulation_.initial_ee_W_.at(ee) = nominal_stance_B.at(ee) + formulation_.initial_base_.lin.at(kPos);
+  	  Eigen::Vector3d ee_pos = formulation_.initial_ee_W_.at(ee);
+  	  formulation_.initial_ee_W_.at(ee)(Z) = formulation_.terrain_->GetHeight(ee_pos.x(), ee_pos.y());
+    }
   }
 
   /**
@@ -63,6 +107,10 @@ public:
   Parameters GetTowrParameters(int n_ee, const TowrCommandMsg& msg) const override
   {
     Parameters params;
+
+    yaml_tools::YamlNode basenode = yaml_tools::YamlNode::fromFile(config_file_);
+    if (basenode.isNull())
+    	throw std::runtime_error("CONFIGURATION LOADING FAILED");
 
     // Instead of manually defining the initial durations for each foot and
     // step, for convenience we use a GaitGenerator with some predefined gaits
@@ -75,6 +123,8 @@ public:
       params.ee_in_contact_at_start_.push_back(gait_gen_->IsInContactAtStart(ee));
     }
 
+    PrintPhaseDurations(params.ee_phase_durations_);
+
     // Here you can also add other constraints or change parameters
     // params.constraints_.push_back(Parameters::BaseRom);
 
@@ -83,7 +133,67 @@ public:
     if (msg.optimize_phase_durations)
       params.OptimizePhaseDurations();
 
+    params.is_pure_driving_motion_ = false;
+    if (msg.gait == towr::GaitGenerator::DRIVE) {
+	  std::cout << "PARAM is_pure_driving_motion_ TRUE!!!" << std::endl;
+      params.is_pure_driving_motion_ = true;
+    }
+
     return params;
+  }
+
+  towr_ros::TowrCommand BuildTowrCommandMsg () override
+  {
+    towr_ros::TowrCommand msg;
+
+    yaml_tools::YamlNode basenode = yaml_tools::YamlNode::fromFile(config_file_);
+
+    if (basenode.isNull())
+  	throw std::runtime_error("CONFIGURATION LOADING FAILED");
+    Eigen::Vector3d final_position_;
+
+    std::string terrain = basenode["terrain"].as<std::string>();
+    auto towr_terrain_id = terrain_ids.find(terrain)->second;
+
+    // initial position now comes from the file
+    initial_position_.x() = basenode[terrain]["initial_pose"]["x"].as<double>();
+    initial_position_.y() = basenode[terrain]["initial_pose"]["y"].as<double>();
+    initial_position_.z() = basenode[terrain]["initial_pose"]["z"].as<double>();
+
+    bool init_state_from_file = basenode["init_state_from_file"].as<bool>();
+    if (init_state_from_file) {
+      formulation_.terrain_ = HeightMap::MakeTerrain(towr_terrain_id);
+      SetTowrInitialStateFromFile();
+    }
+
+    final_position_.x() = basenode[terrain]["final_pose"]["x"].as<double>();
+    final_position_.y() = basenode[terrain]["final_pose"]["y"].as<double>();
+    final_position_.z() = basenode[terrain]["final_pose"]["z"].as<double>();
+    goal_geom_.lin.p_ = final_position_;
+//    goal_geom_.lin.p_.x() += formulation_.initial_base_.lin.at(kPos).x();
+
+    bool plot_trajectory = basenode["plot_trajectory"].as<bool>();
+    bool play_initialization = basenode["play_initialization"].as<bool>();
+
+    float total_duration = basenode[terrain]["total_time"].as<float>();
+
+    int gait_combo = basenode[terrain]["gait"].as<int>();
+
+    msg.goal_lin                 = xpp::Convert::ToRos(goal_geom_.lin);
+    msg.goal_ang                 = xpp::Convert::ToRos(goal_geom_.ang);
+    msg.total_duration           = total_duration;
+    msg.replay_trajectory        = true;
+    msg.play_initialization      = play_initialization;
+    msg.replay_speed             = 0.3; //1.0;
+    msg.optimize                 = true;
+    msg.terrain                  = (int) towr_terrain_id;
+    msg.gait                     = gait_combo; //towr::GaitGenerator::C0;
+    msg.robot                    = towr::RobotModel::AnymalWheels;
+    msg.optimize_phase_durations = false;
+    msg.plot_trajectory          = plot_trajectory;
+
+    return msg;
+
   }
 
   /**
@@ -91,30 +201,39 @@ public:
    */
   void SetIpoptParameters(const TowrCommandMsg& msg) override
   {
-    // the HA-L solvers are alot faster, so consider installing and using
-    solver_->SetOption("linear_solver", "mumps"); // ma27, ma57
+	yaml_tools::YamlNode basenode = yaml_tools::YamlNode::fromFile(config_file_);
 
-    // Analytically defining the derivatives in IFOPT as we do it, makes the
-    // problem a lot faster. However, if this becomes too difficult, we can also
-    // tell IPOPT to just approximate them using finite differences. However,
-    // this uses numerical derivatives for ALL constraints, there doesn't yet
-    // exist an option to turn on numerical derivatives for only some constraint
-    // sets.
-    solver_->SetOption("jacobian_approximation", "exact"); // finite difference-values
+	if (basenode.isNull())
+	throw std::runtime_error("CONFIGURATION LOADING FAILED");
 
-    // This is a great to test if the analytical derivatives implemented in are
-    // correct. Some derivatives that are correct are still flagged, showing a
-    // deviation of 10e-4, which is fine. What to watch out for is deviations > 10e-2.
-    // solver_->SetOption("derivative_test", "first-order");
+	bool run_derivative_test = basenode["run_derivative_test"].as<bool>();
+	solver_->SetOption("linear_solver", "ma97"); // ma27, ma57, ma77, ma86, ma97
+	solver_->SetOption("jacobian_approximation", "exact"); // "finite difference-values"
+	solver_->SetOption("max_cpu_time", 60.0); // 3 min
+	solver_->SetOption("print_level", 5);
 
-    solver_->SetOption("max_cpu_time", 40.0);
-    solver_->SetOption("print_level", 5);
+	if (msg.play_initialization)
+	  solver_->SetOption("max_iter", 0);
+	else
+	  solver_->SetOption("max_iter", 3000);
 
-    if (msg.play_initialization)
+    // derivative test
+    if (run_derivative_test) {
       solver_->SetOption("max_iter", 0);
-    else
-      solver_->SetOption("max_iter", 3000);
+      solver_->SetOption("derivative_test", "first-order");
+      solver_->SetOption("print_level", 4);
+      solver_->SetOption("derivative_test_tol", 1e-3);
+      //solver_->SetOption("derivative_test_perturbation", 1e-4);
+      //solver_->SetOption("derivative_test_print_all", "yes");
+    }
+
   }
+
+protected:
+  std::string config_file_;
+  xpp::State3dEuler goal_geom_;
+  Eigen::Vector3d initial_position_;
+
 };
 
 } // namespace towr
@@ -123,7 +242,9 @@ public:
 int main(int argc, char *argv[])
 {
   ros::init(argc, argv, "my_towr_ros_app");
-  towr::TowrRosApp towr_app;
+
+  std::string config_file = ros::package::getPath("towr_ros") + "/config/parameters.yaml";
+  towr::TowrRosApp towr_app (config_file);
   ros::spin();
 
   return 1;

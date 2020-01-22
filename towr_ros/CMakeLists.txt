@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   xpp_msgs
   xpp_states
   towr
+  yaml_tools
 )
 
 
@@ -42,6 +43,7 @@ include_directories(
 # The interface to derive from for ros integration
 add_library(${PROJECT_NAME} SHARED
   src/towr_ros_interface.cc
+  src/helpers_towr.cc
 )
 add_dependencies(${PROJECT_NAME} 
   ${PROJECT_NAME}_gencpp

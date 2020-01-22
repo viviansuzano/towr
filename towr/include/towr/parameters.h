@@ -143,7 +143,10 @@ public:
                         Force,          ///< sets ForceConstraint
                         Swing,          ///< sets SwingConstraint
                         BaseRom,        ///< sets BaseMotionConstraint
-                        BaseAcc         ///< sets SplineAccConstraint
+                        BaseAcc,        ///< sets SplineAccConstraint
+						BaseAccLimits,	///< sets BaseAccLimitsConstraint
+						EndeffectorAcc, ///< sets EEAccConstraint
+						EEAccLimits	    ///< sets EEAccLimitsConstraint
   };
   /**
    *  @brief Indentifiers to be used to add certain costs to the optimization
@@ -179,6 +182,9 @@ public:
   /// Interval at which the dynamic constraint is enforced.
   double dt_constraint_dynamic_;
 
+  /// Interval at which the driving constraints are enforced.
+  double dt_drive_constraint_;
+
   /// Interval at which the range of motion constraint is enforced.
   double dt_constraint_range_of_motion_;
 
@@ -189,13 +195,28 @@ public:
   double duration_base_polynomial_;
 
   /// Number of polynomials to parameterize foot movement during swing phases.
-  int ee_polynomials_per_swing_phase_;
+  int n_polynomials_per_swing_phase_;
 
   /// Number of polynomials to parameterize each contact force during stance phase.
   int force_polynomials_per_stance_phase_;
 
+  /// Number of polynomials to parameterize each ee motion during stance phase.
+  int motion_polynomials_per_stance_phase_;
+
+  /// Number of polynomials to parameterize each contact force during driving phase.
+  bool is_pure_driving_motion_;
+
   /// The maximum allowable force [N] in normal direction
   double force_limit_in_normal_direction_;
+
+  /// Maximum acceleration of the base (x, y, z)
+  std::vector<double> max_base_acc_lin_;
+
+  /// Maximum acceleration of the wheels [m/s^2] (x, y, z)
+  std::vector<double> max_wheels_acc_;
+
+  /// Maximum acceleration of the base (roll, pitch, yaw)
+  std::vector<double> max_base_acc_ang_;
 
   /// which dimensions (x,y,z) of the final base state should be bounded
   std::vector<int> bounds_final_lin_pos_,
@@ -228,6 +249,9 @@ public:
 
   /// Total duration [s] of the motion.
   double GetTotalTime() const;
+
+  /// Clear all the constraints.
+  void DeleteAllConstraints();
 };
 
 } // namespace towr

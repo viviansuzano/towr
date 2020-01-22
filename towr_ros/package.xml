@@ -30,9 +30,9 @@
   <depend>xpp_states</depend>
   <depend>xpp_msgs</depend>
   <depend>towr</depend>
+  <depend>yaml_tools</depend>
   
-  <exec_depend>xterm</exec_depend>
-  <exec_depend>xpp_hyq</exec_depend>
+  <exec_depend>xpp_anymal_wheels</exec_depend>
   <exec_depend>rviz</exec_depend>
   <exec_depend>rqt_bag</exec_depend>
 </package>

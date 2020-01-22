@@ -32,7 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ifopt/constraint_set.h>
 
+#include <towr/variables/spline.h>
+#include <towr/variables/spline_holder.h>
+#include <towr/variables/node_spline.h>
 #include <towr/variables/nodes_variables_phase_based.h>
+
 #include <towr/terrain/height_map.h> // for friction cone
 
 namespace towr {
@@ -56,16 +60,18 @@ class ForceConstraint : public ifopt::ConstraintSet {
 public:
   using Vector3d = Eigen::Vector3d;
   using EE = uint;
+  using VecTimes = std::vector<double>;
 
   /**
-   * @brief Constructs a force contraint.
+   * @brief Constructs a force constraint.
    * @param terrain  The gradient information of the terrain for friction cone.
    * @param force_limit_in_normal_direction  Maximum pushing force [N].
    * @param endeffector_id Which endeffector force should be constrained.
    */
   ForceConstraint (const HeightMap::Ptr& terrain,
                    double force_limit_in_normal_direction,
-                   EE endeffector_id);
+                   EE endeffector_id, double dt,
+				   const SplineHolder& spline_holder);
   virtual ~ForceConstraint () = default;
 
   void InitVariableDependedQuantities(const VariablesPtr& x) override;
@@ -78,17 +84,25 @@ private:
   NodesVariablesPhaseBased::Ptr ee_force_;  ///< the current xyz foot forces.
   NodesVariablesPhaseBased::Ptr ee_motion_; ///< the current xyz foot positions.
 
+  NodeSpline::Ptr spline_ee_motion_;  ///< endeffector position in world frame.
+  NodeSpline::Ptr spline_ee_force_;   ///< endeffector forces in world frame.
+
+//  std::vector<NodeSpline::Ptr> ee_motion_;
+
   HeightMap::Ptr terrain_; ///< gradient information at every position (x,y).
   double fn_max_;          ///< force limit in normal direction.
   double mu_;              ///< friction coeff between robot feet and terrain.
   int n_constraints_per_node_; ///< number of constraint for each node.
   EE ee_;                  ///< The endeffector force to be constrained.
 
-  /**
-   * The are those Hermite-nodes that shape the polynomial during the
-   * stance phases, while all the others are already set to zero force (swing)
-   **/
-  std::vector<int> pure_stance_force_node_ids_;
+  int n_polys_;  // number of polynomials in the force spline
+  std::vector<double> T_; ///< Duration of each polynomial in spline.
+  double dt_; ///< time interval for the constraint.
+  VecTimes dts_; ///< times at which the constraint is evaluated.
+
+  Eigen::Matrix3d GetJacobianTerrainBasis(HeightMap::Direction basis, double x, double y) const;
+
+
 };
 
 } /* namespace towr */

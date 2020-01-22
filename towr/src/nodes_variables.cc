@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <towr/variables/nodes_variables.h>
 
+#include <iostream>
+
 namespace towr {
 
 
@@ -133,12 +135,15 @@ NodesVariables::SetByLinearInterpolation(const VectorXd& initial_val,
   VectorXd dp = final_val-initial_val;
   VectorXd average_velocity = dp / t_total;
   int num_nodes = nodes_.size();
+//  std::cout << "num_nodes: " << num_nodes << ", " << GetRows() << std::endl;
 
   for (int idx=0; idx<GetRows(); ++idx) {
+//	std::cout << idx << std::endl;
     for (auto nvi : GetNodeValuesInfo(idx)) {
 
       if (nvi.deriv_ == kPos) {
         VectorXd pos = initial_val + nvi.id_/static_cast<double>(num_nodes-1)*dp;
+//        std::cout << "id: " << nvi.id_ << ", pos: " << pos.transpose() << ", " << pos(nvi.dim_) << "/ dim: " << nvi.dim_ << std::endl;
         nodes_.at(nvi.id_).at(kPos)(nvi.dim_) = pos(nvi.dim_);
       }
 

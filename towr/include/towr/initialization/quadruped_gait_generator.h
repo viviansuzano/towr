@@ -50,6 +50,7 @@ private:
   GaitInfo GetStrideStand() const;
   GaitInfo GetStrideFlight() const;
   GaitInfo GetStrideWalk() const;
+  GaitInfo GetStrideWalkTest() const;
   GaitInfo GetStrideWalkOverlap() const;
   GaitInfo GetStrideTrot() const;
   GaitInfo GetStrideTrotFly() const;
@@ -61,6 +62,9 @@ private:
   GaitInfo GetStrideGallop() const;
   GaitInfo GetStridePronk() const;
   GaitInfo GetStrideLimp() const;
+
+  // specific for wheels
+  GaitInfo GetDriveGait() const;
 
   void SetCombo(Combos combo) override;
 

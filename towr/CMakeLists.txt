@@ -40,6 +40,9 @@ add_library(${PROJECT_NAME} SHARED
   src/range_of_motion_constraint.cc
   src/spline_acc_constraint.cc
   src/linear_constraint.cc
+  src/base_acc_limits_constraint.cc
+  src/ee_acc_constraint.cc
+  src/ee_acc_limits_constraint.cc
   # costs
   src/node_cost.cc
   src/soft_constraint.cc
@@ -104,6 +107,14 @@ if (TARGET GTest::GTest) # only build when modern targets exists
   add_test(${PROJECT_NAME}-test ${PROJECT_NAME}-test)
 endif()
 
+add_executable(anymal_wheels_example 
+  test/anymal_wheels_example.cc
+)
+target_link_libraries(anymal_wheels_example
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ifopt::ifopt_ipopt
+)
 
 #############
 ## Install ##

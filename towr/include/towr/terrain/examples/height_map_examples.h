@@ -62,7 +62,7 @@ public:
 private:
   double block_start = 0.7;
   double length_     = 3.5;
-  double height_     = 0.5; // [m]
+  double height_     = 0.1; // [m]
 
   double eps_ = 0.03; // approximate as slope
   const double slope_ = height_/eps_;
@@ -93,9 +93,9 @@ public:
   double GetHeightDerivWrtXX(double x, double y) const override;
 
 private:
-  const double gap_start_ = 1.0;
-  const double w = 0.5;
-  const double h = 1.5;
+  const double gap_start_ = 0.7;
+  const double w = 0.2;
+  const double h = 0.9;
 
   const double slope_ = h/w;
   const double dx = w/2.0;
@@ -120,7 +120,7 @@ public:
   double GetHeightDerivWrtX(double x, double y) const override;
 
 private:
-  const double slope_start_ = 1.0;
+  const double slope_start_ = 0.5;
   const double up_length_   = 1.0;
   const double down_length_ = 1.0;
   const double height_center = 0.7;

@@ -55,7 +55,7 @@ public:
    *
    * @param dim  The number of dimensions this state has (e.g. x,y,z).
    * @param n_derivatives  The number of derivatives. In control a state
-   *                       is usually made up of two (positions and velocities.
+   *                       is usually made up of two (positions and velocities).
    */
   explicit State(int dim, int n_derivatives);
   virtual ~State() = default;
