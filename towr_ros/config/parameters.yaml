@@ -1,10 +1,10 @@
-terrain: "Flat"
+terrain: "Block"
 run_derivative_test: false
 plot_trajectory: false
 play_initialization: false
 init_state_from_file: true  # 'true' if initial_pose for base is read from this file, 'false' if it is set by the current anymal state
 
-# Possible gaits: 0 (C0), 1 (C1), 2 (C2), 3 (C3), 4 (C4), 5 (DRIVE), 6 (FlatSim), 7 (BlockCross), 8 (C5), 9 (C6)
+# Possible gaits: 0 (C0), 1 (C1), 2 (C2), 3 (C3), 4 (C4), 5 (DRIVE), 6 (FlatSim), 7 (BlockCross), 8 (GapCross), 9 (C5), 10 (C6)
 
 Flat:
   initial_pose:
@@ -18,7 +18,7 @@ Flat:
     z: 0.5
 
   total_time: 3.0 # from combo FlatSim
-  gait: 5
+  gait: 7
 
 Gap:
   initial_pose:
@@ -31,8 +31,8 @@ Gap:
     y: 0.0
     z: 0.5
 
-  total_time: 3.0
-  gait: 7
+  total_time: 2.0 # 2.0 (converge)
+  gait: 1
 
 Block:
   initial_pose:

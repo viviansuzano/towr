@@ -88,23 +88,11 @@ bag_contact = select(bag, 'Topic', 'foot_contact_3');
 ts_contact_RH  = timeseries(bag_contact);
 
 % ee polynomials durations
-bag_dur_pos_LF = select(bag, 'Topic', 'poly_dur_pos_0');
-ts_dur_pos_LF = readMessages(bag_dur_pos_LF);
-bag_dur_pos_RF = select(bag, 'Topic', 'poly_dur_pos_1');
-ts_dur_pos_RF = readMessages(bag_dur_pos_RF);
-bag_dur_pos_LH = select(bag, 'Topic', 'poly_dur_pos_2');
-ts_dur_pos_LH = readMessages(bag_dur_pos_LH);
-bag_dur_pos_RH = select(bag, 'Topic', 'poly_dur_pos_3');
-ts_dur_pos_RH = readMessages(bag_dur_pos_RH);
+bag_durations_pos = select(bag, 'Topic', {'poly_dur_pos_0','poly_dur_pos_1','poly_dur_pos_2','poly_dur_pos_3'});
+ts_duration_pos = readMessages(bag_durations_pos);
 
-bag_dur_force_LF = select(bag, 'Topic', 'poly_dur_force_0');
-ts_dur_force_LF = readMessages(bag_dur_force_LF);
-bag_dur_force_RF = select(bag, 'Topic', 'poly_dur_force_1');
-ts_dur_force_RF = readMessages(bag_dur_force_RF);
-bag_dur_force_LH = select(bag, 'Topic', 'poly_dur_force_2');
-ts_dur_force_LH = readMessages(bag_dur_force_LH);
-bag_dur_force_RH = select(bag, 'Topic', 'poly_dur_force_3');
-ts_dur_force_RH = readMessages(bag_dur_force_RH);
+bag_durations_force = select(bag, 'Topic', {'poly_dur_force_0','poly_dur_force_1','poly_dur_force_2','poly_dur_force_3'});
+ts_duration_force = readMessages(bag_durations_force);
 
 %% define the plotting range and other additional quantities
 t = ts_base_pos.Time; 
@@ -156,16 +144,16 @@ contact_LH = ts_contact_LH.Data(:,1);
 contact_RH = ts_contact_RH.Data(:,1);
 
 % pos phase durations
-[dur_pos_LF, idx_pos_LF] = build_time_vec(ts_dur_pos_LF{1,1}.Data(:,1),t);
-[dur_pos_RF, idx_pos_RF] = build_time_vec(ts_dur_pos_RF{1,1}.Data(:,1),t);
-[dur_pos_LH, idx_pos_LH] = build_time_vec(ts_dur_pos_LH{1,1}.Data(:,1),t);
-[dur_pos_RH, idx_pos_RH] = build_time_vec(ts_dur_pos_RH{1,1}.Data(:,1),t); 
+[dur_pos_LF, idx_pos_LF] = build_time_vec(ts_duration_pos{1,1}.Data(:,1),t);
+[dur_pos_RF, idx_pos_RF] = build_time_vec(ts_duration_pos{2,1}.Data(:,1),t);
+[dur_pos_LH, idx_pos_LH] = build_time_vec(ts_duration_pos{3,1}.Data(:,1),t);
+[dur_pos_RH, idx_pos_RH] = build_time_vec(ts_duration_pos{4,1}.Data(:,1),t); 
 
 % force phase durations
-[dur_force_LF, idx_force_LF] = build_time_vec(ts_dur_force_LF{1,1}.Data(:,1),t);
-[dur_force_RF, idx_force_RF] = build_time_vec(ts_dur_force_RF{1,1}.Data(:,1),t);
-[dur_force_LH, idx_force_LH] = build_time_vec(ts_dur_force_LH{1,1}.Data(:,1),t);
-[dur_force_RH, idx_force_RH] = build_time_vec(ts_dur_force_RH{1,1}.Data(:,1),t); 
+durations_force_LF = build_time_vec(ts_duration_force{1,1}.Data(:,1),t);
+durations_force_RF = build_time_vec(ts_duration_force{2,1}.Data(:,1),t);
+durations_force_LH = build_time_vec(ts_duration_force{3,1}.Data(:,1),t);
+durations_force_RH = build_time_vec(ts_duration_force{4,1}.Data(:,1),t); 
 
 %% Check dynamics
 
@@ -350,7 +338,7 @@ hold on; plot(t(idx_pos_RH), pos_RH(idx_pos_RH,3),'r*');
 xlabel('t [s]'); ylabel('p_z [m]')
 
 h = figure();
-terrain = "Block"; % "Block"; %"Gap"; %"Flat"; %"Step45";
+terrain = "Gap"; % "Block"; %"Gap"; %"Flat"; %"Step45";
 set(h, 'Name', 'Wheels position (X x Z)');
 subplot(4,1,1); plot(pos_LF(:,1),pos_LF(:,3),pos_LF(:,1),GetTerrainHeight(pos_LF(:,1), terrain)); grid on; %axis equal;
 % hold on; plot(pos_LF(idx_pos_LF,1),pos_LF(idx_pos_LF,3),'r*');
@@ -413,54 +401,43 @@ h = figure();
 set(h, 'Name', 'Wheels acceleration');
 subplot(3,4,1); plot(t,acc_LF(:,1)); grid on;
 hold on; plot(t, contact_LF*max(acc_LF(:,1)));
-hold on; plot(t(idx_pos_LF), acc_LF(idx_pos_LF,1),'r*');
+hold on; plot(t(idx_pos_LF), pos_LF(idx_pos_LF,1),'r*');
 xlabel('t [s]'); ylabel('a_x [m/s^2]'); title('LF')
 subplot(3,4,5); plot(t,acc_LF(:,2)); grid on;
 hold on; plot(t, contact_LF*max(acc_LF(:,2)));
-hold on; plot(t(idx_pos_LF), acc_LF(idx_pos_LF,2),'r*');
 xlabel('t [s]'); ylabel('a_y [m/s^2]')
 subplot(3,4,9); plot(t,acc_LF(:,3)); grid on;
 hold on; plot(t, contact_LF*max(acc_LF(:,3)));
-hold on; plot(t(idx_pos_LF), acc_LF(idx_pos_LF,3),'r*');
 xlabel('t [s]'); ylabel('a_z [m/s^2]')
 
 subplot(3,4,2); plot(t,acc_RF(:,1)); grid on;
 hold on; plot(t, contact_RF*max(acc_RF(:,1)));
-hold on; plot(t(idx_pos_RF), acc_RF(idx_pos_RF,1),'r*');
 xlabel('t [s]'); ylabel('a_x [m/s^2]'); title('RF')
 subplot(3,4,6); plot(t,acc_RF(:,2)); grid on;
 hold on; plot(t, contact_RF*max(acc_RF(:,2)));
-hold on; plot(t(idx_pos_RF), acc_RF(idx_pos_RF,2),'r*');
 xlabel('t [s]'); ylabel('a_y [m/s^2]')
 subplot(3,4,10); plot(t,acc_RF(:,3)); grid on;
 hold on; plot(t, contact_RF*max(acc_RF(:,3)));
-hold on; plot(t(idx_pos_RF), acc_RF(idx_pos_RF,3),'r*');
 xlabel('t [s]'); ylabel('a_z [m/s^2]')
 
 subplot(3,4,3); plot(t,acc_LH(:,1)); grid on;
 hold on; plot(t, contact_LH*max(acc_LH(:,1)));
-hold on; plot(t(idx_pos_LH), acc_LH(idx_pos_LH,1),'r*');
 xlabel('t [s]'); ylabel('a_x [m/s^2]'); title('LH')
 subplot(3,4,7); plot(t,acc_LH(:,2)); grid on;
 hold on; plot(t, contact_LH*max(acc_LH(:,2)));
-hold on; plot(t(idx_pos_LH), acc_LH(idx_pos_LH,2),'r*');
 xlabel('t [s]'); ylabel('a_y [m/s^2]')
 subplot(3,4,11); plot(t,acc_LH(:,3)); grid on;
 hold on; plot(t, contact_LH*max(acc_LH(:,3)));
-hold on; plot(t(idx_pos_LH), acc_LH(idx_pos_LH,3),'r*');
 xlabel('t [s]'); ylabel('a_z [m/s^2]')
 
 subplot(3,4,4); plot(t,acc_RH(:,1)); grid on;
 hold on; plot(t, contact_RH*max(acc_RH(:,1)));
-hold on; plot(t(idx_pos_RH), acc_RH(idx_pos_RH,1),'r*');
 xlabel('t [s]'); ylabel('a_x [m/s^2]'); title('RH')
 subplot(3,4,8); plot(t,acc_RH(:,2)); grid on;
 hold on; plot(t, contact_RH*max(acc_RH(:,2)));
-hold on; plot(t(idx_pos_RH), acc_RH(idx_pos_RH,2),'r*');
 xlabel('t [s]'); ylabel('a_y [m/s^2]')
 subplot(3,4,12); plot(t,acc_RH(:,3)); grid on;
 hold on; plot(t, contact_RH*max(acc_RH(:,3)));
-hold on; plot(t(idx_pos_RH), acc_RH(idx_pos_RH,3),'r*');
 xlabel('t [s]'); ylabel('a_z [m/s^2]')
 
 % foot forces
@@ -474,9 +451,8 @@ subplot(3,4,5); plot(t,force_LF(:,2),'LineWidth',lineWidth); grid on;
 hold on; plot(t, contact_LF*max(force_LF(:,2)));
 xlabel('t [s]'); ylabel('f_y [N]')
 subplot(3,4,9); plot(t,force_LF(:,3),'LineWidth',lineWidth); grid on;
-hold on; plot(t, GetTerrainHeight(pos_LF(:,1), terrain)*50); 
-hold on; plot(t, contact_LF*max(force_LF(:,3)));
-hold on; plot(t(idx_force_LF), force_LF(idx_force_LF,3),'r*');
+hold on; plot(t, GetTerrainHeight(pos_LF(:,1), terrain)*50); %contact_LF*max(force_LF(:,3)));
+% hold on; plot(durations_force_LF, 
 xlabel('t [s]'); ylabel('f_z [N]')
 
 subplot(3,4,2); plot(t,force_RF(:,1),'LineWidth',lineWidth); grid on;
@@ -486,9 +462,7 @@ subplot(3,4,6); plot(t,force_RF(:,2),'LineWidth',lineWidth); grid on;
 hold on; plot(t, contact_RF*max(force_RF(:,2)));
 xlabel('t [s]'); ylabel('f_y [N]')
 subplot(3,4,10); plot(t,force_RF(:,3),'LineWidth',lineWidth); grid on;
-hold on; plot(t, GetTerrainHeight(pos_RF(:,1), terrain)*50); 
-hold on; plot(t, contact_RF*max(force_RF(:,3)));
-hold on; plot(t(idx_force_RF), force_RF(idx_force_RF,3),'r*');
+hold on; plot(t, GetTerrainHeight(pos_RF(:,1), terrain)*50); %contact_RF*max(force_RF(:,3)));
 xlabel('t [s]'); ylabel('f_z [N]')
 
 subplot(3,4,3); plot(t,force_LH(:,1),'LineWidth',lineWidth); grid on;
@@ -498,9 +472,7 @@ subplot(3,4,7); plot(t,force_LH(:,2),'LineWidth',lineWidth); grid on;
 hold on; plot(t, contact_LH*max(force_LH(:,2)));
 xlabel('t [s]'); ylabel('f_y [N]')
 subplot(3,4,11); plot(t,force_LH(:,3),'LineWidth',lineWidth); grid on;
-hold on; plot(t, GetTerrainHeight(pos_LH(:,1), terrain)*50); 
-hold on; plot(t, contact_LH*max(force_LH(:,3)));
-hold on; plot(t(idx_force_LH), force_LH(idx_force_LH,3),'r*');
+hold on; plot(t, GetTerrainHeight(pos_LH(:,1), terrain)*50); %contact_LH*max(force_LH(:,3)));
 xlabel('t [s]'); ylabel('f_z [N]')
 
 subplot(3,4,4); plot(t,force_RH(:,1),'LineWidth',lineWidth); grid on;
@@ -510,9 +482,7 @@ subplot(3,4,8); plot(t,force_RH(:,2),'LineWidth',lineWidth); grid on;
 hold on; plot(t, contact_RH*max(force_RH(:,2)));
 xlabel('t [s]'); ylabel('f_y [N]')
 subplot(3,4,12); plot(t,force_RH(:,3),'LineWidth',lineWidth); grid on;
-hold on; plot(t, GetTerrainHeight(pos_RH(:,1), terrain)*50); 
-hold on; plot(t, contact_RH*max(force_RH(:,3)));
-hold on; plot(t(idx_force_RH), force_RH(idx_force_RH,3),'r*');
+hold on; plot(t, GetTerrainHeight(pos_RH(:,1), terrain)*50); %contact_RH*max(force_RH(:,3)));
 xlabel('t [s]'); ylabel('f_z [N]')
 
 % base_ang = [base_roll, base_pitch, base_yaw];

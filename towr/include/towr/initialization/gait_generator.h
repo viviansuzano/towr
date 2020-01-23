@@ -56,7 +56,7 @@ public:
    * @brief Predefined combinations of different strides.
    */
   enum Combos { C0, C1, C2, C3, C4,
-	  	  	  	DRIVE, FlatSim, BlockCross, // specific for wheels
+	  	  	  	DRIVE, FlatSim, BlockCross, GapCross,// specific for wheels
 				C5, C6,
 			    COMBO_COUNT};
 

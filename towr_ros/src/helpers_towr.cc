@@ -10,6 +10,7 @@
 #include <xpp_msgs/TerrainInfo.h>
 
 #include <std_msgs/UInt8.h>
+#include <std_msgs/Float64MultiArray.h>
 
 namespace towr {
 
@@ -98,7 +99,7 @@ void getDataFromBag (std::string bagname)
 }
 
 void
-ExtractGeometryMessagesFromTrajectoryBag (const std::string bag_file)
+ExtractGeometryMessagesFromTrajectoryBag (const std::string bag_file, const SplineHolder& solution)
 {
 	rosbag::Bag bag_r;
 	bag_r.open(bag_file, rosbag::bagmode::Read);
@@ -140,9 +141,54 @@ ExtractGeometryMessagesFromTrajectoryBag (const std::string bag_file)
 	  }
 	}
 
+	int n_ee = solution.ee_motion_.size();
+	auto timestamp = ::ros::Time(1e-6);
+
+	for (int ee=0; ee<n_ee; ++ee) {
+	  std::vector<double> motion_poly_durations = solution.ee_motion_.at(ee)->GetPolyDurations();
+	  std::vector<double> force_poly_durations = solution.ee_force_.at(ee)->GetPolyDurations();
+
+	  std_msgs::Float64MultiArray poly_motion;
+	  for (auto p : motion_poly_durations)
+		  poly_motion.data.push_back(p);
+
+	  std_msgs::Float64MultiArray poly_force;
+	  for (auto p : force_poly_durations)
+		  poly_force.data.push_back(p);
+
+	  bag_w.write("poly_dur_pos_"+std::to_string(ee), timestamp, poly_motion);
+	  bag_w.write("poly_dur_force_"+std::to_string(ee), timestamp, poly_force);
+	}
+
 	bag_r.close();
 	std::cout << "Successfully created bag  " << bag_w.getFileName() << std::endl;
 	bag_w.close();
+}
+
+void
+AddPolyDurationsToBag (const std::string bag_file, const SplineHolder& solution) {
+	rosbag::Bag bag;
+	bag.open(bag_file, rosbag::bagmode::Write);
+
+	int n_ee = solution.ee_motion_.size();
+	auto timestamp = ::ros::Time(1e-6);
+
+	for (int ee=0; ee<n_ee; ++ee) {
+	  std::vector<double> motion_poly_durations = solution.ee_motion_.at(ee)->GetPolyDurations();
+	  std::vector<double> force_poly_durations = solution.ee_force_.at(ee)->GetPolyDurations();
+
+	  std_msgs::Float64MultiArray poly_motion;
+	  for (auto p : motion_poly_durations)
+		  poly_motion.data.push_back(p);
+
+	  std_msgs::Float64MultiArray poly_force;
+	  for (auto p : force_poly_durations)
+		  poly_force.data.push_back(p);
+
+	  bag.write("poly_dur_pos_"+std::to_string(ee), timestamp, poly_motion);
+	  bag.write("poly_dur_force_"+std::to_string(ee), timestamp, poly_force);
+	}
+
 }
 
 } // namespace towr

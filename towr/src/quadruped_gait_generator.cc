@@ -84,7 +84,8 @@ QuadrupedGaitGenerator::SetCombo (Combos combo)
     case C4:  		SetGaits({Stand, Hop3, Hop3, Hop3, Hop3E, Stand}); break; // gallop
     case DRIVE: 	SetGaits({Stand}); break;
     case FlatSim:	SetGaits({Drive, Run2, Run2, Run2, Run2E, Drive}); break;
-    case BlockCross:  SetGaits({Stand, Walk2, Walk2E, Stand}); break;
+    case BlockCross:  SetGaits({Drive, Walk3E, Stand}); break;
+    case GapCross:  SetGaits({Stand, Walk3, Walk3E, Stand});     break; // fly trot
     case C5: 		SetGaits({Stand, Walk1, Walk1, Walk1, Walk1, Stand}); break; // overlap-walk
     case C6: 		SetGaits({Stand, Walk3, Walk3, Walk3, Walk3E, Stand}); break; // overlap-walk
     default: assert(false); std::cout << "Gait not defined\n"; break;
@@ -208,17 +209,23 @@ QuadrupedGaitGenerator::GaitInfo
 QuadrupedGaitGenerator::GetStrideWalkTest () const
 {
   double three    = 0.3;
-  double lateral  = 0.2;
-  double diagonal = 0.1;
+  double lateral  = 0.15;
+  double diagonal = 0.15;
 
   auto times =
   {
-	  three, lateral, three, three, lateral, three, three,
+	  three, lateral, three,
+	  diagonal,
+	  three, lateral, three, //three,
+	  diagonal,
   };
   auto phase_contacts =
   {
 	//bB_, bb_, Bb_, Pb_, PB_, PP_, BP_, bP_,
-	  Bb_, BI_, BP_, bB_, IB_, PB_, BB_,
+	  Bb_, BI_, BP_,
+	  bP_, //BB_,
+	  bB_, IB_, PB_, //BB_,
+	  Pb_, //BB_,
 	  // melhorar subida traseira!!
   };
 

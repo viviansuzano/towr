@@ -147,8 +147,8 @@ NlpFormulation::MakeEndeffectorVariables () const
 	const std::vector<double> phase_durations = params_.ee_phase_durations_.at(ee);
 	for (auto v : phase_durations) {
 		if (phase_constant) {
-			std::cout << "(" << v << ", " << floor(v/params_.dt_drive_constraint_) << ")";
-			n_polys.push_back(floor(v/params_.dt_drive_constraint_));
+			std::cout << "(" << v << ", " << floor(v/params_.dt_drive_constraint_)+1 << ")";
+			n_polys.push_back(floor(v/params_.dt_drive_constraint_)+1);
 		}
 		else {
 			std::cout << "(" << v << ", " << params_.n_polynomials_per_swing_phase_ << ")";
@@ -222,8 +222,8 @@ NlpFormulation::MakeForceVariables () const
 			n_polys.push_back(1);
 		}
 		else {
-			std::cout << "(" << v << ", " << floor(v/params_.dt_drive_constraint_) << ")";
-			n_polys.push_back(floor(v/params_.dt_drive_constraint_));
+			std::cout << "(" << v << ", " << floor(v/params_.dt_drive_constraint_)+1 << ")";
+			n_polys.push_back(floor(v/params_.dt_drive_constraint_)+1);
 		}
 		phase_constant = !phase_constant;
 	}
@@ -449,8 +449,9 @@ NlpFormulation::MakeEEAccLimitsConstraint (const SplineHolder& s) const
 {
   ContraintPtrVec c;
 
+  Vector3d acc_limits (params_.max_wheels_acc_.at(X), params_.max_wheels_acc_.at(Y), params_.max_wheels_acc_.at(Z));
   for (int ee=0; ee<params_.GetEECount(); ee++) {
-    auto constraint = std::make_shared<EEAccLimitsConstraint>(Vector3d(params_.max_wheels_acc_.data()), ee, s);
+    auto constraint = std::make_shared<EEAccLimitsConstraint>(acc_limits, ee, s);
     c.push_back(constraint);
   }
   return c;

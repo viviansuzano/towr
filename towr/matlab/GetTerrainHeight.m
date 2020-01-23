@@ -107,9 +107,9 @@ switch type
            end
         end
     case "Gap"
-        gap_start = 1.0;
-        w = 0.3;
-        hh = 1.5;
+        gap_start = 0.7; %1.0;
+        w = 0.3; %0.3;
+        hh = 1.0; %1.5;
         slope = hh/w;
         dx = w/2.0;
         xc = gap_start + dx; 

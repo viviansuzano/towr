@@ -132,7 +132,7 @@ TowrRosInterface::planServiceCallback(std_srvs::Trigger::Request  &req,
 	}
 
 	// save bags for controller and matlab
-	ExtractGeometryMessagesFromTrajectoryBag(bag_file);
+	ExtractGeometryMessagesFromTrajectoryBag(bag_file, solution);
 	std::string bag_name = ros::package::getPath("towr_ros") + "/bags/anymal_hybrid_traj.bag";
 	auto final_trajectory = GetTrajectory();
 	SaveTrajectoryAsRosbag(bag_name, final_trajectory, xpp_msgs::robot_state_desired);

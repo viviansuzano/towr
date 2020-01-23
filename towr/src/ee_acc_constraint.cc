@@ -8,6 +8,7 @@
 #include <towr/constraints/ee_acc_constraint.h>
 
 #include <towr/variables/variable_names.h>
+#include <towr/variables/cartesian_dimensions.h>
 
 #include <iostream>
 
@@ -20,8 +21,7 @@ EEAccConstraint::EEAccConstraint (const NodeSpline::Ptr& spline,
   spline_ = spline;
   ee_motion_id_ = node_variable_name;
 
-  n_dim_ = 1; //spline->GetPoint(0.0).p().rows();
-  n_polys_ = spline->GetPolynomialCount();
+  n_junctions_ = spline->GetPolynomialCount()-1;
   T_ = spline->GetPolyDurations();
 
 }
@@ -41,19 +41,23 @@ EEAccConstraint::InitVariableDependedQuantities (const VariablesPtr& x)
     }
   }
 
-//  std::cout << "ee" << ee_motion_id_[10] << " ACC stance nodes: ";
-//  for (int id : stance_node_ids_)
-//	  std::cout << id << " ";
-//  std::cout << std::endl;
-//
-//  std::cout << "ee" << ee_motion_id_[10] << " ACC stance polys: ";
-//  for (int id : stance_poly_ids_)
-//	  std::cout << id << " ";
-//  std::cout << std::endl;
+  std::cout << "ee" << ee_motion_id_[10] << " ACC stance nodes: ";
+  for (int id : stance_node_ids_)
+	  std::cout << id << " ";
+  std::cout << std::endl;
 
-  int num_constraints = n_dim_*stance_node_ids_.size();
-  std::cout << "ee" << ee_motion_id_[10] << " ACC num con: " << num_constraints << std::endl;
-  SetRows(num_constraints);
+  std::cout << "ee" << ee_motion_id_[10] << " ACC stance polys: ";
+  for (int id : stance_poly_ids_)
+	  std::cout << id << " ";
+  std::cout << std::endl;
+
+  swing_node_ids_ = ee_motion_->GetIndicesOfNonConstantNodes();
+  std::cout << "ee" << ee_motion_id_[10] << " ACC swing nodes: ";
+  for (int id : swing_node_ids_)
+	  std::cout << id << " ";
+  std::cout << std::endl;
+
+  SetRows(n_junctions_ + swing_node_ids_.size());
 }
 
 Eigen::VectorXd
@@ -62,20 +66,27 @@ EEAccConstraint::GetValues () const
   VectorXd g(GetRows());
 
   int row = 0;
-  for (int i=0; i<stance_poly_ids_.size(); ++i) {
-//	std::cout << row << " ";
-    int p_prev = stance_poly_ids_.at(i); // id of previous polynomial
-    VectorXd acc_prev = spline_->GetPoint(p_prev, T_.at(p_prev)).a();
 
-    int p_next = stance_poly_ids_.at(i+1);
-    VectorXd acc_next = spline_->GetPoint(p_next, 0.0).a();
+  // constraint in x-direction for all nodes
+  for (int j=0; j<n_junctions_; ++j) {
+	int p_prev = j; // id of previous polynomial
+	VectorXd acc_prev = spline_->GetPoint(p_prev, T_.at(p_prev)).a();
 
-//    std::cout << "(" << p_prev << ", " << p_next << ") ";
-    g(row) = acc_prev(0) - acc_next(0);
-//    g.segment(j*n_dim_, n_dim_) = acc_prev - acc_next;
+	int p_next = j+1;
+	VectorXd acc_next = spline_->GetPoint(p_next, 0.0).a();
 
-    i++;
-    row += n_dim_;
+    g(row++) = acc_prev(X) - acc_next(X);
+  }
+
+  // constraint in z-direction for swing nodes
+  for (auto node : swing_node_ids_) {
+	int p_prev = node-1;
+	VectorXd acc_prev = spline_->GetPoint(p_prev, T_.at(p_prev)).a();
+
+	int p_next = node;
+	VectorXd acc_next = spline_->GetPoint(p_next, 0.0).a();
+
+	g(row++) = acc_prev(Z) - acc_next(Z);
   }
 
   return g;
@@ -86,19 +97,26 @@ EEAccConstraint::FillJacobianBlock (std::string var_set, Jacobian& jac) const
 {
   if (var_set == ee_motion_id_) {
 	int row = 0;
-	for (int i=0; i<stance_poly_ids_.size(); ++i) {
-	  int p_prev = stance_poly_ids_.at(i); // id of previous polynomial
-	  Jacobian acc_prev = spline_->GetJacobianWrtNodes(p_prev, T_.at(p_prev), kAcc).row(0);
+	for (int j=0; j<n_junctions_; ++j) {
+	  int p_prev = j; // id of previous polynomial
+	  Jacobian acc_prev = spline_->GetJacobianWrtNodes(p_prev, T_.at(p_prev), kAcc);
 
-      int p_next = stance_poly_ids_.at(i+1);
-      Jacobian acc_next = spline_->GetJacobianWrtNodes(p_next, 0.0, kAcc).row(0);
+	  int p_next = j+1;
+      Jacobian acc_next = spline_->GetJacobianWrtNodes(p_next, 0.0, kAcc);
 
-//	  jac.middleRows(row*n_dim_, n_dim_) = acc_prev - acc_next;
-      jac.row(row) = acc_prev - acc_next;
-
-	  i++;
-	  row += n_dim_;
+      jac.row(row++) = acc_prev.row(X) - acc_next.row(X);
 	}
+
+	for (auto node : swing_node_ids_) {
+	  int p_prev = node-1;
+	  Jacobian acc_prev = spline_->GetJacobianWrtNodes(p_prev, T_.at(p_prev), kAcc);
+
+	  int p_next = node;
+	  Jacobian acc_next = spline_->GetJacobianWrtNodes(p_next, 0.0, kAcc);
+
+	  jac.row(row++) = acc_prev.row(Z) - acc_next.row(Z);
+	}
+
   }
 }
 

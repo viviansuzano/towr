@@ -32,7 +32,7 @@ std::vector<xpp::RobotStateCartesian> GetTrajectoryFromSolution (const SplineHol
 // method to check if the bag was created correctly
 void getDataFromBag (std::string bagname);
 
-void ExtractGeometryMessagesFromTrajectoryBag (const std::string bag_file);
+void ExtractGeometryMessagesFromTrajectoryBag (const std::string bag_file, const SplineHolder& solution);
 
 }
 

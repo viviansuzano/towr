@@ -35,7 +35,7 @@ int main()
   NlpFormulation formulation;
 
   // terrain
-  formulation.terrain_ = std::make_shared<Block>(); //(0.0);
+  formulation.terrain_ = std::make_shared<Gap>(); //(0.0);
 
   // Kinematic limits and dynamic parameters of the Anymal Wheels
   formulation.model_ = RobotModel(RobotModel::AnymalWheels);
@@ -49,12 +49,12 @@ int main()
   formulation.initial_base_.lin.at(kPos).z() = 0.48;
 
   // define the desired goal state of the robot
-  formulation.final_base_.lin.at(towr::kPos) << 1.5, 0.0, 0.48;
+  formulation.final_base_.lin.at(towr::kPos) << 2.0, 0.0, 0.48;
 
   // Parameters that define the motion.
-  double total_duration = 3.0;
+  double total_duration = 2.1;
   auto gait_gen_ = GaitGenerator::MakeGaitGenerator(4);
-  auto id_gait = towr::GaitGenerator::BlockCross; //C0;
+  auto id_gait = towr::GaitGenerator::GapCross; //C0;
   gait_gen_->SetCombo(id_gait);
   for (int ee=0; ee<4; ++ee) {
 	formulation.params_.ee_phase_durations_.push_back(gait_gen_->GetPhaseDurations(total_duration, ee));

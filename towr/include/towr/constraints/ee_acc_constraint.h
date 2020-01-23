@@ -39,8 +39,10 @@ private:
   std::vector<int> stance_node_ids_; ///< the indices of nodes in stance phase.
   std::vector<int> stance_poly_ids_; ///< the indices of the polynomials in stance phase.
 
-  int n_polys_;       ///< number of polynomials in spline.
-  int n_dim_;             ///< dimensions that this polynomial represents (e.g. x,y).
+  std::vector<int> swing_node_ids_; ///< the indices of nodes in stance phase.
+  std::vector<int> swing_poly_ids_; ///< the indices of the polynomials in stance phase.
+
+  int n_junctions_;       ///< number of polynomials junctions in spline.
   std::vector<double> T_; ///< Duration of each polynomial in spline.
 };
 
