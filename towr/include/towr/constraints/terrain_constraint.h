@@ -32,8 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ifopt/constraint_set.h>
 
-#include <towr/variables/spline.h>
-#include <towr/variables/spline_holder.h>
 #include <towr/variables/nodes_variables_phase_based.h>
 #include <towr/terrain/height_map.h>
 
@@ -53,18 +51,15 @@ namespace towr {
 class TerrainConstraint : public ifopt::ConstraintSet {
 public:
   using Vector3d = Eigen::Vector3d;
-  using VecTimes = std::vector<double>;
 
   /**
    * @brief Constructs a terrain constraint.
    * @param terrain  The terrain height value and slope for each position x,y.
    * @param ee_motion_id The name of the endeffector variable set.
    */
-  TerrainConstraint (const HeightMap::Ptr& terrain,
-		  	  	     const NodeSpline::Ptr& spline,
-					 std::string ee_motion, double dt);
-
+  TerrainConstraint (const HeightMap::Ptr& terrain, std::string ee_motion_id);
   virtual ~TerrainConstraint () = default;
+
   void InitVariableDependedQuantities(const VariablesPtr& x) override;
 
   VectorXd GetValues() const override;
@@ -72,20 +67,11 @@ public:
   void FillJacobianBlock (std::string var_set, Jacobian&) const override;
 
 private:
-  NodesVariablesPhaseBased::Ptr ee_motion_; ///< the position of the endeffector at each node.
-  NodeSpline::Ptr spline_; 		///< a spline comprised of polynomials
+  NodesVariablesPhaseBased::Ptr ee_motion_; ///< the position of the endeffector.
   HeightMap::Ptr terrain_;    ///< the height map of the current terrain.
 
   std::string ee_motion_id_;  ///< the name of the endeffector variable set.
-  std::vector<int> swing_node_ids_; ///< the indices of nodes in swing phase.
-
-  int n_polys_;  // number of polynomials in the spline
-  std::vector<double> T_; ///< Duration of each polynomial in spline.
-  double dt_; ///< time interval for the constraint.
-  VecTimes dts_; ///< times at which the constraint is evaluated.
-
-  Jacobian GetJacobianTerrainHeight(double x, double y) const;
-
+  std::vector<int> node_ids_; ///< the indices of the nodes constrained.
 };
 
 } /* namespace towr */

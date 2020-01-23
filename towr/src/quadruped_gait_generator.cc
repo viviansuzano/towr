@@ -85,6 +85,8 @@ QuadrupedGaitGenerator::SetCombo (Combos combo)
     case DRIVE: 	SetGaits({Stand}); break;
     case FlatSim:	SetGaits({Drive, Run2, Run2, Run2, Run2E, Drive}); break;
     case BlockCross:  SetGaits({Stand, Walk2, Walk2E, Stand}); break;
+    case C5: 		SetGaits({Stand, Walk1, Walk1, Walk1, Walk1, Stand}); break; // overlap-walk
+    case C6: 		SetGaits({Stand, Walk3, Walk3, Walk3, Walk3E, Stand}); break; // overlap-walk
     default: assert(false); std::cout << "Gait not defined\n"; break;
   }
 }
@@ -226,9 +228,9 @@ QuadrupedGaitGenerator::GetStrideWalkTest () const
 QuadrupedGaitGenerator::GaitInfo
 QuadrupedGaitGenerator::GetStrideWalkOverlap () const
 {
-  double three    = 0.3; //0.25;
-  double lateral  = 0.2; //0.13;
-  double diagonal = 0.1; //0.13;
+  double three    = 0.25;
+  double lateral  = 0.13;
+  double diagonal = 0.13;
 
   auto times =
   {

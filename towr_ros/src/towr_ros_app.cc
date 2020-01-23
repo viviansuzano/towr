@@ -184,7 +184,7 @@ public:
     msg.total_duration           = total_duration;
     msg.replay_trajectory        = true;
     msg.play_initialization      = play_initialization;
-    msg.replay_speed             = 0.3; //1.0;
+    msg.replay_speed             = 0.2; //1.0;
     msg.optimize                 = true;
     msg.terrain                  = (int) towr_terrain_id;
     msg.gait                     = gait_combo; //towr::GaitGenerator::C0;

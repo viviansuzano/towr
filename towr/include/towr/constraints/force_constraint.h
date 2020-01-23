@@ -60,18 +60,16 @@ class ForceConstraint : public ifopt::ConstraintSet {
 public:
   using Vector3d = Eigen::Vector3d;
   using EE = uint;
-  using VecTimes = std::vector<double>;
 
   /**
-   * @brief Constructs a force constraint.
+   * @brief Constructs a force contraint.
    * @param terrain  The gradient information of the terrain for friction cone.
    * @param force_limit_in_normal_direction  Maximum pushing force [N].
    * @param endeffector_id Which endeffector force should be constrained.
    */
   ForceConstraint (const HeightMap::Ptr& terrain,
                    double force_limit_in_normal_direction,
-                   EE endeffector_id, double dt,
-				   const SplineHolder& spline_holder);
+                   EE endeffector_id);
   virtual ~ForceConstraint () = default;
 
   void InitVariableDependedQuantities(const VariablesPtr& x) override;
@@ -84,25 +82,17 @@ private:
   NodesVariablesPhaseBased::Ptr ee_force_;  ///< the current xyz foot forces.
   NodesVariablesPhaseBased::Ptr ee_motion_; ///< the current xyz foot positions.
 
-  NodeSpline::Ptr spline_ee_motion_;  ///< endeffector position in world frame.
-  NodeSpline::Ptr spline_ee_force_;   ///< endeffector forces in world frame.
-
-//  std::vector<NodeSpline::Ptr> ee_motion_;
-
   HeightMap::Ptr terrain_; ///< gradient information at every position (x,y).
   double fn_max_;          ///< force limit in normal direction.
   double mu_;              ///< friction coeff between robot feet and terrain.
   int n_constraints_per_node_; ///< number of constraint for each node.
   EE ee_;                  ///< The endeffector force to be constrained.
 
-  int n_polys_;  // number of polynomials in the force spline
-  std::vector<double> T_; ///< Duration of each polynomial in spline.
-  double dt_; ///< time interval for the constraint.
-  VecTimes dts_; ///< times at which the constraint is evaluated.
-
-  Eigen::Matrix3d GetJacobianTerrainBasis(HeightMap::Direction basis, double x, double y) const;
-
-
+  /**
+   * The are those Hermite-nodes that shape the polynomial during the
+   * stance phases, while all the others are already set to zero force (swing)
+   **/
+  std::vector<int> pure_stance_force_node_ids_;
 };
 
 } /* namespace towr */

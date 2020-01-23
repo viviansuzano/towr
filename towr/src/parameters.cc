@@ -56,7 +56,7 @@ Parameters::Parameters ()
   // maximum acceleration for smooth motions
   max_base_acc_lin_ = {10.0, 10.0, 10.0};
   max_base_acc_ang_ = {10.0, 10.0, 10.0};
-  max_wheels_acc_ = {10.0, 0.0, 10.0};
+  max_wheels_acc_ = {20.0, 0.0, 20.0};
 
   DeleteAllConstraints();
 
@@ -67,9 +67,10 @@ Parameters::Parameters ()
   constraints_.push_back(EndeffectorRom); //Ensures that the range of motion is respected at discrete times.
   constraints_.push_back(Force); // ensures unilateral forces and inside the friction cone.
 //  constraints_.push_back(Swing); // creates smoother swing motions, not absolutely required.
-//  constraints_.push_back(BaseAccLimits); // ensures maximum acc on the base motions
   constraints_.push_back(EEAccLimits); // ensures maximum acc on the ee motions
   constraints_.push_back(EndeffectorAcc); // so accelerations don't jump between polynomials
+//  if (is_pure_driving_motion_)
+//    constraints_.push_back(BaseAccLimits); // ensures maximum acc on the base motions
 
   // optional costs to e.g penalize endeffector forces
   // costs_.push_back({ForcesCostID, 1.0}); weighed by 1.0 relative to other costs

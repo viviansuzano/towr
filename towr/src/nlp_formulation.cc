@@ -92,6 +92,7 @@ NlpFormulation::GetVariableSets (SplineHolder& spline_holder)
                                ee_force,
                                contact_schedule,
                                params_.IsOptimizeTimings());
+
   return vars;
 }
 
@@ -138,15 +139,31 @@ NlpFormulation::MakeEndeffectorVariables () const
   double T = params_.GetTotalTime();
 //  std::cout << "Total time: " << T << std::endl;
 
+  std::vector<int> n_polys;
+
   for (int ee=0; ee<params_.GetEECount(); ee++) {
 
-	std::cout << "OptIdxMap EE_motion " << ee << std::endl;
+	bool phase_constant = params_.ee_in_contact_at_start_.at(ee);
+	const std::vector<double> phase_durations = params_.ee_phase_durations_.at(ee);
+	for (auto v : phase_durations) {
+		if (phase_constant) {
+			std::cout << "(" << v << ", " << floor(v/params_.dt_drive_constraint_) << ")";
+			n_polys.push_back(floor(v/params_.dt_drive_constraint_));
+		}
+		else {
+			std::cout << "(" << v << ", " << params_.n_polynomials_per_swing_phase_ << ")";
+			n_polys.push_back(params_.n_polynomials_per_swing_phase_);
+		}
+		phase_constant = !phase_constant;
+	}
+	std::cout << std::endl;
+
+//	std::cout << "OptIdxMap EE_motion " << ee << std::endl;
     auto nodes = std::make_shared<NodesVariablesEEMotion>(
                                               params_.GetPhaseCount(ee),
                                               params_.ee_in_contact_at_start_.at(ee),
                                               id::EEMotionNodes(ee),
-											  params_.n_polynomials_per_swing_phase_,
-											  params_.motion_polynomials_per_stance_phase_);
+                                              n_polys);
 
     // initialize towards final footholds
     double yaw = final_base_.ang.p().z();
@@ -172,6 +189,14 @@ NlpFormulation::MakeEndeffectorVariables () const
     // nodes->AddFinalBound(kPos, {X,Y,Z}, Vector3d(x,y,z));
 
     vars.push_back(nodes);
+
+    n_polys.clear();
+
+    std::cout << "Poly Durations EE " << ee << " motion: ";
+    std::vector<double> poly_durations = nodes->ConvertPhaseToPolyDurations(params_.ee_phase_durations_.at(ee));
+    for (auto p : poly_durations)
+    	std::cout << " " << p;
+    std::cout << std::endl;
   }
 
   return vars;
@@ -184,22 +209,46 @@ NlpFormulation::MakeForceVariables () const
 
   // force is still constant and zero on swing phase!!
   int force_polynomials_per_swing_phase_ = 1;
+  std::vector<int> n_polys;
 
   double T = params_.GetTotalTime();
   for (int ee=0; ee<params_.GetEECount(); ee++) {
-	std::cout << "OptIdxMap EE_force " << ee << std::endl;
+
+	bool phase_constant = !params_.ee_in_contact_at_start_.at(ee);
+	const std::vector<double> phase_durations = params_.ee_phase_durations_.at(ee);
+	for (auto v : phase_durations) {
+		if (phase_constant) {
+			std::cout << "(" << v << ", " << 1 << ")";
+			n_polys.push_back(1);
+		}
+		else {
+			std::cout << "(" << v << ", " << floor(v/params_.dt_drive_constraint_) << ")";
+			n_polys.push_back(floor(v/params_.dt_drive_constraint_));
+		}
+		phase_constant = !phase_constant;
+	}
+	std::cout << std::endl;
+
+//	std::cout << "OptIdxMap EE_force " << ee << std::endl;
     auto nodes = std::make_shared<NodesVariablesEEForce>(
                                               params_.GetPhaseCount(ee),
                                               params_.ee_in_contact_at_start_.at(ee),
                                               id::EEForceNodes(ee),
-											  force_polynomials_per_swing_phase_,
-											  params_.force_polynomials_per_stance_phase_);
+											  n_polys);
 
     // initialize with mass of robot distributed equally on all legs
     double m = model_.dynamic_model_->m();
     double g = model_.dynamic_model_->g();
 
 //    std::cout << "EE force: " << std::endl;
+
+    std::cout << "Poly Durations EE " << ee << " force: ";
+    std::vector<double> poly_durations = nodes->ConvertPhaseToPolyDurations(params_.ee_phase_durations_.at(ee));
+    for (auto p : poly_durations)
+    	std::cout << " " << p;
+    std::cout << std::endl;
+
+    n_polys.clear();
 
     Vector3d f_stance(0.0, 0.0, m*g/params_.GetEECount());
     nodes->SetByLinearInterpolation(f_stance, f_stance, T); // stay constant
@@ -313,9 +362,10 @@ NlpFormulation::MakeTerrainConstraint (const SplineHolder& s) const
   ContraintPtrVec constraints;
 
   for (int ee=0; ee<params_.GetEECount(); ee++) {
-    auto c = std::make_shared<TerrainConstraint>(terrain_, s.ee_motion_.at(ee),
-    											 id::EEMotionNodes(ee),
-												 params_.dt_drive_constraint_);
+	auto c = std::make_shared<TerrainConstraint>(terrain_, id::EEMotionNodes(ee));
+//    auto c = std::make_shared<TerrainConstraint>(terrain_, s.ee_motion_.at(ee),
+//    											 id::EEMotionNodes(ee),
+//												 params_.dt_drive_constraint_);
     constraints.push_back(c);
   }
 
@@ -330,7 +380,8 @@ NlpFormulation::MakeForceConstraint (const SplineHolder& s) const
   for (int ee=0; ee<params_.GetEECount(); ee++) {
     auto c = std::make_shared<ForceConstraint>(terrain_,
                                                params_.force_limit_in_normal_direction_,
-                                               ee, params_.dt_drive_constraint_, s);
+											   ee);
+//                                               ee, params_.dt_drive_constraint_, s);
     constraints.push_back(c);
   }
 
@@ -399,9 +450,7 @@ NlpFormulation::MakeEEAccLimitsConstraint (const SplineHolder& s) const
   ContraintPtrVec c;
 
   for (int ee=0; ee<params_.GetEECount(); ee++) {
-    auto constraint = std::make_shared<EEAccLimitsConstraint>(Vector3d(params_.max_wheels_acc_.data()),
-    														  params_.GetTotalTime(),
-														  	  params_.dt_constraint_dynamic_, ee, s);
+    auto constraint = std::make_shared<EEAccLimitsConstraint>(Vector3d(params_.max_wheels_acc_.data()), ee, s);
     c.push_back(constraint);
   }
   return c;

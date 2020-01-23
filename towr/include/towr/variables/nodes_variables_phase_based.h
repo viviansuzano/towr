@@ -86,8 +86,9 @@ public:
   NodesVariablesPhaseBased (int phase_count,
                             bool first_phase_constant,
                             const std::string& var_name,
-	                        int n_polys_in_swing_phase,
-							int n_polys_in_stance_phase);
+							std::vector<int> n_polys_per_phase);
+//	                        int n_polys_in_swing_phase,
+//							int n_polys_in_stance_phase);
 
   virtual ~NodesVariablesPhaseBased() = default;
 
@@ -200,8 +201,7 @@ public:
   NodesVariablesEEMotion (int phase_count,
 	                      bool is_in_contact_at_start,
 	                      const std::string& name,
-	                      int n_polys_in_swing_phase,
-					      int n_polys_in_stance_phase);
+						  std::vector<int> n_polys_per_phase);
   virtual ~NodesVariablesEEMotion() = default;
   OptIndexMap GetPhaseBasedEEParameterization ();
 };
@@ -217,8 +217,7 @@ public:
   NodesVariablesEEForce (int phase_count,
 						 bool first_phase_constant,
 						 const std::string& var_name,
-	                     int n_polys_in_swing_phase,
-						 int n_polys_in_stance_phase);
+					     std::vector<int> n_polys_per_phase);
   virtual ~NodesVariablesEEForce() = default;
   OptIndexMap GetPhaseBasedEEParameterization ();
 };

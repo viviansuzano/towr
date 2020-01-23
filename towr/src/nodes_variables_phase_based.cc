@@ -37,7 +37,8 @@ namespace towr {
 
 std::vector<NodesVariablesPhaseBased::PolyInfo>
 BuildPolyInfos (int phase_count, bool first_phase_constant,
-                int n_polys_in_swing_phase, int n_polys_in_stance_phase)
+        		std::vector<int> n_polys_per_phase)
+//                int n_polys_in_swing_phase, int n_polys_in_stance_phase)
 {
   using PolyInfo = NodesVariablesPhaseBased::PolyInfo;
   std::vector<PolyInfo> polynomial_info;
@@ -45,12 +46,15 @@ BuildPolyInfos (int phase_count, bool first_phase_constant,
   bool phase_constant = first_phase_constant;
 
   for (int i=0; i<phase_count; ++i) {
-    if (phase_constant)
-	  for (int j=0; j<n_polys_in_stance_phase; ++j)
-		polynomial_info.push_back(PolyInfo(i,j,n_polys_in_stance_phase, true, false));
-    else
-      for (int j=0; j<n_polys_in_swing_phase; ++j)
-        polynomial_info.push_back(PolyInfo(i,j,n_polys_in_swing_phase, false, false));
+    int n_polys = n_polys_per_phase.at(i);
+	if (phase_constant) {
+	  for (int j=0; j<n_polys; ++j)
+	    polynomial_info.push_back(PolyInfo(i,j,n_polys, true, false));
+    }
+    else {
+      for (int j=0; j<n_polys; ++j)
+        polynomial_info.push_back(PolyInfo(i,j,n_polys, false, false));
+    }
 
     phase_constant = !phase_constant; // constant and non-constant phase alternate
   }
@@ -61,11 +65,12 @@ BuildPolyInfos (int phase_count, bool first_phase_constant,
 NodesVariablesPhaseBased::NodesVariablesPhaseBased (int phase_count,
                                                     bool first_phase_constant,
                                                     const std::string& name,
-							                        int n_polys_in_swing_phase,
-													int n_polys_in_stance_phase)
+													std::vector<int> n_polys_per_phase)
+						//	                        int n_polys_in_swing_phase,
+						//							int n_polys_in_stance_phase);
     : NodesVariables(name)
 {
-  polynomial_info_ = BuildPolyInfos(phase_count, first_phase_constant, n_polys_in_swing_phase, n_polys_in_stance_phase);
+  polynomial_info_ = BuildPolyInfos(phase_count, first_phase_constant, n_polys_per_phase);
 
   n_dim_ = k3D;
   int n_nodes = polynomial_info_.size()+1;
@@ -117,7 +122,7 @@ NodesVariablesPhaseBased::AdjacentPolyIdsConstant (int node_id) const
 {
   bool is_constant = true;
 
-  // node is returned if left AND right polynomial
+  // node is considered constant if left AND right polynomial
   // belongs to a constant phase
   std::vector<int> polys = GetAdjacentPolyIds(node_id);
   if (polys.size() > 1) {
@@ -152,16 +157,9 @@ NodesVariablesPhaseBased::GetIndicesOfNonConstantNodes() const
 int
 NodesVariablesPhaseBased::GetPhase (int node_id) const
 {
-  std::cout << node_id << " " << !IsConstantNode(node_id); // << std::endl;
-  if (!IsConstantNode(node_id) == 0)
-	  std::cout << " -> ASSERT! "; // << std::endl;
-  else
-	  std::cout << " -> OK! "; // << std::endl;
-
-  assert(!IsConstantNode(node_id)); // because otherwise it has two phases
+//  assert(!IsConstantNode(node_id)); // because otherwise it has two phases
 
   int poly_id = GetAdjacentPolyIds(node_id).front();
-  std::cout << "phase: " << polynomial_info_.at(poly_id).phase_ << std::endl;
   return polynomial_info_.at(poly_id).phase_;
 }
 
@@ -240,16 +238,13 @@ NodesVariablesPhaseBased::PrintOptIdxMap ()
 NodesVariablesEEMotion::NodesVariablesEEMotion(int phase_count,
                                                bool is_in_contact_at_start,
                                                const std::string& name,
-						                       int n_polys_in_swing_phase,
-											   int n_polys_in_stance_phase)
+											   std::vector<int> n_polys_per_phase)
     :NodesVariablesPhaseBased(phase_count,
                               is_in_contact_at_start, // contact phase for motion is constant
-                              name,
-							  n_polys_in_swing_phase,
-							  n_polys_in_stance_phase)
+                              name, n_polys_per_phase)
 {
   index_to_node_value_info_ = GetPhaseBasedEEParameterization();
-  PrintOptIdxMap();
+//  PrintOptIdxMap();
   SetNumberOfVariables(index_to_node_value_info_.size());
 }
 
@@ -275,6 +270,8 @@ NodesVariablesEEMotion::GetPhaseBasedEEParameterization ()
         // smoother stepping motions.
         if (dim == Z)
           nodes_.at(node_id).at(kVel).z() = 0.0;
+//        if (dim == Y)
+//          nodes_.at(node_id).at(kVel).y() = 0.0;
         else
           // velocity in x,y dimension during swing fully optimized.
           index_map[idx++].push_back(NodeValueInfo(node_id, kVel, dim));
@@ -313,16 +310,13 @@ NodesVariablesEEMotion::GetPhaseBasedEEParameterization ()
 NodesVariablesEEForce::NodesVariablesEEForce(int phase_count,
                                               bool is_in_contact_at_start,
                                               const std::string& name,
-						                      int n_polys_in_swing_phase,
-										      int n_polys_in_stance_phase)
-	:NodesVariablesPhaseBased(phase_count,
-							  !is_in_contact_at_start,
-							  name,
-							  n_polys_in_stance_phase,
-							  n_polys_in_swing_phase)
+											  std::vector<int> n_polys_per_phase)
+    :NodesVariablesPhaseBased(phase_count,
+                              !is_in_contact_at_start, // contact phase for force is non-constant
+                              name, n_polys_per_phase)
 {
   index_to_node_value_info_ = GetPhaseBasedEEParameterization();
-  PrintOptIdxMap ();
+//  PrintOptIdxMap ();
   SetNumberOfVariables(index_to_node_value_info_.size());
 }
 
