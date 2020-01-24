@@ -174,6 +174,7 @@ public:
 
     bool plot_trajectory = basenode["plot_trajectory"].as<bool>();
     bool play_initialization = basenode["play_initialization"].as<bool>();
+    bool optimize_phase_durations = basenode["optimize_phase_durations"].as<bool>();
 
     float total_duration = basenode[terrain]["total_time"].as<float>();
 
@@ -189,7 +190,7 @@ public:
     msg.terrain                  = (int) towr_terrain_id;
     msg.gait                     = gait_combo; //towr::GaitGenerator::C0;
     msg.robot                    = towr::RobotModel::AnymalWheels;
-    msg.optimize_phase_durations = false;
+    msg.optimize_phase_durations = optimize_phase_durations;
     msg.plot_trajectory          = plot_trajectory;
 
     return msg;

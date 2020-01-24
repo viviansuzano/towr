@@ -1,6 +1,7 @@
 terrain: "Block"
 run_derivative_test: false
 plot_trajectory: false
+optimize_phase_durations: false
 play_initialization: false
 init_state_from_file: true  # 'true' if initial_pose for base is read from this file, 'false' if it is set by the current anymal state
 

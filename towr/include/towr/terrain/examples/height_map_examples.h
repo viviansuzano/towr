@@ -93,8 +93,8 @@ public:
   double GetHeightDerivWrtXX(double x, double y) const override;
 
 private:
-  const double gap_start_ = 0.7;
-  const double w = 0.3;
+  const double gap_start_ = 0.6;
+  const double w = 0.1;
   const double h = 1.0;
 
   const double slope_ = h/w;

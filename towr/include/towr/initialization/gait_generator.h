@@ -67,7 +67,7 @@ public:
                Walk1, Walk2, Walk2E, Walk3, Walk3E,
                Run2, Run2E, Run1, Run1E, Run3, Run3E,
                Hop1, Hop1E, Hop2, Hop3, Hop3E, Hop5, Hop5E,
-			   Drive, // specific for wheels
+			   Drive, StandFlight,// specific for wheels
                GAIT_COUNT};
 
   static Ptr MakeGaitGenerator(int leg_count);
