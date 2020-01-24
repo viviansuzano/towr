@@ -84,7 +84,7 @@ QuadrupedGaitGenerator::SetCombo (Combos combo)
     case C4:  		SetGaits({Stand, Hop3, Hop3, Hop3, Hop3E, Stand}); break; // gallop
     case DRIVE: 	SetGaits({Stand}); break;
     case FlatSim:	SetGaits({Drive, Run2, Run2, Run2, Run2E, Drive}); break;
-    case BlockCross:  SetGaits({Drive, Walk3E, Stand}); break;
+    case BlockCross:  SetGaits({Stand, Walk3E, Drive}); break;
     case GapCross:  SetGaits({Stand, Walk3, Walk3E, Stand});     break; // fly trot
     case C5: 		SetGaits({Stand, Walk1, Walk1, Walk1, Walk1, Stand}); break; // overlap-walk
     case C6: 		SetGaits({Stand, Walk3, Walk3, Walk3, Walk3E, Stand}); break; // overlap-walk
@@ -127,7 +127,7 @@ QuadrupedGaitGenerator::GetDriveGait () const
 {
   auto times =
   {
-      0.5,
+      0.6,
   };
   auto contacts =
   {

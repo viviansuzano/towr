@@ -473,10 +473,10 @@ xlabel('t [s]'); ylabel('f_x [N]'); title('LF')
 subplot(3,4,5); plot(t,force_LF(:,2),'LineWidth',lineWidth); grid on;
 hold on; plot(t, contact_LF*max(force_LF(:,2)));
 xlabel('t [s]'); ylabel('f_y [N]')
-subplot(3,4,9); plot(t,force_LF(:,3),'LineWidth',lineWidth); grid on;
-hold on; plot(t, GetTerrainHeight(pos_LF(:,1), terrain)*50); 
-hold on; plot(t, contact_LF*max(force_LF(:,3)));
-hold on; plot(t(idx_force_LF), force_LF(idx_force_LF,3),'r*');
+subplot(3,4,9); %plot(t,force_LF(:,3),'LineWidth',lineWidth); grid on;
+hold on; plot(t, GetTerrainHeight(pos_LF(:,1), terrain)); 
+hold on; plot(t, contact_LF*0.1); %max(force_LF(:,3)));
+% hold on; plot(t(idx_force_LF), force_LF(idx_force_LF,3),'r*');
 xlabel('t [s]'); ylabel('f_z [N]')
 
 subplot(3,4,2); plot(t,force_RF(:,1),'LineWidth',lineWidth); grid on;
@@ -485,10 +485,10 @@ xlabel('t [s]'); ylabel('f_x [N]'); title('RF')
 subplot(3,4,6); plot(t,force_RF(:,2),'LineWidth',lineWidth); grid on;
 hold on; plot(t, contact_RF*max(force_RF(:,2)));
 xlabel('t [s]'); ylabel('f_y [N]')
-subplot(3,4,10); plot(t,force_RF(:,3),'LineWidth',lineWidth); grid on;
-hold on; plot(t, GetTerrainHeight(pos_RF(:,1), terrain)*50); 
-hold on; plot(t, contact_RF*max(force_RF(:,3)));
-hold on; plot(t(idx_force_RF), force_RF(idx_force_RF,3),'r*');
+subplot(3,4,10); %plot(t,force_RF(:,3),'LineWidth',lineWidth); grid on;
+hold on; plot(t, GetTerrainHeight(pos_RF(:,1), terrain)); 
+hold on; plot(t, contact_RF*0.1); %max(force_RF(:,3)));
+% hold on; plot(t(idx_force_RF), force_RF(idx_force_RF,3),'r*');
 xlabel('t [s]'); ylabel('f_z [N]')
 
 subplot(3,4,3); plot(t,force_LH(:,1),'LineWidth',lineWidth); grid on;
@@ -497,10 +497,10 @@ xlabel('t [s]'); ylabel('f_x [N]'); title('LH')
 subplot(3,4,7); plot(t,force_LH(:,2),'LineWidth',lineWidth); grid on;
 hold on; plot(t, contact_LH*max(force_LH(:,2)));
 xlabel('t [s]'); ylabel('f_y [N]')
-subplot(3,4,11); plot(t,force_LH(:,3),'LineWidth',lineWidth); grid on;
-hold on; plot(t, GetTerrainHeight(pos_LH(:,1), terrain)*50); 
-hold on; plot(t, contact_LH*max(force_LH(:,3)));
-hold on; plot(t(idx_force_LH), force_LH(idx_force_LH,3),'r*');
+subplot(3,4,11); %plot(t,force_LH(:,3),'LineWidth',lineWidth); grid on;
+hold on; plot(t, GetTerrainHeight(pos_LH(:,1), terrain)); 
+hold on; plot(t, contact_LH*0.1); %max(force_LH(:,3)));
+% hold on; plot(t(idx_force_LH), force_LH(idx_force_LH,3),'r*');
 xlabel('t [s]'); ylabel('f_z [N]')
 
 subplot(3,4,4); plot(t,force_RH(:,1),'LineWidth',lineWidth); grid on;
@@ -509,10 +509,10 @@ xlabel('t [s]'); ylabel('f_x [N]'); title('RH')
 subplot(3,4,8); plot(t,force_RH(:,2),'LineWidth',lineWidth); grid on;
 hold on; plot(t, contact_RH*max(force_RH(:,2)));
 xlabel('t [s]'); ylabel('f_y [N]')
-subplot(3,4,12); plot(t,force_RH(:,3),'LineWidth',lineWidth); grid on;
-hold on; plot(t, GetTerrainHeight(pos_RH(:,1), terrain)*50); 
-hold on; plot(t, contact_RH*max(force_RH(:,3)));
-hold on; plot(t(idx_force_RH), force_RH(idx_force_RH,3),'r*');
+subplot(3,4,12); %plot(t,force_RH(:,3),'LineWidth',lineWidth); grid on;
+hold on; plot(t, GetTerrainHeight(pos_RH(:,1), terrain)); 
+hold on; plot(t, contact_RH*0.1); %max(force_RH(:,3)));
+% hold on; plot(t(idx_force_RH), force_RH(idx_force_RH,3),'r*');
 xlabel('t [s]'); ylabel('f_z [N]')
 
 % base_ang = [base_roll, base_pitch, base_yaw];
