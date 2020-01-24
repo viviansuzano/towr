@@ -56,7 +56,7 @@ public:
    * @brief Predefined combinations of different strides.
    */
   enum Combos { C0, C1, C2, C3, C4,
-	  	  	  	DRIVE, FlatSim, BlockCross, GapCross,// specific for wheels
+	  	  	  	DRIVE, FlatSim, BlockCross, BlockHop, GapCross,// specific for wheels
 				C5, C6,
 			    COMBO_COUNT};
 
@@ -66,7 +66,7 @@ public:
   enum Gaits  {Stand=0, Flight,
                Walk1, Walk2, Walk2E, Walk3, Walk3E,
                Run2, Run2E, Run1, Run1E, Run3, Run3E,
-               Hop1, Hop1E, Hop2, Hop3, Hop3E, Hop5, Hop5E,
+               Hop1, Hop1E, Hop2, Hop3, Hop3E, Hop4, Hop5, Hop5E,
 			   Drive, StandFlight,// specific for wheels
                GAIT_COUNT};
 

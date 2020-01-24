@@ -85,6 +85,7 @@ QuadrupedGaitGenerator::SetCombo (Combos combo)
     case DRIVE: 	SetGaits({Stand}); break;
     case FlatSim:	SetGaits({Drive, Run2, Run2, Run2, Run2E, Drive}); break;
     case BlockCross:  SetGaits({StandFlight, Walk3E, Drive}); break;
+    case BlockHop:  SetGaits({Hop4}); break;
     case GapCross:  SetGaits({Stand, Walk3, Walk3E, Stand});     break; // fly trot
     case C5: 		SetGaits({Stand, Walk1, Walk1, Walk1, Walk1, Stand}); break; // overlap-walk
     case C6: 		SetGaits({Stand, Walk3, Walk3, Walk3, Walk3E, Stand}); break; // overlap-walk
@@ -113,6 +114,7 @@ QuadrupedGaitGenerator::GetGait(Gaits gait) const
     case Hop2:    return GetStridePronk();
     case Hop3:    return GetStrideGallop();
     case Hop3E:   return RemoveTransition(GetStrideGallop());
+    case Hop4:    return GetStrideHop();
     case Hop5:    return GetStrideLimp();
 
     // specific for wheels
@@ -352,6 +354,26 @@ QuadrupedGaitGenerator::GetStridePaceEnd () const
   auto phase_contacts =
   {
       PP_,
+  };
+
+  return std::make_pair(times, phase_contacts);
+}
+
+
+QuadrupedGaitGenerator::GaitInfo
+QuadrupedGaitGenerator::GetStrideHop () const
+{
+  double stand = 0.5;
+  double hop   = 0.3;
+  double drive = 0.6;
+
+  auto times =
+  {
+      0.2, 0.3, 0.2, 0.3, 0.2,
+  };
+  auto phase_contacts =
+  {
+      BB_, BI_, BB_, IB_, BB_,
   };
 
   return std::make_pair(times, phase_contacts);

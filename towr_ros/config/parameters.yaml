@@ -5,7 +5,7 @@ optimize_phase_durations: false
 play_initialization: false
 init_state_from_file: true  # 'true' if initial_pose for base is read from this file, 'false' if it is set by the current anymal state
 
-# Possible gaits: 0 (C0), 1 (C1), 2 (C2), 3 (C3), 4 (C4), 5 (DRIVE), 6 (FlatSim), 7 (BlockCross), 8 (GapCross), 9 (C5), 10 (C6)
+# Possible gaits: 0 (C0), 1 (C1), 2 (C2), 3 (C3), 4 (C4), 5 (DRIVE), 6 (FlatSim), 7 (BlockCross), 8 (BlockHop), 9 (GapCross), 10 (C5), 11 (C6)
 
 Flat:
   initial_pose:
@@ -46,8 +46,8 @@ Block:
     y: 0.0
     z: 0.5
 
-  total_time: 3.0 # 2.0
-  gait: 7
+  total_time: 2.0 # 2.0
+  gait: 8
 
 Slope:
   initial_pose:
