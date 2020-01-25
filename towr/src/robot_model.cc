@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <towr/models/examples/hyq_model.h>
 #include <towr/models/examples/anymal_model.h>
 #include <towr/models/examples/anymal_wheels_model.h>
+#include <towr/models/examples/harpia_model.h>
 
 namespace towr {
 
@@ -60,6 +61,10 @@ RobotModel::RobotModel(Robot robot)
     case AnymalWheels:
       dynamic_model_   = std::make_shared<AnymalWheelsDynamicModel>();
       kinematic_model_ = std::make_shared<AnymalWheelsKinematicModel>();
+      break;
+    case Harpia:
+      dynamic_model_   = std::make_shared<HarpiaDynamicModel>();
+      kinematic_model_ = std::make_shared<HarpiaKinematicModel>();
       break;
     default:
       assert(false); // Error: Robot model not implemented.

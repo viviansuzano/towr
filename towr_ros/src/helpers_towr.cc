@@ -286,7 +286,7 @@ ExtractGeometryMessagesFromTrajectoryBag (const std::string bag_file)
 
 	// write the message with modified timestamp into new bag file
 	rosbag::Bag bag_w;
-	std::string path = ros::package::getPath("towr_drive") + "/bags/anymal_wheels_matlab.bag";
+	std::string path = ros::package::getPath("towr_drive") + "/bags/harpia_matlab.bag";
 	bag_w.open(path, rosbag::bagmode::Write);
 
 	BOOST_FOREACH(rosbag::MessageInstance const m, view)

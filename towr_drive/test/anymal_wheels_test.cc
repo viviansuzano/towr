@@ -84,12 +84,6 @@ bool SetTowrParameters(NlpFormulationDrive *formulation, const std::string& file
   double total_duration = basenode[terrain]["total_time"].as<double>();
   formulation->params_drive_.total_time_ = total_duration;
 
-  bool use_wheels_motion_constraint = basenode[terrain]["use_wheels_motion_constraint"].as<bool>();
-  if (use_wheels_motion_constraint)
-	formulation->params_drive_.SetWheelsMotionConstraint();
-  else
-	formulation->params_drive_.SetEndeffectorRomConstraint();
-
   bool use_non_holonomic_constraint = basenode["use_non_holonomic_constraint"].as<bool>();
   if (use_non_holonomic_constraint)
 	formulation->params_drive_.SetNonHolonomicConstraint();

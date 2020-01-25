@@ -65,7 +65,6 @@ private:
   ConstraintPtrVec MakeWheelsAccLimitsConstraint(const SplineHolderDrive& s) const;
   ConstraintPtrVec MakeBaseAccLimitsConstraint(const SplineHolderDrive& s) const;
   ConstraintPtrVec MakeWheelsNonHolonomicConstraint(const SplineHolderDrive& s) const;
-  ConstraintPtrVec MakeWheelsMotionConstraint (const SplineHolderDrive& s) const;
   ConstraintPtrVec MakeStabilityConstraint (const SplineHolderDrive& s) const;
 
   // costs

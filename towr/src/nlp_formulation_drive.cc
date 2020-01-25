@@ -21,7 +21,6 @@
 #include <towr/constraints/force_wheels_constraint.h>
 #include <towr/constraints/wheels_acc_limits_constraint.h>
 #include <towr/constraints/base_acc_limits_constraint.h>
-#include <towr/constraints/wheels_motion_constraint.h>
 #include <towr/constraints/stability_constraint.h>
 #include <towr/constraints/wheels_non_holonomic_constraint.h>
 
@@ -197,7 +196,6 @@ NlpFormulationDrive::GetConstraint (Parameters::ConstraintName name,
     case Parameters::EndeffectorAcc:  		return MakeEndEffectorAccConstraint(s);
     case Parameters::BaseAccLimits:  		return MakeBaseAccLimitsConstraint(s);
     case Parameters::WheelsAccLimits:  		return MakeWheelsAccLimitsConstraint(s);
-    case Parameters::WheelsMotion: 			return MakeWheelsMotionConstraint(s);
     case Parameters::Stability: 			return MakeStabilityConstraint(s);
     case Parameters::WheelsNonHolonomic:	return MakeWheelsNonHolonomicConstraint(s);
     default: throw std::runtime_error("constraint not defined!");
@@ -318,22 +316,6 @@ NlpFormulationDrive::MakeBaseAccLimitsConstraint(const SplineHolderDrive& s) con
   return {std::make_shared<BaseAccLimitsConstraint>(max_base_acc,
     											    params_drive_.GetTotalTime(),
 												    params_drive_.dt_constraint_dynamic_, s)};
-}
-
-NlpFormulationDrive::ConstraintPtrVec
-NlpFormulationDrive::MakeWheelsMotionConstraint (const SplineHolderDrive& s) const
-{
-  ContraintPtrVec c;
-
-  for (int ee=0; ee<params_drive_.GetEECount(); ee++) {
-    auto constraint = std::make_shared<WheelsMotionConstraint>(model_.kinematic_model_,
-                                                        	   params_drive_.GetTotalTime(),
-															   params_drive_.dt_constraint_range_of_motion_,
-															   ee, s);
-    c.push_back(constraint);
-  }
-
-  return c;
 }
 
 NlpFormulationDrive::ConstraintPtrVec

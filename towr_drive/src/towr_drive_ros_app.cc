@@ -122,12 +122,6 @@ public:
     double total_duration = basenode[terrain]["total_time"].as<double>();
     params_drive.total_time_ = total_duration;
 
-    bool use_wheels_motion_constraint = basenode[terrain]["use_wheels_motion_constraint"].as<bool>();
-    if (use_wheels_motion_constraint)
-    	params_drive.SetWheelsMotionConstraint();
-    else
-    	params_drive.SetEndeffectorRomConstraint();
-
     bool set_wheels_motion_cost = basenode["set_wheels_motion_cost"].as<bool>();
     if (set_wheels_motion_cost)
       params_drive.SetWheelsMotionCost();
@@ -197,23 +191,12 @@ public:
     initial_position_.z() = basenode[terrain]["initial_pose"]["z"].as<double>();
 
     bool init_state_from_file = basenode["init_state_from_file"].as<bool>();
-    double height_ref = 0.0;
-    bool offset_reference_height = basenode["offset_reference_height"].as<bool>();
-    if (offset_reference_height) {
-	  height_ref = basenode["offset_height"].as<double>();
-	  // can also use the height of one of the wheels as reference for the terrain
-//	  height_ref = init_state.ee_motion_.at(LH).GetByIndex(xpp::kPos).z();
-    }
-    std_msgs::Float64 height_msg;
-    height_msg.data = height_ref;
-    terrain_ref_height_pub_.publish(height_msg);  // publish reference height for visualization in RViz
-
     if (init_state_from_file) {
-      formulation_.terrain_ = HeightMap::MakeTerrain(towr_terrain_id, height_ref);
+      formulation_.terrain_ = HeightMap::MakeTerrain(towr_terrain_id);
       SetTowrInitialStateFromFile();
     }
     else {
-	  formulation_.terrain_ = HeightMap::MakeTerrain(towr_terrain_id, height_ref);
+	  formulation_.terrain_ = HeightMap::MakeTerrain(towr_terrain_id);
 	  SetTowrInitialStateFromController(init_state);
     }
 
@@ -229,7 +212,7 @@ public:
 
     final_position_.x() = basenode[terrain]["final_pose"]["x"].as<double>();
     final_position_.y() = basenode[terrain]["final_pose"]["y"].as<double>();
-    final_position_.z() = basenode[terrain]["final_pose"]["z"].as<double>() + height_ref;
+    final_position_.z() = basenode[terrain]["final_pose"]["z"].as<double>();
     goal_geom_.lin.p_ = final_position_;
     goal_geom_.lin.p_.x() += formulation_.initial_base_.lin.at(kPos).x();
 

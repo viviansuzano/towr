@@ -30,13 +30,7 @@ TowrDriveRosInterface::TowrDriveRosInterface () : current_state_robot_(4)
 
   trajectory_pub_ = n.advertise<xpp_msgs::RobotStateCartesianTrajectory>(xpp_msgs::robot_trajectory_desired, 1);
 
-  new_trajectory_pub_ = n.advertise<std_msgs::Bool>("/xpp/new_trajectory", 1);
-
-  terrain_map_pub_ = n.advertise<anymal_wheels_ctrl_track_msgs::TerrainMap>("/towr/terrain_map", 1);
-
   towr_command_pub_ = n.advertise<towr_ros::TowrCommand>(towr_msgs::user_command, 1);
-
-  terrain_ref_height_pub_ = n.advertise<std_msgs::Float64>("/towr/terrain_ref_height", 1);
 
   plan_service_ = n.advertiseService("towr_drive/plan_motion", &TowrDriveRosInterface::planServiceCallback, this);
   replay_service_ = n.advertiseService("towr_drive/replay_motion", &TowrDriveRosInterface::replayServiceCallback, this);
@@ -108,18 +102,11 @@ TowrDriveRosInterface::planServiceCallback(std_srvs::Trigger::Request  &req,
 
   // publish trajectory and terrain map for the controller
   XppVec trajectory = GetTrajectory(trajectory_dt_);
-  std_msgs::Bool new_traj;
-  new_traj.data = true;
   xpp_msgs::RobotStateCartesianTrajectory xpp_msg = xpp::Convert::ToRos(trajectory);
-  new_trajectory_pub_.publish(new_traj);
   trajectory_pub_.publish(xpp_msg);
-  anymal_wheels_ctrl_track_msgs::TerrainMap terrain_msg = GetTerrainMap(trajectory);
-  terrain_map_pub_.publish(terrain_msg);
 
   // save bags for controller and matlab
   ExtractGeometryMessagesFromTrajectoryBag(bag_file);
-  bag_file = ros::package::getPath("anymal_wheels_ctrl_track_ros") + "/data/anymal_wheels_traj.bag";
-  SaveDrivingMotionTerrainInRosbag (solution, msg.terrain, bag_file);
 
   res.success = true;
   res.message = "optimization done";
@@ -304,28 +291,6 @@ TowrDriveRosInterface::SaveTrajectoryInRosbag (rosbag::Bag& bag,
 
     bag.write(xpp_msgs::terrain_info, timestamp, terrain_msg);
   }
-}
-
-anymal_wheels_ctrl_track_msgs::TerrainMap
-TowrDriveRosInterface::GetTerrainMap (const XppVec& traj) const
-{
-  anymal_wheels_ctrl_track_msgs::TerrainMap map;
-
-  for (const auto state : traj) {
-    auto timestamp = ::ros::Time(state.t_global_ + 1e-6); // t=0.0 throws ROS exception
-
-    xpp_msgs::TerrainInfo terrain_msg;
-    for (auto ee : state.ee_motion_.ToImpl()) {
-      Vector3d n = formulation_.terrain_->GetNormalizedBasis(HeightMap::Normal, ee.p_.x(), ee.p_.y());
-      terrain_msg.surface_normals.push_back(xpp::Convert::ToRos<geometry_msgs::Vector3>(n));
-      terrain_msg.friction_coeff = formulation_.terrain_->GetFrictionCoeff();
-    }
-
-    map.terrain.push_back(terrain_msg);
-
-  }
-
-  return map;
 }
 
 } /* namespace towr */

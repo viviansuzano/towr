@@ -150,7 +150,6 @@ public:
 						WheelsAccLimits,
 						BaseAccLimits,
 						ForceWheels,
-						WheelsMotion,
 						Stability,
 						WheelsNonHolonomic
   };

@@ -34,6 +34,7 @@ ParametersDrive::ParametersDrive()
   constraints_.push_back(DynamicWheels);   		// ensures that the dynamic model is fullfilled at discrete times.
   constraints_.push_back(BaseAcc); 		   		// so accelerations don't jump between polynomials
   constraints_.push_back(EndeffectorAcc);  		// so accelerations don't jump between polynomials
+  constraints_.push_back(EndeffectorRom);       // ensures end-effector range of motion
   constraints_.push_back(ForceWheels); 	   		// ensures unilateral forces and inside the friction cone
   constraints_.push_back(WheelsAccLimits); 		// constrain the acceleration on the wheels
   constraints_.push_back(BaseAccLimits);   		// constrain the acceleration of the base
@@ -47,16 +48,6 @@ ParametersDrive::ParametersDrive()
   // cost
 //  costs_.push_back({TorqueCostID, 1.0});  // weighed by 1.0 relative to other costs
 //  costs_.push_back({WheelsMotionCostID, -1.0});  // weighed by 1.0 relative to other costs
-}
-
-void
-ParametersDrive::SetWheelsMotionConstraint () {
-  constraints_.push_back(WheelsMotion);
-}
-
-void
-ParametersDrive::SetEndeffectorRomConstraint () {
-  constraints_.push_back(EndeffectorRom);
 }
 
 void

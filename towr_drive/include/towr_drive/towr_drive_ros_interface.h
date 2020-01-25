@@ -20,7 +20,6 @@
 #include <xpp_msgs/RobotStateCartesian.h>
 #include <xpp_msgs/RobotParameters.h>
 #include <towr_ros/TowrCommand.h>
-#include <anymal_wheels_ctrl_track_msgs/TerrainMap.h>
 
 #include <towr/nlp_formulation.h>
 #include <towr/nlp_formulation_drive.h>
@@ -48,8 +47,6 @@ protected:
 
   ifopt::IpoptSolver::Ptr solver_; ///< NLP solver, could also use SNOPT.
 
-  ::ros::Publisher  terrain_ref_height_pub_;
-
 private:
   SplineHolderDrive solution; ///< the solution splines linked to the opt-variables.
   ifopt::Problem nlp_;        ///< the actual nonlinear program to be solved.
@@ -59,8 +56,6 @@ private:
   xpp::RobotStateCartesian current_state_robot_;
 
   ::ros::Publisher trajectory_pub_;
-  ::ros::Publisher terrain_map_pub_;
-  ::ros::Publisher new_trajectory_pub_;
   ::ros::Publisher initial_state_pub_;
   ::ros::Publisher robot_parameters_pub_;
   ::ros::ServiceServer plan_service_;
@@ -68,7 +63,6 @@ private:
   ::ros::Publisher  towr_command_pub_;
   ::ros::Subscriber current_state_sub_;
 
-  anymal_wheels_ctrl_track_msgs::TerrainMap GetTerrainMap (const XppVec& traj) const;
   bool planServiceCallback(std_srvs::Trigger::Request  &req,
 	   	   	   	   	   	   std_srvs::Trigger::Response &res);
   bool replayServiceCallback(std_srvs::Trigger::Request  &req,

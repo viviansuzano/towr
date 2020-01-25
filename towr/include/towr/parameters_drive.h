@@ -80,8 +80,6 @@ public:
   /// Clear the costs initialized by the Base class
   void DeleteAllCosts();
 
-  void SetWheelsMotionConstraint ();
-  void SetEndeffectorRomConstraint ();
   void SetNonHolonomicConstraint ();
   void SetWheelsMotionCost ();
   void SetBasePitchCost ();

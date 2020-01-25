@@ -25,7 +25,6 @@ add_library(${PROJECT_NAME} SHARED
   src/force_wheels_constraint.cc
   src/wheels_acc_limits_constraint.cc
   src/base_acc_limits_constraint.cc
-  src/wheels_motion_constraint.cc
   src/nlp_formulation_drive.cc
   src/stability_constraint.cc
   src/wheels_non_holonomic_constraint.cc

@@ -12,7 +12,6 @@ find_package(catkin REQUIRED COMPONENTS
   towr
   xpp_states
   xpp_msgs
-  anymal_wheels_ctrl_track_msgs
   yaml_tools  
 )
 
@@ -39,9 +38,6 @@ include_directories(
 add_library(${PROJECT_NAME} SHARED
   src/towr_drive_ros_interface.cc
 )
-add_dependencies(${PROJECT_NAME} 
-  ${PROJECT_NAME}_gencpp
-)
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
@@ -49,9 +45,6 @@ target_link_libraries(${PROJECT_NAME}
 ## An example executable that runs TOWR
 add_executable(towr_drive_ros_app 
   src/towr_drive_ros_app.cc
-)
-add_dependencies(towr_drive_ros_app 
-  ${PROJECT_NAME}_gencpp
 )
 target_link_libraries(towr_drive_ros_app
   ${catkin_LIBRARIES}
@@ -63,14 +56,6 @@ add_executable(anymal_wheels_test
   test/anymal_wheels_test.cc
 )
 target_link_libraries(anymal_wheels_test
-  ${catkin_LIBRARIES}
-)
-
-# Send trajectory to controller from TOWR rosbag
-add_executable(send_trajectory_from_bag 
-  src/send_trajectory_from_bag.cc
-)
-target_link_libraries(send_trajectory_from_bag
   ${catkin_LIBRARIES}
 )
 
