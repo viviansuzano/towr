@@ -143,14 +143,27 @@ public:
                         Force,          ///< sets ForceConstraint
                         Swing,          ///< sets SwingConstraint
                         BaseRom,        ///< sets BaseMotionConstraint
-                        BaseAcc         ///< sets SplineAccConstraint
+                        BaseAcc,         ///< sets SplineAccConstraint
+						TerrainWheels,
+						DynamicWheels,
+						EndeffectorAcc,
+						WheelsAccLimits,
+						BaseAccLimits,
+						ForceWheels,
+						WheelsMotion,
+						Stability,
+						WheelsNonHolonomic
   };
+
   /**
    *  @brief Indentifiers to be used to add certain costs to the optimization
    *  problem.
    */
-  enum CostName       { ForcesCostID,    ///< sets NodeCost on force nodes
-                        EEMotionCostID   ///< sets NodeCost on endeffector velocity
+  enum CostName       { ForcesCostID,    	///< sets NodeCost on force nodes
+                        EEMotionCostID,   	///< sets NodeCost on endeffector velocity
+						TorqueCostID,	  	// minimizes total torque on the wheels
+						WheelsMotionCostID, // force one wheel at a time motion! (hack!!)
+						BasePitchCostID			// minimize base pitch angle
   };
 
   using CostWeights      = std::vector<std::pair<CostName, double>>;
@@ -173,7 +186,7 @@ public:
   /// Which constraints should be used in the optimization problem.
   UsedConstraints constraints_;
 
-  /// Which costs should be used in the optimiation problem.
+  /// Which costs should be used in the optimization problem.
   CostWeights costs_;
 
   /// Interval at which the dynamic constraint is enforced.
@@ -215,7 +228,7 @@ public:
   void OptimizePhaseDurations();
 
   /// The durations of each base polynomial in the spline (lin+ang).
-  VecTimes GetBasePolyDurations() const;
+  virtual VecTimes GetBasePolyDurations() const;
 
   /// The number of phases allowed for endeffector ee.
   int GetPhaseCount(EEID ee) const;
@@ -224,10 +237,10 @@ public:
   bool IsOptimizeTimings() const;
 
   /// The number of endeffectors.
-  int GetEECount() const;
+  virtual int GetEECount() const;
 
   /// Total duration [s] of the motion.
-  double GetTotalTime() const;
+  virtual double GetTotalTime() const;
 };
 
 } // namespace towr

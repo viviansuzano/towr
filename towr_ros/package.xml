@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>towr_ros</name>
-  <version>1.4.1</version>
+  <version>1.4.0</version>
   <description>
     A ROS dependent wrapper for
     <a href="http://wiki.ros.org/towr">towr</a>.
@@ -33,6 +33,7 @@
   
   <exec_depend>xterm</exec_depend>
   <exec_depend>xpp_hyq</exec_depend>
+  <exec_depend>xpp_anymal</exec_depend>
   <exec_depend>rviz</exec_depend>
   <exec_depend>rqt_bag</exec_depend>
 </package>
