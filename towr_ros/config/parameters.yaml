@@ -46,7 +46,7 @@ Block:
     y: 0.0
     z: 0.5
 
-  total_time: 3.0 # 2.0
+  total_time: 3.0 # 2.0 (Hop), 3.0 (Cross)
   gait: 7
 
 Slope:
