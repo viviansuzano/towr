@@ -226,13 +226,13 @@ QuadrupedGaitGenerator::GetStrideWalk () const
 QuadrupedGaitGenerator::GaitInfo
 QuadrupedGaitGenerator::GetStrideWalkTest () const
 {
-  double three    = 0.3;
-  double lateral  = 0.15;
-  double diagonal = 0.15;
+  double three    = 0.35;
+  double lateral  = 0.25;
+  double diagonal = 0.25;
 
   auto times =
   {
-	  three, lateral, 0.35,
+	  three, lateral, three,
 	  diagonal,
 	  three, lateral, three, //three,
 	  diagonal,

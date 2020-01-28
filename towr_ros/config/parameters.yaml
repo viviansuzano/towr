@@ -46,8 +46,8 @@ Block:
     y: 0.0
     z: 0.5
 
-  total_time: 2.0 # 2.0
-  gait: 8
+  total_time: 3.0 # 2.0
+  gait: 7
 
 Slope:
   initial_pose:

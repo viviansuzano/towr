@@ -94,7 +94,7 @@ switch type
     case "Block"
         block_start = 0.7;
         len = 3.5;
-        height = 0.1;
+        height = 0.2;
         eps = 0.03;
         slope = height/eps;
         for i = 1:length(x)
