@@ -33,6 +33,8 @@ public:
   using TowrCommandMsg = towr_ros::TowrCommand;
   using Vector3d       = Eigen::Vector3d;
 
+//  virtual void OptimizeMotion ();
+
 protected:
   TowrDriveRosInterface ();
   virtual ~TowrDriveRosInterface () = default;
@@ -41,7 +43,7 @@ protected:
 
   virtual void SetIpoptParameters(const TowrCommandMsg& msg) = 0;
 
-  virtual TowrCommandMsg BuildTowrCommandMsg (const xpp::RobotStateCartesian& init_state) = 0;
+  virtual TowrCommandMsg BuildTowrCommandMsg () = 0;
 
   NlpFormulationDrive formulation_;         ///< the default formulation, can be adapted
 
@@ -53,21 +55,17 @@ private:
   double visualization_dt_;   ///< duration between two rviz visualization states.
   double trajectory_dt_;      ///< interval between the states in the trajectory.
 
-  xpp::RobotStateCartesian current_state_robot_;
-
   ::ros::Publisher trajectory_pub_;
   ::ros::Publisher initial_state_pub_;
   ::ros::Publisher robot_parameters_pub_;
   ::ros::ServiceServer plan_service_;
   ::ros::ServiceServer replay_service_;
   ::ros::Publisher  towr_command_pub_;
-  ::ros::Subscriber current_state_sub_;
 
   bool planServiceCallback(std_srvs::Trigger::Request  &req,
 	   	   	   	   	   	   std_srvs::Trigger::Response &res);
   bool replayServiceCallback(std_srvs::Trigger::Request  &req,
 	   	   	   	   	   	     std_srvs::Trigger::Response &res);
-  void currentStateCallback (const xpp_msgs::RobotStateCartesianConstPtr& msg);
   XppVec GetTrajectory(const double dt) const;
   virtual BaseState GetGoalState(const TowrCommandMsg& msg) const;
   void PublishInitialState();

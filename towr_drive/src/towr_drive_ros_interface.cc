@@ -24,7 +24,7 @@
 namespace towr {
 
 
-TowrDriveRosInterface::TowrDriveRosInterface () : current_state_robot_(4)
+TowrDriveRosInterface::TowrDriveRosInterface ()
 {
   ::ros::NodeHandle n;
 
@@ -39,25 +39,25 @@ TowrDriveRosInterface::TowrDriveRosInterface () : current_state_robot_(4)
 
   robot_parameters_pub_  = n.advertise<xpp_msgs::RobotParameters>(xpp_msgs::robot_parameters, 1);
 
-  current_state_sub_ = n.subscribe(xpp_msgs::robot_state_current, 1, &TowrDriveRosInterface::currentStateCallback, this);
-
   solver_ = std::make_shared<ifopt::IpoptSolver>();
 
   visualization_dt_ = 0.01;
   trajectory_dt_ = 0.0025;
+
 }
 
 bool
 TowrDriveRosInterface::planServiceCallback(std_srvs::Trigger::Request  &req,
 		  	  	  	       	   	   	   	   std_srvs::Trigger::Response &res)
+//void TowrDriveRosInterface::OptimizeMotion ()
 {
   // robot model
-  formulation_.model_ = RobotModel(RobotModel::AnymalWheels);
+  formulation_.model_ = RobotModel(RobotModel::Harpia);
   auto robot_params_msg = BuildRobotParametersMsg(formulation_.model_);
   robot_parameters_pub_.publish(robot_params_msg);
 
   // set initial and goal position for TOWR + towr command message
-  TowrCommandMsg msg = BuildTowrCommandMsg(current_state_robot_);
+  TowrCommandMsg msg = BuildTowrCommandMsg();
   towr_command_pub_.publish(msg);
 
   int n_ee = formulation_.model_.kinematic_model_->GetNumberOfEndeffectors();
@@ -128,14 +128,6 @@ TowrDriveRosInterface::replayServiceCallback(std_srvs::Trigger::Request  &req,
   res.message = "replay done";
 
   return true;
-}
-
-void
-TowrDriveRosInterface::currentStateCallback (const xpp_msgs::RobotStateCartesianConstPtr& msg)
-{
-  xpp::RobotStateCartesian xpp = xpp::Convert::ToXpp(*msg);
-
-  current_state_robot_ = xpp;
 }
 
 BaseState

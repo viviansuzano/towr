@@ -28,6 +28,7 @@ add_library(${PROJECT_NAME} SHARED
   src/nlp_formulation_drive.cc
   src/stability_constraint.cc
   src/wheels_non_holonomic_constraint.cc
+  src/wheels_motion_constraint.cc
   # sample formulation usage
   src/nlp_formulation.cc
   src/parameters.cc
@@ -130,6 +131,15 @@ add_executable(anymal_example
   test/anymal_example.cc
 )
 target_link_libraries(anymal_example
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ifopt::ifopt_ipopt
+)
+
+add_executable(harpia_example 
+  test/harpia_example.cc
+)
+target_link_libraries(harpia_example
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ifopt::ifopt_ipopt

@@ -69,28 +69,28 @@ switch type
                h(i) = height;
            end
        end
-    case "Slope"
-       slope_start = 0.5; 
-       up_length   = 2.0;
-       down_length = 2.0;
-       plat_length = 1.0;
-       slope = 0.3;
-       height_center = up_length*sin(slope);
-       x_plat_start = slope_start+up_length*cos(slope);
-       x_down_start = x_plat_start+plat_length;
-       x_flat_start = x_down_start + down_length*cos(slope);
-        if (x >= slope_start)
-            h = slope*(x-slope_start);
-        end
-        if (x >= x_plat_start)
-            h = height_center;
-        end
-        if (x >= x_down_start)
-            h = height_center - slope*(x-x_down_start);
-        end
-        if (x >= x_flat_start)
-            h = 0.0; 
-        end
+%     case "Slope"
+%        slope_start = 0.5; 
+%        up_length   = 2.0;
+%        down_length = 2.0;
+%        plat_length = 1.0;
+%        slope = 0.3;
+%        height_center = up_length*sin(slope);
+%        x_plat_start = slope_start+up_length*cos(slope);
+%        x_down_start = x_plat_start+plat_length;
+%        x_flat_start = x_down_start + down_length*cos(slope);
+%         if (x >= slope_start)
+%             h = slope*(x-slope_start);
+%         end
+%         if (x >= x_plat_start)
+%             h = height_center;
+%         end
+%         if (x >= x_down_start)
+%             h = height_center - slope*(x-x_down_start);
+%         end
+%         if (x >= x_flat_start)
+%             h = 0.0; 
+%         end
     case "Block"
         block_start = 0.7;
         len = 3.5;
@@ -123,6 +123,52 @@ switch type
            else
                h(i) = 0.0;
            end
+        end
+	case "Slope"
+        slope_start_ = 1.0;
+        up_length_   = 1.0;
+        down_length_ = 1.0;
+        height_center = 0.2;
+        x_down_start_ = slope_start_+up_length_;
+        x_flat_start_ = x_down_start_ + down_length_;
+        slope_ = height_center/up_length_;
+        for i = 1:length(x)
+           if (x(i) >= slope_start_)
+               h(i) = slope_*(x(i)-slope_start_);
+           end
+           if (x(i) >= x_down_start_)
+               h(i) = height_center - slope_*(x(i)-x_down_start_);
+           end
+           if (x(i) >= x_flat_start_)
+               h(i) = 0.0;
+           end
+        end
+	case "SlopePlat"
+        slope_start_   = 1.0;
+        up_length_     = 1.0; 
+        down_length_   = 1.0;
+        plat_length_   = 0.2;
+        height_center_ = 0.2;
+        slope_up_	  = height_center_/up_length_;
+        slope_down_	  = height_center_/down_length_;
+
+        x_plat_start_ = slope_start_ + up_length_;
+        x_down_start_ = x_plat_start_ + plat_length_;
+        x_flat_start_ = x_down_start_ + down_length_;
+        for i = 1:length(x)
+          h(i) = 0.0;
+          if (x(i) >= slope_start_)
+            h(i) = slope_up_*(x(i)-slope_start_);
+          end
+          if (x(i) >= x_plat_start_)
+            h(i) = height_center_;
+          end
+          if (x(i) >= x_down_start_) 
+            h(i) = height_center_ - slope_down_*(x(i)-x_down_start_);
+          end
+          if (x(i) >= x_flat_start_)
+            h(i) = 0.0;
+          end
         end
     otherwise
         h = 0.0;

@@ -2,14 +2,9 @@ terrain: "Flat"
 run_derivative_test: false
 plot_trajectory: false
 play_initialization: false
-shift_initialization: false
 init_state_from_file: true  # 'true' if initial_pose for base is read from this file, 'false' if it is set by the current anymal state
 
 constrain_initial_y_base: true
-constrain_final_y_base:   false 
-constrain_final_z_base:   false
-constrain_final_ee_pos:   false
-constrain_final_base_orientation: false 
 
 set_wheels_motion_cost: false
 set_base_pitch_cost: false
@@ -20,15 +15,57 @@ Flat:
   initial_pose:
     x: 0.0
     y: 0.0
-    z: 0.48
+    z: 0.04445
    
   final_pose: 
-    x: 1.0
+    x: 2.0
     y: 0.0
-    z: 0.48
+    z: 0.04445
 
-  total_time: 1.0
-  traction_limit: 400
+  total_time: 2.0
+  traction_limit: 4000
+
+Slope:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.04445
+   
+  final_pose: 
+    x: 3.5
+    y: 0.0
+    z: 0.04445
+
+  total_time: 5.0
+  traction_limit: 4000
+
+SineHighFreq:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.04445
+   
+  final_pose: 
+    x: 3.5
+    y: 0.0
+    z: 0.04445
+
+  total_time: 5.0
+  traction_limit: 4000
+
+SlopePlat:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.04445
+   
+  final_pose: 
+    x: 4.0
+    y: 0.0
+    z: 0.04445
+
+  total_time: 4.0
+  traction_limit: 4000
 
 
 

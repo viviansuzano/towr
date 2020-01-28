@@ -23,6 +23,7 @@
 #include <towr/constraints/base_acc_limits_constraint.h>
 #include <towr/constraints/stability_constraint.h>
 #include <towr/constraints/wheels_non_holonomic_constraint.h>
+#include <towr/constraints/wheels_motion_constraint.h>
 
 #include <towr/costs/node_cost.h>
 #include <towr/costs/torque_cost.h>
@@ -75,6 +76,9 @@ NlpFormulationDrive::MakeBaseVariables () const
   spline_lin->AddFinalBound(kPos, params_drive_.bounds_final_lin_pos_, final_base_.lin.p());
   spline_lin->AddFinalBound(kVel, params_drive_.bounds_final_lin_vel_, final_base_.lin.v());
 
+  // constrain no velocity in the y-axis
+  spline_lin->AddAllNodesBounds(kVel, {Y}, Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0));
+
   // constrain same height for the entire motion
 //  spline_lin->AddAllNodesBounds(kPos, {Z}, initial_base_.lin.p(), initial_base_.lin.p());
 
@@ -89,7 +93,7 @@ NlpFormulationDrive::MakeBaseVariables () const
 
   spline_ang->AddStartBound(kPos, {X,Y,Z}, initial_base_.ang.p());
   spline_ang->AddStartBound(kVel, {X,Y,Z}, initial_base_.ang.v());
-  spline_ang->AddFinalBound(kPos, params_drive_.bounds_final_ang_pos_, final_base_.ang.p());
+//  spline_ang->AddFinalBound(kPos, params_drive_.bounds_final_ang_pos_, final_base_.ang.p());
   spline_ang->AddFinalBound(kVel, params_drive_.bounds_final_ang_vel_, final_base_.ang.v());
   vars.push_back(spline_ang);
 
@@ -124,7 +128,7 @@ NlpFormulationDrive::MakeEEWheelsMotionVariables () const
 	nodes->AddFinalBound(kVel, {X,Y,Z}, Vector3d(0.0, 0.0, 0.0));  // wheels vel zero at the end
 
     // initial wheel's position
-    nodes->AddStartBound(kPos, {Y}, initial_ee_W_.at(ee));
+    nodes->AddStartBound(kPos, {X,Y,Z}, initial_ee_W_.at(ee));
 
     // final wheel's position
     if (params_drive_.constrain_final_ee_pos_)
@@ -188,7 +192,7 @@ NlpFormulationDrive::GetConstraint (Parameters::ConstraintName name,
 {
   switch (name) {
     case Parameters::DynamicWheels:     	return MakeDynamicWheelsConstraint(s);
-    case Parameters::EndeffectorRom: 		return MakeRangeOfMotionBoxConstraint(s);
+    case Parameters::EndeffectorRom: 		return MakeWheelsMotionConstraint(s);
     case Parameters::BaseRom:        		return MakeBaseRangeOfMotionConstraint(s);
     case Parameters::TerrainWheels:     	return MakeTerrainWheelsConstraint(s);
     case Parameters::ForceWheels:       	return MakeForceWheelsConstraint(s);
@@ -218,6 +222,24 @@ NlpFormulationDrive::MakeRangeOfMotionBoxConstraint (const SplineHolderDrive& s)
 
   return c;
 }
+
+NlpFormulationDrive::ConstraintPtrVec
+NlpFormulationDrive::MakeWheelsMotionConstraint (const SplineHolderDrive& s) const
+{
+  ContraintPtrVec c;
+
+  for (int ee=0; ee<params_drive_.GetEECount(); ee++) {
+    auto rom = std::make_shared<WheelsMotionConstraint>(model_.kinematic_model_,
+                                                        params_drive_.GetTotalTime(),
+														params_drive_.dt_constraint_range_of_motion_,
+                                                        params_drive_.wheels_radius_, ee,
+														terrain_, s);
+    c.push_back(rom);
+  }
+
+  return c;
+}
+
 
 NlpFormulationDrive::ContraintPtrVec
 NlpFormulationDrive::MakeBaseRangeOfMotionConstraint (const SplineHolderDrive& s) const

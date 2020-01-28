@@ -15,9 +15,9 @@ ParametersDrive::ParametersDrive()
   duration_ee_polynomial_ = duration_base_polynomial_;
   wheels_torque_limit_ = 32.0;
   max_wheels_acc_ = {10.0, 0.0, 10.0};
-  max_base_acc_lin_ = {8.0, 8.0, 8.0};
-  max_base_acc_ang_ = {5.0, 5.0, 5.0};
-  wheels_radius_ = 0.08;
+  max_base_acc_lin_ = {10.0, 0.0, 10.0};
+  max_base_acc_ang_ = {10.0, 10.0, 10.0};
+  wheels_radius_ = 0.0762;  // 3 inches = 76.2mm
   force_limit_in_x_direction_ = 400.0;
   use_non_holonomic_constraint_ = false;
   constrain_final_ee_pos_ = false;
@@ -36,8 +36,8 @@ ParametersDrive::ParametersDrive()
   constraints_.push_back(EndeffectorAcc);  		// so accelerations don't jump between polynomials
   constraints_.push_back(EndeffectorRom);       // ensures end-effector range of motion
   constraints_.push_back(ForceWheels); 	   		// ensures unilateral forces and inside the friction cone
-  constraints_.push_back(WheelsAccLimits); 		// constrain the acceleration on the wheels
-  constraints_.push_back(BaseAccLimits);   		// constrain the acceleration of the base
+//  constraints_.push_back(WheelsAccLimits); 		// constrain the acceleration on the wheels
+//  constraints_.push_back(BaseAccLimits);   		// constrain the acceleration of the base
   constraints_.push_back(Stability);       		// ensure stability margin
 //  constraints_.push_back(WheelsNonHolonomic);  	// non-holonomic driving constraint
 

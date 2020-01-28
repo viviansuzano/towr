@@ -24,11 +24,12 @@
   </node>
   
   <!-- Launch rviz with specific configuration -->
-  <node name="rviz_xpp" pkg="rviz" type="rviz" args="-d $(find towr_drive)/rviz/xpp_towr_drive.rviz">
+  <node name="rviz_xpp" pkg="rviz" type="rviz" args="-d $(find towr_drive)/rviz/xpp_towr_harpia.rviz">
   </node>
   
   <!--  Launches the URDF visualizers  --> 
   <!-- <include file="$(find xpp_anymal)/launch/xpp_anymal.launch"></include> -->
-  <include file="$(find xpp_anymal_wheels)/launch/xpp_anymal_wheels.launch"></include>
+  <!-- <include file="$(find xpp_anymal_wheels)/launch/xpp_anymal_wheels.launch"></include> -->
+  <include file="$(find xpp_harpia)/launch/xpp_harpia.launch"></include>
        
 </launch>

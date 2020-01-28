@@ -49,6 +49,7 @@ class KinematicModel {
 public:
   using Ptr      = std::shared_ptr<KinematicModel>;
   using EEPos    = std::vector<Eigen::Vector3d>;
+  using WhPos    = std::vector<Eigen::Vector3d>;
   using Vector3d = Eigen::Vector3d;
 
   /**
@@ -68,6 +69,12 @@ public:
    * @returns The vector from base to each foot expressed in the base frame.
    */
   virtual EEPos GetNominalStanceInBase() const
+  {
+    return nominal_stance_;
+  }
+
+  // Only for wheeled vehicles!!
+  virtual WhPos GetWheelsCenterPositionInBase() const
   {
     return nominal_stance_;
   }

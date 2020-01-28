@@ -123,7 +123,7 @@ private:
   const double slope_start_ = 1.0;
   const double up_length_   = 1.0;
   const double down_length_ = 1.0;
-  const double height_center = 0.7;
+  const double height_center = 0.2;
 
   const double x_down_start_ = slope_start_+up_length_;
   const double x_flat_start_ = x_down_start_ + down_length_;
@@ -164,6 +164,48 @@ private:
   const double x_end1_ = x_start_+length_;
   const double x_end2_ = x_start_+2*length_;
 };
+
+/**
+ * @brief Sample terrain with a low frequency sine profile.
+ */
+class SineHighFreq : public HeightMap {
+public:
+  double GetHeight(double x, double y) const override;
+  double GetHeightDerivWrtX(double x, double y) const override;
+  double GetHeightDerivWrtXX(double x, double y) const override;
+
+private:
+  const double sine_start_ = 0.5;
+  const double freq_ = 1.5*M_PI/0.7;
+  const double amp_  = 0.06;
+  const double h_offset_ = 0.0; //amp_;
+  const double n_cycles_ = 2.0;
+  const double sine_end_ = n_cycles_*2*M_PI/freq_ + sine_start_;
+};
+
+/**
+ * @brief Sample terrain with an increasing and then decreasing slope.
+ */
+class SlopePlat : public HeightMap {
+public:
+  double GetHeight(double x, double y) const override;
+  double GetHeightDerivWrtX(double x, double y) const override;
+
+private:
+
+  const double slope_start_   = 1.0;
+  const double up_length_     = 1.0;
+  const double down_length_   = 1.0;
+  const double plat_length_   = 0.2;
+  const double height_center_ = 0.2;
+  const double slope_up_	  = height_center_/up_length_;
+  const double slope_down_	  = height_center_/down_length_;
+
+  const double x_plat_start_ = slope_start_ + up_length_;
+  const double x_down_start_ = x_plat_start_ + plat_length_;
+  const double x_flat_start_ = x_down_start_ + down_length_;
+};
+
 
 /** @}*/
 

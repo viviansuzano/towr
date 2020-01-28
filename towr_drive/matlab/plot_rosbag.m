@@ -7,7 +7,8 @@ clear;
 close all;
 
 %% Extract the desired 3D vectors from the bag
-filePath = '~/Dropbox/ETH/JFR_2019/videos/27_08_2019/up_45/anymal_wheels_matlab.bag';
+filePath = '../bags/harpia_matlab.bag';
+% filePath = '~/Dropbox/ETH/JFR_2019/videos/27_08_2019/up_45/anymal_wheels_matlab.bag';
 % filePath = '~/Dropbox/ETH/JFR_2019/simulations/five_steps/large/anymal_wheels_matlab.bag';
 % filePath = '../bags/anymal_wheels_matlab.bag';
 % filePath = '../bags/step_bear_v1_matlab.bag';
@@ -89,6 +90,7 @@ base_pos  = [ts_base_pos.Data(:,1), ts_base_pos.Data(:,2), ts_base_pos.Data(:,3)
 base_quat = [ts_base_pos.Data(:,4), ts_base_pos.Data(:,5), ...
              ts_base_pos.Data(:,6), ts_base_pos.Data(:,7)];
 [base_yaw, base_pitch, base_roll] = quat2angle(base_quat,'XYZ');
+base_roll = abs(base_roll);
 
 % base velocity
 base_vel_lin = [ts_base_vel_lin.Data(:,1), ts_base_vel_lin.Data(:,2), ts_base_vel_lin.Data(:,3)];
@@ -124,14 +126,14 @@ force_RH = [ts_force_RH.Data(:,1), ts_force_RH.Data(:,2), ts_force_RH.Data(:,3)]
 
 %% Check dynamics
 
-Ixx =  0.248057547486776;
-Iyy =  0.650151658461464;
-Izz =  0.620944203624185;
-Ixy =  0.001097838800893; 
-Ixz = -0.003945011648535;
-Iyz = -0.002135691054868;
+Ixx =  1.39698239;
+Iyy =  0.56281087;
+Izz =  1.82100537;
+Ixy = -0.00160128; 
+Ixz = -0.01746027;
+Iyz = -0.00814363;
 
-m = 19.642;
+m = 27.24;
 J = [Ixx Ixy Ixz; 
      Ixy Iyy Iyz;
      Ixz Iyz Izz];  % inertia
@@ -281,9 +283,10 @@ subplot(3,4,12); plot(t,pos_RH(:,3)); grid on;
 xlabel('t [s]'); ylabel('p_z [m]')
 
 h = figure();
-terrain = "Flat"; %"Step45";
+terrain = "SlopePlat"; %"Step45";
 set(h, 'Name', 'Wheels position (X x Z)');
 subplot(4,1,1); plot(pos_LF(:,1),pos_LF(:,3),pos_LF(:,1),GetTerrainHeight(pos_LF(:,1), terrain)); grid on; axis equal;
+% hold on; plot(pos_LF(dyn_con_idx,1),pos_LF(dyn_con_idx,3),'r*');
 xlabel('p_x [m]'); ylabel('p_z [m]'); title('LF')
 subplot(4,1,2); plot(pos_RF(:,1),pos_RF(:,3),pos_RF(:,1),GetTerrainHeight(pos_RF(:,1), terrain)); grid on; axis equal;
 xlabel('p_x [m]'); ylabel('p_z [m]'); title('RF')
@@ -386,8 +389,8 @@ xlabel('t [s]'); ylabel('f_y [N]')
 subplot(3,4,12); plot(t,force_RH(:,3),'LineWidth',lineWidth); grid on;
 xlabel('t [s]'); ylabel('f_z [N]')
 
-% base_ang = [base_roll, base_pitch, base_yaw];
-% plot_stability_measure(base_pos, base_ang, pos_ee, base_acc_lin, base_acc_ang, base_vel_ang, J, m ,g, t);
+base_ang = [base_roll, base_pitch, base_yaw];
+plot_stability_measure(base_pos, base_ang, pos_ee, base_acc_lin, base_acc_ang, base_vel_ang, J, m ,g, t);
 
 % %% compute wheel's torque
 % 
