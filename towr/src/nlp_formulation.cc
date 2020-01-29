@@ -125,6 +125,11 @@ NlpFormulation::MakeBaseVariables () const
   spline_ang->AddStartBound(kVel, {X,Y,Z}, initial_base_.ang.v());
   spline_ang->AddFinalBound(kPos, params_.bounds_final_ang_pos_, final_base_.ang.p());
   spline_ang->AddFinalBound(kVel, params_.bounds_final_ang_vel_, final_base_.ang.v());
+
+  // limits all angles displacement to 30 degrees (optional)
+  Vector3d ang_limit_ = Vector3d(10, 10, 10) * (M_PI/180);
+  spline_ang->AddAllNodesBounds(kPos, {Y}, -ang_limit_, ang_limit_);
+
   vars.push_back(spline_ang);
 
   return vars;

@@ -116,6 +116,7 @@ base_pos  = [ts_base_pos.Data(:,1), ts_base_pos.Data(:,2), ts_base_pos.Data(:,3)
 base_quat = [ts_base_pos.Data(:,4), ts_base_pos.Data(:,5), ...
              ts_base_pos.Data(:,6), ts_base_pos.Data(:,7)];
 [base_yaw, base_pitch, base_roll] = quat2angle(base_quat,'XYZ');
+base_roll = abs(base_roll);
 
 % base velocity
 base_vel_lin = [ts_base_vel_lin.Data(:,1), ts_base_vel_lin.Data(:,2), ts_base_vel_lin.Data(:,3)];
@@ -350,7 +351,7 @@ hold on; plot(t(idx_pos_RH), pos_RH(idx_pos_RH,3),'r*');
 xlabel('t [s]'); ylabel('p_z [m]')
 
 h = figure();
-terrain = "Block"; % "Block"; %"Gap"; %"Flat"; %"Step45";
+terrain = "Gap"; % "Block"; %"Gap"; %"Flat"; %"Step45";
 set(h, 'Name', 'Wheels position (X x Z)');
 subplot(4,1,1); plot(pos_LF(:,1),pos_LF(:,3),pos_LF(:,1),GetTerrainHeight(pos_LF(:,1), terrain)); grid on; %axis equal;
 % hold on; plot(pos_LF(idx_pos_LF,1),pos_LF(idx_pos_LF,3),'r*');
