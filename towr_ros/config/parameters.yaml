@@ -3,6 +3,7 @@ run_derivative_test: false
 plot_trajectory: false
 optimize_phase_durations: false
 play_initialization: false
+shift_initialization: false
 init_state_from_file: true  # 'true' if initial_pose for base is read from this file, 'false' if it is set by the current anymal state
 
 # Possible gaits: 0 (C0), 1 (C1), 2 (C2), 3 (C3), 4 (C4), 5 (DRIVE), 6 (FlatSim), 7 (BlockCross), 8 (BlockHop), 9 (GapCross), 10 (C5), 11 (C6)
@@ -25,12 +26,12 @@ Gap:
   initial_pose:
     x: 0.0
     y: 0.0
-    z: 0.48
+    z: 0.45
    
   final_pose: 
     x: 1.5
     y: 0.0
-    z: 0.5
+    z: 0.45
 
   total_time: 2.0 # 2.0 (converge)
   gait: 9

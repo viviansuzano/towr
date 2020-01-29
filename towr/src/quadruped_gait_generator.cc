@@ -261,7 +261,7 @@ QuadrupedGaitGenerator::GetGapCrossingGait () const
   auto times =
   {
 	  //three, lateral, three, diagonal, three, lateral, three, diagonal,
-     0.2, 0.15, 0.25, 0.15, 0.2, 0.1, 0.25, 0.1, 0.1,
+     0.2, 0.15, 0.25, 0.15, 0.15, 0.15, 0.25, 0.15, 0.05,
   };
   auto phase_contacts =
   {

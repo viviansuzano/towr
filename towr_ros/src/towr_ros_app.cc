@@ -178,6 +178,16 @@ public:
 
     float total_duration = basenode[terrain]["total_time"].as<float>();
 
+    bool shift_initialization = basenode["shift_initialization"].as<bool>();
+    if (shift_initialization)
+    {
+	  Eigen::Vector3d pos_phase (0.15, 0.0, 0.0);
+	  formulation_.initial_ee_W_.at(LF) += pos_phase;
+	  formulation_.initial_ee_W_.at(LH) += pos_phase;
+	  formulation_.initial_ee_W_.at(RF) -= pos_phase;
+	  formulation_.initial_ee_W_.at(RH) -= pos_phase;
+    }
+
     int gait_combo = basenode[terrain]["gait"].as<int>();
 
     msg.goal_lin                 = xpp::Convert::ToRos(goal_geom_.lin);
