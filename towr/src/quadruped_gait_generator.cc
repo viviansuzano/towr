@@ -86,7 +86,7 @@ QuadrupedGaitGenerator::SetCombo (Combos combo)
     case FlatSim:	SetGaits({Drive, Run2, Run2, Run2, Run2E, Drive}); break;
     case BlockCross:  SetGaits({StandFlight, Walk3E, Drive}); break;
     case BlockHop:  SetGaits({Hop4}); break;
-    case GapCross:  SetGaits({Stand, Walk3, Walk3E, Stand});     break; // fly trot
+    case GapCross:  SetGaits({Gap});     break; // fly trot
     case C5: 		SetGaits({Stand, Walk1, Walk1, Walk1, Walk1, Stand}); break; // overlap-walk
     case C6: 		SetGaits({Stand, Walk3, Walk3, Walk3, Walk3E, Stand}); break; // overlap-walk
     default: assert(false); std::cout << "Gait not defined\n"; break;
@@ -120,6 +120,7 @@ QuadrupedGaitGenerator::GetGait(Gaits gait) const
     // specific for wheels
     case Drive: return GetDriveGait();
     case StandFlight: return GetStrideStandFlight();
+    case Gap: return GetGapCrossingGait();
 
     default: assert(false); // gait not implemented
   }
@@ -245,6 +246,26 @@ QuadrupedGaitGenerator::GetStrideWalkTest () const
 	  bB_, IB_, PB_, //BB_,
 	  Pb_, //BB_,
 	  // melhorar subida traseira!!
+  };
+
+  return std::make_pair(times, phase_contacts);
+}
+
+QuadrupedGaitGenerator::GaitInfo
+QuadrupedGaitGenerator::GetGapCrossingGait () const
+{
+  double three    = 0.35;
+  double lateral  = 0.25;
+  double diagonal = 0.25;
+
+  auto times =
+  {
+	  //three, lateral, three, diagonal, three, lateral, three, diagonal,
+     0.2, 0.15, 0.25, 0.15, 0.2, 0.1, 0.25, 0.1, 0.1,
+  };
+  auto phase_contacts =
+  {
+	  BB_, Bb_, BI_, BP_, BB_, bB_, IB_, PB_, BB_,
   };
 
   return std::make_pair(times, phase_contacts);

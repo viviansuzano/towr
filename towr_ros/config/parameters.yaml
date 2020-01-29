@@ -1,4 +1,4 @@
-terrain: "Block"
+terrain: "Gap"
 run_derivative_test: false
 plot_trajectory: false
 optimize_phase_durations: false
@@ -28,12 +28,12 @@ Gap:
     z: 0.48
    
   final_pose: 
-    x: 2.0
+    x: 1.5
     y: 0.0
     z: 0.5
 
   total_time: 2.0 # 2.0 (converge)
-  gait: 1
+  gait: 9
 
 Block:
   initial_pose:

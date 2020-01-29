@@ -67,6 +67,7 @@ private:
 
   // specific for wheels
   GaitInfo GetDriveGait() const;
+  GaitInfo GetGapCrossingGait() const;
 
   void SetCombo(Combos combo) override;
 
