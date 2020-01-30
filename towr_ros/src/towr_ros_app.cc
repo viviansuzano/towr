@@ -133,6 +133,12 @@ public:
     if (msg.optimize_phase_durations)
       params.OptimizePhaseDurations();
 
+    bool constrain_final_z_base = basenode["constrain_final_z_base"].as<bool>();
+    if (constrain_final_z_base)
+    {
+    	params.bounds_final_lin_pos_ = {X, Y, Z};
+    }
+
     params.is_pure_driving_motion_ = false;
     if (msg.gait == towr::GaitGenerator::DRIVE) {
 	  std::cout << "PARAM is_pure_driving_motion_ TRUE!!!" << std::endl;

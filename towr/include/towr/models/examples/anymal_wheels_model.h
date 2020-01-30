@@ -21,9 +21,9 @@ class AnymalWheelsKinematicModel : public KinematicModel {
 public:
   AnymalWheelsKinematicModel () : KinematicModel(4)
   {
-    const double x_nominal_b = 0.35;
+    const double x_nominal_b = 0.35; //0.341;
     const double y_nominal_b = 0.235; // 0.21;
-    const double z_nominal_b = -0.42;
+    const double z_nominal_b = -0.45;
 
     nominal_stance_.at(LF) <<  x_nominal_b,   y_nominal_b, z_nominal_b;
     nominal_stance_.at(RF) <<  x_nominal_b,  -y_nominal_b, z_nominal_b;

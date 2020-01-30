@@ -83,7 +83,7 @@ QuadrupedGaitGenerator::SetCombo (Combos combo)
     case C3: 		SetGaits({Stand, Hop1, Hop1, Hop1, Hop1E, Stand}); break; // bound
     case C4:  		SetGaits({Stand, Hop3, Hop3, Hop3, Hop3E, Stand}); break; // gallop
     case DRIVE: 	SetGaits({Stand}); break;
-    case FlatSim:	SetGaits({Drive, Run2, Run2, Run2, Run2E, Drive}); break;
+    case FlatSim:	SetGaits({Drive, Run2, Run2, Run2, Run2E, Stand}); break;
     case BlockCross:  SetGaits({StandFlight, Walk3E, Drive}); break;
     case BlockHop:  SetGaits({Hop4}); break;
     case GapCross:  SetGaits({Gap});     break; // fly trot

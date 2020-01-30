@@ -136,6 +136,7 @@ TowrRosInterface::planServiceCallback(std_srvs::Trigger::Request  &req,
 	std::string bag_name = ros::package::getPath("towr_ros") + "/bags/anymal_hybrid_traj.bag";
 	auto final_trajectory = GetTrajectory();
 	SaveTrajectoryAsRosbag(bag_name, final_trajectory, xpp_msgs::robot_state_desired);
+	std::cout << "Successfully created bag  " << bag_name << std::endl;
 
 	res.success = true;
 	res.message = "optimization done";
@@ -319,8 +320,12 @@ TowrRosInterface::SaveTrajectoryAsRosbag (const std::string& bag_name,
     bag.write(topic, timestamp, msg);
 
     xpp_msgs::TerrainInfo terrain_msg;
-    for (auto ee : state.ee_motion_.ToImpl()) {
-      Vector3d n = formulation_.terrain_->GetNormalizedBasis(HeightMap::Normal, ee.p_.x(), ee.p_.y());
+    for (auto ee : state.ee_motion_.GetEEsOrdered()) {
+      Eigen::Vector3d ee_pos = state.ee_motion_.at(ee).p_;
+      Vector3d n = Vector3d(0, 0, 1);
+      if (state.ee_contact_.at(ee))
+    	  Vector3d n = formulation_.terrain_->GetNormalizedBasis(HeightMap::Normal, ee_pos.x(), ee_pos.y());
+
       terrain_msg.surface_normals.push_back(xpp::Convert::ToRos<geometry_msgs::Vector3>(n));
       terrain_msg.friction_coeff = formulation_.terrain_->GetFrictionCoeff();
     }

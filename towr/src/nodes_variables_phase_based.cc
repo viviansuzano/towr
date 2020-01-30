@@ -270,9 +270,9 @@ NodesVariablesEEMotion::GetPhaseBasedEEParameterization ()
         // smoother stepping motions.
         if (dim == Z)
           nodes_.at(node_id).at(kVel).z() = 0.0;
-//        if (dim == Y)
-//          nodes_.at(node_id).at(kVel).y() = 0.0;
-//        else
+        if (dim == Y)
+          nodes_.at(node_id).at(kVel).y() = 0.0;
+        else
           // velocity in x,y dimension during swing fully optimized.
           index_map[idx++].push_back(NodeValueInfo(node_id, kVel, dim));
       }

@@ -8,6 +8,8 @@ init_state_from_file: true  # 'true' if initial_pose for base is read from this 
 
 # Possible gaits: 0 (C0), 1 (C1), 2 (C2), 3 (C3), 4 (C4), 5 (DRIVE), 6 (FlatSim), 7 (BlockCross), 8 (BlockHop), 9 (GapCross), 10 (C5), 11 (C6)
 
+constrain_final_z_base: false
+
 Flat:
   initial_pose:
     x: 0.0
@@ -16,11 +18,11 @@ Flat:
    
   final_pose: 
     x: 2.0 
-    y: 0.0
-    z: 0.5
+    y: 1.0 #0.0
+    z: 0.48
 
   total_time: 3.0 # from combo FlatSim
-  gait: 7
+  gait: 1
 
 Gap:
   initial_pose:

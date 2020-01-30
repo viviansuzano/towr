@@ -191,7 +191,7 @@ NlpFormulation::MakeEndeffectorVariables () const
     nodes->AddFinalBound(kVel, {X,Y,Z}, Vector3d(0, 0, 0));
 
     // bound on the final ee_pos
-    // nodes->AddFinalBound(kPos, {X,Y,Z}, Vector3d(x,y,z));
+//    nodes->AddFinalBound(kPos, {X,Y,Z}, Vector3d(x,y,z));
 
     vars.push_back(nodes);
 
