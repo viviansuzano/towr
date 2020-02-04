@@ -71,7 +71,7 @@ public:
     int poly_in_phase_; ///< is this the 1st, 2nd, ... polynomial or this phase.
     int n_polys_in_phase_; ///< the number of polynomials used for this phase.
     bool is_constant_; ///< Does this polynomial represent a constant phase.
-    bool is_driving_;  // does this polynomial represent a driving phase.
+    bool is_driving_;  // does this polynomial represent a driving phase or a still contact phase.
     PolyInfo(int phase, int poly_in_phase, int n_polys_in_phase, bool is_const, bool is_drive);
   };
 

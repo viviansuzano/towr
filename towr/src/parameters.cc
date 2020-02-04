@@ -43,7 +43,7 @@ Parameters::Parameters ()
   duration_base_polynomial_ = 0.1;
   motion_polynomials_per_stance_phase_ = 3;
   force_polynomials_per_stance_phase_ = 3;
-  n_polynomials_per_swing_phase_ = 3; // so step can at least lift leg
+  n_polynomials_per_swing_phase_ = 2; // so step can at least lift leg
 
   // parameters related to specific constraints (only used when it is added as well)
   force_limit_in_normal_direction_ = 1000;
@@ -54,9 +54,10 @@ Parameters::Parameters ()
   bound_phase_duration_ = std::make_pair(0.2, 1.0);  // used only when optimizing phase durations, so gait
 
   // maximum acceleration for smooth motions
-  max_base_acc_lin_ = {10.0, 10.0, 5.0};
-  max_base_acc_ang_ = {10.0, 10.0, 5.0};
-  max_wheels_acc_ = {20.0, 0.0, 20.0};
+  max_base_acc_lin_ = {10.0, 10.0, 10.0};
+  max_base_acc_ang_ = {10.0, 10.0, 10.0};
+//  max_wheels_acc_ = {40.0, 0.0, 120.0};
+  max_wheels_acc_ = {20.0, 0.0, 50.0}; // testar!!
 
   DeleteAllConstraints();
 
@@ -70,10 +71,10 @@ Parameters::Parameters ()
   constraints_.push_back(EEAccLimits); // ensures maximum acc on the ee motions
   constraints_.push_back(EndeffectorAcc); // so accelerations don't jump between polynomials
 //  if (is_pure_driving_motion_)
-//    constraints_.push_back(BaseAccLimits); // ensures maximum acc on the base motions
+    constraints_.push_back(BaseAccLimits); // ensures maximum acc on the base motions
 
   // optional costs to e.g penalize endeffector forces
-  // costs_.push_back({ForcesCostID, 1.0}); weighed by 1.0 relative to other costs
+//   costs_.push_back({EEMotionCostID, 1.0}); //weighed by 1.0 relative to other costs
 
   // bounds on final 6DoF base state
   bounds_final_lin_pos_ = {X,Y};

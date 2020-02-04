@@ -1,4 +1,4 @@
-terrain: "Gap"
+terrain: "Flat"
 run_derivative_test: false
 plot_trajectory: false
 optimize_phase_durations: false
@@ -18,7 +18,7 @@ Flat:
    
   final_pose: 
     x: 2.0 
-    y: 1.0 #0.0
+    y: 0.0 #1.0 #0.0
     z: 0.48
 
   total_time: 3.0 # from combo FlatSim
