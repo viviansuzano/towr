@@ -30,6 +30,9 @@ namespace towr {
 std::vector<xpp::RobotStateCartesian> GetTrajectoryFromSolution (const SplineHolder& solution);
 std::vector<xpp::RobotStateCartesian> GetDrivingTrajectoryFromSolution (const SplineHolderDrive& solution);
 
+// saver torques instead of forces in rosbag
+std::vector<xpp::RobotStateCartesian> GetDrivingTorqueTrajectoryFromSolution (const SplineHolderDrive& solution, int terrain);
+
 void SaveTrajectoryInRosbag (const SplineHolder& solution, const std::string &bag_file);
 void SaveDrivingTrajectoryInRosbag (const SplineHolderDrive& solution, const std::string &bag_file);
 void SaveDrivingTrajectoryStatesInRosbag (const SplineHolderDrive& solution, const std::string &bag_file);

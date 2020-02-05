@@ -168,6 +168,26 @@ private:
 /**
  * @brief Sample terrain with a low frequency sine profile.
  */
+class SineLowFreq : public HeightMap {
+public:
+  double GetHeight(double x, double y) const override;
+  double GetHeightDerivWrtX(double x, double y) const override;
+  double GetHeightDerivWrtXX(double x, double y) const override;
+
+private:
+  double height_ref_;
+
+  const double sine_start_ = 0.5;
+  const double freq_ = 2.0;
+  const double amp_  = 0.2;
+  const double h_offset_ = 0.0; //amp_;
+  const double n_cycles_ = 2.0;
+  const double sine_end_ = n_cycles_*2*M_PI/freq_ + sine_start_;
+};
+
+/**
+ * @brief Sample terrain with a low frequency sine profile.
+ */
 class SineHighFreq : public HeightMap {
 public:
   double GetHeight(double x, double y) const override;
@@ -176,10 +196,10 @@ public:
 
 private:
   const double sine_start_ = 0.5;
-  const double freq_ = 1.5*M_PI/0.7;
+  const double freq_ = 2.0*M_PI; //1.5*M_PI/0.7; //2.0*M_PI/0.7;
   const double amp_  = 0.06;
   const double h_offset_ = 0.0; //amp_;
-  const double n_cycles_ = 2.0;
+  const double n_cycles_ = 3.0;
   const double sine_end_ = n_cycles_*2*M_PI/freq_ + sine_start_;
 };
 

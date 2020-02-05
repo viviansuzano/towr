@@ -46,11 +46,25 @@ SineHighFreq:
     z: 0.04445
    
   final_pose: 
-    x: 3.5
+    x: 3.0
     y: 0.0
     z: 0.04445
 
   total_time: 5.0
+  traction_limit: 4000
+
+SineLowFreq:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.04445
+   
+  final_pose: 
+    x: 3.5
+    y: 0.0
+    z: 0.04445
+
+  total_time: 4.0
   traction_limit: 4000
 
 SlopePlat:

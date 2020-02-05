@@ -108,6 +108,9 @@ TowrDriveRosInterface::planServiceCallback(std_srvs::Trigger::Request  &req,
   // save bags for controller and matlab
   ExtractGeometryMessagesFromTrajectoryBag(bag_file);
 
+  bag_file = ros::package::getPath("xpp_harpia") + "/bags/harpia_traj.bag";
+  SaveDrivingMotionTerrainInRosbag (solution, msg.terrain, bag_file);
+
   res.success = true;
   res.message = "optimization done";
 
@@ -283,6 +286,8 @@ TowrDriveRosInterface::SaveTrajectoryInRosbag (rosbag::Bag& bag,
 
     bag.write(xpp_msgs::terrain_info, timestamp, terrain_msg);
   }
+
+  std::cout << "Successfully created bag  " << bag.getFileName() << std::endl;
 }
 
 } /* namespace towr */

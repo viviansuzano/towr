@@ -36,9 +36,9 @@ ParametersDrive::ParametersDrive()
   constraints_.push_back(EndeffectorAcc);  		// so accelerations don't jump between polynomials
   constraints_.push_back(EndeffectorRom);       // ensures end-effector range of motion
   constraints_.push_back(ForceWheels); 	   		// ensures unilateral forces and inside the friction cone
-//  constraints_.push_back(WheelsAccLimits); 		// constrain the acceleration on the wheels
+  constraints_.push_back(WheelsAccLimits); 		// constrain the acceleration on the wheels
 //  constraints_.push_back(BaseAccLimits);   		// constrain the acceleration of the base
-  constraints_.push_back(Stability);       		// ensure stability margin
+//  constraints_.push_back(Stability);       		// ensure stability margin
 //  constraints_.push_back(WheelsNonHolonomic);  	// non-holonomic driving constraint
 
   // only one of these constraints are defined according to the config file

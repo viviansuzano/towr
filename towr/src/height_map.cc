@@ -38,15 +38,16 @@ HeightMap::Ptr
 HeightMap::MakeTerrain (TerrainID type)
 {
   switch (type) {
-    case FlatID:      return std::make_shared<FlatGround>(); break;
-    case BlockID:     return std::make_shared<Block>(); break;
-    case StairsID:    return std::make_shared<Stairs>(); break;
-    case GapID:       return std::make_shared<Gap>(); break;
-    case SlopeID:     return std::make_shared<Slope>(); break;
-    case ChimneyID:   return std::make_shared<Chimney>(); break;
-    case ChimneyLRID: return std::make_shared<ChimneyLR>(); break;
+    case FlatID:      	 return std::make_shared<FlatGround>(); break;
+    case BlockID:     	 return std::make_shared<Block>(); break;
+    case StairsID:    	 return std::make_shared<Stairs>(); break;
+    case GapID:       	 return std::make_shared<Gap>(); break;
+    case SlopeID:     	 return std::make_shared<Slope>(); break;
+    case ChimneyID:   	 return std::make_shared<Chimney>(); break;
+    case ChimneyLRID: 	 return std::make_shared<ChimneyLR>(); break;
+    case SineLowFreqID:	 return std::make_shared<SineLowFreq>(); break;
     case SineHighFreqID: return std::make_shared<SineHighFreq>(); break;
-    case SlopePlatID: return std::make_shared<SlopePlat>(); break;
+    case SlopePlatID: 	 return std::make_shared<SlopePlat>(); break;
     default: assert(false); break;
   }
 }

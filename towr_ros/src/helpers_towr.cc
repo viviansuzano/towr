@@ -80,6 +80,56 @@ std::vector<xpp::RobotStateCartesian> GetDrivingTrajectoryFromSolution (const Sp
   return trajectory;
 }
 
+std::vector<xpp::RobotStateCartesian> GetDrivingTorqueTrajectoryFromSolution (const SplineHolderDrive& solution, int terrain)
+{
+  auto terrain_id = static_cast<HeightMap::TerrainID>(terrain);
+  auto terrain_ = HeightMap::MakeTerrain(terrain_id);
+
+  std::vector<xpp::RobotStateCartesian> trajectory;
+  double t = 0.0;
+  double T = solution.base_linear_->GetTotalTime();
+
+  EulerConverter base_angular(solution.base_angular_);
+
+  while (t<=T+1e-5) {
+    int n_ee = solution.ee_wheels_motion_.size();
+    xpp::RobotStateCartesian state(n_ee);
+
+    state.base_.lin = ToXpp(solution.base_linear_->GetPoint(t));
+
+    state.base_.ang.q  = base_angular.GetQuaternionBaseToWorld(t);
+    state.base_.ang.w  = base_angular.GetAngularVelocityInWorld(t);
+    state.base_.ang.wd = base_angular.GetAngularAccelerationInWorld(t);
+
+    for (int ee_towr=0; ee_towr<n_ee; ++ee_towr) {
+      int ee_xpp = ToXppEndeffector(n_ee, ee_towr).first;
+
+      state.ee_contact_.at(ee_xpp) = true;
+
+      auto ee = solution.ee_wheels_motion_.at(ee_towr)->GetPoint(t);
+      state.ee_motion_.at(ee_xpp)  = ToXpp(ee);
+
+      Eigen::Vector3d n = terrain_->GetNormalizedBasis(HeightMap::Normal, ee.p().x(), ee.p().y());
+      Eigen::Vector3d tx = terrain_->GetNormalizedBasis(HeightMap::Tangent1, ee.p().x(), ee.p().y());
+      Eigen::Vector3d ty = terrain_->GetNormalizedBasis(HeightMap::Tangent2, ee.p().x(), ee.p().y());
+
+      Eigen::Vector3d force = solution.ee_wheels_force_.at(ee_towr)->GetPoint(t).p();
+      Eigen::Vector3d torque;
+      torque(0) = force.transpose() * tx;
+      torque(1) = force.transpose() * ty;
+      torque(2) = force.transpose() * n;
+
+      state.ee_forces_.at(ee_xpp)  = torque;
+    }
+
+    state.t_global_ = t;
+    trajectory.push_back(state);
+    t += 0.0025;
+  }
+
+  return trajectory;
+}
+
 void SaveTrajectoryInRosbag (const SplineHolder& solution, const std::string &bag_file)
 {
   rosbag::Bag bag;
@@ -116,7 +166,8 @@ void SaveDrivingMotionTerrainInRosbag (const SplineHolderDrive& solution, int te
   rosbag::Bag bag;
   bag.open(bag_file, rosbag::bagmode::Write);
 
-  std::vector<xpp::RobotStateCartesian> traj = GetDrivingTrajectoryFromSolution(solution);
+//  std::vector<xpp::RobotStateCartesian> traj = GetDrivingTrajectoryFromSolution(solution);
+  std::vector<xpp::RobotStateCartesian> traj = GetDrivingTorqueTrajectoryFromSolution(solution, terrain);
 
   // change in reference height doesn't affect terrain normals!
   auto terrain_id = static_cast<HeightMap::TerrainID>(terrain);

@@ -210,6 +210,37 @@ ChimneyLR::GetHeightDerivWrtY (double x, double y) const
   return dzdy;
 }
 
+// LOW FREQUENCY SINE
+double
+SineLowFreq::GetHeight(double x, double y) const
+{
+  double h = h_offset_;
+  if (x >= sine_start_ && x <= sine_end_)
+	h = amp_*sin(freq_*(x-sine_start_)) + h_offset_;
+
+  return h + height_ref_;
+}
+
+double
+SineLowFreq::GetHeightDerivWrtX(double x, double y) const
+{
+  double dhdx = 0.0;
+  if (x >= sine_start_ && x <= sine_end_)
+	dhdx = freq_*amp_*cos(freq_*(x-sine_start_));
+
+  return dhdx;
+}
+
+double
+SineLowFreq::GetHeightDerivWrtXX(double x, double y) const
+{
+  double Dhdx = 0.0;
+  if (x >= sine_start_ && x <= sine_end_)
+	Dhdx = -freq_*amp_*freq_*sin(freq_*(x-sine_start_));
+
+  return Dhdx;
+}
+
 // HIGH FREQUENCY SINE
 double
 SineHighFreq::GetHeight(double x, double y) const

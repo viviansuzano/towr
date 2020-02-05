@@ -83,6 +83,7 @@ public:
                    SlopeID,
                    ChimneyID,
                    ChimneyLRID,
+				   SineLowFreqID,
 				   SineHighFreqID,
 				   SlopePlatID,
                    TERRAIN_COUNT };
@@ -182,6 +183,7 @@ const static std::map<HeightMap::TerrainID, std::string> terrain_names =
   {HeightMap::SlopeID,       "Slope"      },
   {HeightMap::ChimneyID,     "Chimney"    },
   {HeightMap::ChimneyLRID,   "ChimenyLR"  },
+  {HeightMap::SineLowFreqID,  	"SineLowFreq"    },
   {HeightMap::SineHighFreqID,  	"SineHighFreq"   },
   {HeightMap::SlopePlatID,    	"SlopePlat"      }
 };
@@ -195,6 +197,7 @@ const static std::map<std::string, HeightMap::TerrainID> terrain_ids =
   {"Slope", 		 HeightMap::SlopeID        	  },
   {"Chimney", 		 HeightMap::ChimneyID      	  },
   {"ChimenyLR", 	 HeightMap::ChimneyLRID       },
+  {"SineLowFreq", 	 HeightMap::SineLowFreqID,    },
   {"SineHighFreq", 	 HeightMap::SineHighFreqID,   },
   {"SlopePlat", 	 HeightMap::SlopePlatID    	  }
 };
