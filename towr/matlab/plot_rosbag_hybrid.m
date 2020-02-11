@@ -107,66 +107,78 @@ bag_dur_force_RH = select(bag, 'Topic', 'poly_dur_force_3');
 ts_dur_force_RH = readMessages(bag_dur_force_RH);
 
 %% define the plotting range and other additional quantities
-t = ts_base_pos.Time; 
+t = ts_base_pos.Time;
+end_idx = length(ts_base_pos.Time);
+% end_idx = find(abs(t-1.65) < 0.001);
+idx = 1:end_idx;
+t = ts_base_pos.Time(idx); 
 dyn_con_idx = rem(t,0.1) < 1e-5;
 kyn_con_idx = rem(t,0.08) < 1e-5;
 
 % base motion
-base_pos  = [ts_base_pos.Data(:,1), ts_base_pos.Data(:,2), ts_base_pos.Data(:,3)];
-base_quat = [ts_base_pos.Data(:,4), ts_base_pos.Data(:,5), ...
-             ts_base_pos.Data(:,6), ts_base_pos.Data(:,7)];
+base_pos  = [ts_base_pos.Data(idx,1), ts_base_pos.Data(idx,2), ts_base_pos.Data(idx,3)];
+base_quat = [ts_base_pos.Data(idx,4), ts_base_pos.Data(idx,5), ...
+             ts_base_pos.Data(idx,6), ts_base_pos.Data(idx,7)];
 [base_yaw, base_pitch, base_roll] = quat2angle(base_quat,'XYZ');
 base_roll = abs(base_roll);
 
 % base velocity
-base_vel_lin = [ts_base_vel_lin.Data(:,1), ts_base_vel_lin.Data(:,2), ts_base_vel_lin.Data(:,3)];
-base_vel_ang = [ts_base_vel_ang.Data(:,1), ts_base_vel_ang.Data(:,2), ts_base_vel_ang.Data(:,3)];
+base_vel_lin = [ts_base_vel_lin.Data(idx,1), ts_base_vel_lin.Data(idx,2), ts_base_vel_lin.Data(idx,3)];
+base_vel_ang = [ts_base_vel_ang.Data(idx,1), ts_base_vel_ang.Data(idx,2), ts_base_vel_ang.Data(idx,3)];
 
 % base acceleration
-base_acc_lin = [ts_base_acc_lin.Data(:,1), ts_base_acc_lin.Data(:,2), ts_base_acc_lin.Data(:,3)];
-base_acc_ang = [ts_base_acc_ang.Data(:,1), ts_base_acc_ang.Data(:,2), ts_base_acc_ang.Data(:,3)];
+base_acc_lin = [ts_base_acc_lin.Data(idx,1), ts_base_acc_lin.Data(idx,2), ts_base_acc_lin.Data(idx,3)];
+base_acc_ang = [ts_base_acc_ang.Data(idx,1), ts_base_acc_ang.Data(idx,2), ts_base_acc_ang.Data(idx,3)];
 
 % foot motion
-pos_LF = [ts_foot_LF.Data(:,1), ts_foot_LF.Data(:,2), ts_foot_LF.Data(:,3)];
-pos_RF = [ts_foot_RF.Data(:,1), ts_foot_RF.Data(:,2), ts_foot_RF.Data(:,3)];
-pos_LH = [ts_foot_LH.Data(:,1), ts_foot_LH.Data(:,2), ts_foot_LH.Data(:,3)];
-pos_RH = [ts_foot_RH.Data(:,1), ts_foot_RH.Data(:,2), ts_foot_RH.Data(:,3)];
+pos_LF = [ts_foot_LF.Data(idx,1), ts_foot_LF.Data(idx,2), ts_foot_LF.Data(idx,3)];
+pos_RF = [ts_foot_RF.Data(idx,1), ts_foot_RF.Data(idx,2), ts_foot_RF.Data(idx,3)];
+pos_LH = [ts_foot_LH.Data(idx,1), ts_foot_LH.Data(idx,2), ts_foot_LH.Data(idx,3)];
+pos_RH = [ts_foot_RH.Data(idx,1), ts_foot_RH.Data(idx,2), ts_foot_RH.Data(idx,3)];
 
 % foot velocity
-vel_LF = [ts_vel_LF.Data(:,1), ts_vel_LF.Data(:,2), ts_vel_LF.Data(:,3)];
-vel_RF = [ts_vel_RF.Data(:,1), ts_vel_RF.Data(:,2), ts_vel_RF.Data(:,3)];
-vel_LH = [ts_vel_LH.Data(:,1), ts_vel_LH.Data(:,2), ts_vel_LH.Data(:,3)];
-vel_RH = [ts_vel_RH.Data(:,1), ts_vel_RH.Data(:,2), ts_vel_RH.Data(:,3)];
+vel_LF = [ts_vel_LF.Data(idx,1), ts_vel_LF.Data(idx,2), ts_vel_LF.Data(idx,3)];
+vel_RF = [ts_vel_RF.Data(idx,1), ts_vel_RF.Data(idx,2), ts_vel_RF.Data(idx,3)];
+vel_LH = [ts_vel_LH.Data(idx,1), ts_vel_LH.Data(idx,2), ts_vel_LH.Data(idx,3)];
+vel_RH = [ts_vel_RH.Data(idx,1), ts_vel_RH.Data(idx,2), ts_vel_RH.Data(idx,3)];
 
 % foot acceleration
-acc_LF = [ts_acc_LF.Data(:,1), ts_acc_LF.Data(:,2), ts_acc_LF.Data(:,3)];
-acc_RF = [ts_acc_RF.Data(:,1), ts_acc_RF.Data(:,2), ts_acc_RF.Data(:,3)];
-acc_LH = [ts_acc_LH.Data(:,1), ts_acc_LH.Data(:,2), ts_acc_LH.Data(:,3)];
-acc_RH = [ts_acc_RH.Data(:,1), ts_acc_RH.Data(:,2), ts_acc_RH.Data(:,3)];
+acc_LF = [ts_acc_LF.Data(idx,1), ts_acc_LF.Data(idx,2), ts_acc_LF.Data(idx,3)];
+acc_RF = [ts_acc_RF.Data(idx,1), ts_acc_RF.Data(idx,2), ts_acc_RF.Data(idx,3)];
+acc_LH = [ts_acc_LH.Data(idx,1), ts_acc_LH.Data(idx,2), ts_acc_LH.Data(idx,3)];
+acc_RH = [ts_acc_RH.Data(idx,1), ts_acc_RH.Data(idx,2), ts_acc_RH.Data(idx,3)];
 
 % foot force
-force_LF = [ts_force_LF.Data(:,1), ts_force_LF.Data(:,2), ts_force_LF.Data(:,3)];
-force_RF = [ts_force_RF.Data(:,1), ts_force_RF.Data(:,2), ts_force_RF.Data(:,3)];
-force_LH = [ts_force_LH.Data(:,1), ts_force_LH.Data(:,2), ts_force_LH.Data(:,3)];
-force_RH = [ts_force_RH.Data(:,1), ts_force_RH.Data(:,2), ts_force_RH.Data(:,3)];
+force_LF = [ts_force_LF.Data(idx,1), ts_force_LF.Data(idx,2), ts_force_LF.Data(idx,3)];
+force_RF = [ts_force_RF.Data(idx,1), ts_force_RF.Data(idx,2), ts_force_RF.Data(idx,3)];
+force_LH = [ts_force_LH.Data(idx,1), ts_force_LH.Data(idx,2), ts_force_LH.Data(idx,3)];
+force_RH = [ts_force_RH.Data(idx,1), ts_force_RH.Data(idx,2), ts_force_RH.Data(idx,3)];
 
 % foot contact
-contact_LF = ts_contact_LF.Data(:,1);
-contact_RF = ts_contact_RF.Data(:,1);
-contact_LH = ts_contact_LH.Data(:,1);
-contact_RH = ts_contact_RH.Data(:,1);
+contact_LF = ts_contact_LF.Data(idx,1);
+contact_RF = ts_contact_RF.Data(idx,1);
+contact_LH = ts_contact_LH.Data(idx,1);
+contact_RH = ts_contact_RH.Data(idx,1);
 
 % pos phase durations
 [dur_pos_LF, idx_pos_LF] = build_time_vec(ts_dur_pos_LF{1,1}.Data(:,1),t);
 [dur_pos_RF, idx_pos_RF] = build_time_vec(ts_dur_pos_RF{1,1}.Data(:,1),t);
 [dur_pos_LH, idx_pos_LH] = build_time_vec(ts_dur_pos_LH{1,1}.Data(:,1),t);
 [dur_pos_RH, idx_pos_RH] = build_time_vec(ts_dur_pos_RH{1,1}.Data(:,1),t); 
+idx_pos_LF = unique(idx_pos_LF);
+idx_pos_RF = unique(idx_pos_RF);
+idx_pos_LH = unique(idx_pos_LH);
+idx_pos_RH = unique(idx_pos_RH);
 
 % force phase durations
 [dur_force_LF, idx_force_LF] = build_time_vec(ts_dur_force_LF{1,1}.Data(:,1),t);
 [dur_force_RF, idx_force_RF] = build_time_vec(ts_dur_force_RF{1,1}.Data(:,1),t);
 [dur_force_LH, idx_force_LH] = build_time_vec(ts_dur_force_LH{1,1}.Data(:,1),t);
 [dur_force_RH, idx_force_RH] = build_time_vec(ts_dur_force_RH{1,1}.Data(:,1),t); 
+idx_force_LF = unique(idx_force_LF);
+idx_force_RF = unique(idx_force_RF);
+idx_force_LH = unique(idx_force_LH);
+idx_force_RH = unique(idx_force_RH);
 
 %% Check dynamics
 

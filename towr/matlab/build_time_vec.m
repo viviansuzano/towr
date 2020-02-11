@@ -7,11 +7,21 @@ for i = 1:length(vec)
     tmp = find(abs(t-time(i)) < 0.001);
     id = 1;
     if (isempty(tmp))
-        tmp = find(abs(t-time(i)) < 0.002);
-        [m, id] = min(abs(t(tmp)-time(i)));
+        tmp = find(abs(t-time(i)) < 0.002);  % try with a higher tol
+        if  (isempty(tmp) == 0)
+            [m, id] = min(abs(t(tmp)-time(i)));
+            idx(i) = tmp(id);
+        else
+            idx(i) = length(t);
+        end
+    else
+        idx(i) = tmp(id);
     end
 %     disp([i time(i), tmp', t(tmp)', tmp(id)])
-    idx(i) = tmp(id);
+    
 end
+
+time = [0; time];
+idx = [1; idx];
 
 end
