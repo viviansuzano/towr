@@ -1,4 +1,4 @@
-terrain: "Flat"
+terrain: "SineHighFreq"
 run_derivative_test: false
 plot_trajectory: false
 play_initialization: false
@@ -46,7 +46,7 @@ SineHighFreq:
     z: 0.04445
    
   final_pose: 
-    x: 3.0
+    x: 4.0
     y: 0.0
     z: 0.04445
 
