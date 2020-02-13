@@ -43,6 +43,7 @@ add_library(${PROJECT_NAME} SHARED
   src/base_acc_limits_constraint.cc
   src/ee_acc_constraint.cc
   src/ee_acc_limits_constraint.cc
+  src/wheels_lateral_constraint.cc
   # costs
   src/node_cost.cc
   src/soft_constraint.cc

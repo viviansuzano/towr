@@ -289,10 +289,11 @@ NodesVariablesEEMotion::GetPhaseBasedEEParameterization ()
       for (int dim=0; dim<GetDim(); ++dim) {
         index_map[idx++].push_back(NodeValueInfo(node_id,   kPos, dim));
 
-        if (dim == Y) {
-          nodes_.at(node_id).at(kVel).y() = 0.0;
-        }
-        else if (dim == Z) {
+//        if (dim == Y) {  // non-holonomic constraint takes care of this!
+//          nodes_.at(node_id).at(kVel).y() = 0.0;
+//        }
+//        else
+        if (dim == Z) {
         	if (is_first_node_in_phase)
         		nodes_.at(node_id).at(kVel).z() = 0.0;
         }

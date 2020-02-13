@@ -70,8 +70,8 @@ Parameters::Parameters ()
 //  constraints_.push_back(Swing); // creates smoother swing motions, not absolutely required.
   constraints_.push_back(EEAccLimits); // ensures maximum acc on the ee motions
   constraints_.push_back(EndeffectorAcc); // so accelerations don't jump between polynomials
-//  if (is_pure_driving_motion_)
-    constraints_.push_back(BaseAccLimits); // ensures maximum acc on the base motions
+  //constraints_.push_back(BaseAccLimits); // ensures maximum acc on the base motions
+  constraints_.push_back(WheelsLateralConstraint);
 
   // optional costs to e.g penalize endeffector forces
 //   costs_.push_back({EEMotionCostID, 1.0}); //weighed by 1.0 relative to other costs

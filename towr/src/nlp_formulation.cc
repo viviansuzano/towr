@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <towr/constraints/base_acc_limits_constraint.h>
 #include <towr/constraints/ee_acc_constraint.h>
 #include <towr/constraints/ee_acc_limits_constraint.h>
+#include <towr/constraints/wheels_lateral_constraint.h>
 
 #include <towr/costs/node_cost.h>
 #include <towr/variables/nodes_variables_all.h>
@@ -307,6 +308,7 @@ NlpFormulation::GetConstraint (Parameters::ConstraintName name,
     case Parameters::BaseAccLimits:  return MakeBaseAccLimitsConstraint(s);
     case Parameters::EndeffectorAcc: return MakeEENodesAccConstraint(s);
     case Parameters::EEAccLimits:	 return MakeEEAccLimitsConstraint(s);
+    case Parameters::WheelsLateralConstraint: return MakeWheelsLateralConstraint(s);
     default: throw std::runtime_error("constraint not defined!");
   }
 }
@@ -457,6 +459,18 @@ NlpFormulation::MakeEEAccLimitsConstraint (const SplineHolder& s) const
   Vector3d acc_limits (params_.max_wheels_acc_.at(X), params_.max_wheels_acc_.at(Y), params_.max_wheels_acc_.at(Z));
   for (int ee=0; ee<params_.GetEECount(); ee++) {
     auto constraint = std::make_shared<EEAccLimitsConstraint>(acc_limits, ee, s);
+    c.push_back(constraint);
+  }
+  return c;
+}
+
+NlpFormulation::ContraintPtrVec
+NlpFormulation::MakeWheelsLateralConstraint (const SplineHolder& s) const
+{
+  ContraintPtrVec c;
+
+  for (int ee=0; ee<params_.GetEECount(); ee++) {
+    auto constraint = std::make_shared<WheelsLateralConstraint>(terrain_, ee, s);
     c.push_back(constraint);
   }
   return c;

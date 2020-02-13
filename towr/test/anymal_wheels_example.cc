@@ -49,12 +49,12 @@ int main()
   formulation.initial_base_.lin.at(kPos).z() = 0.48;
 
   // define the desired goal state of the robot
-  formulation.final_base_.lin.at(towr::kPos) << 1.5, 0.0, 0.48;
+  formulation.final_base_.lin.at(towr::kPos) << 2.0, 0.0, 0.48;
 
   // Parameters that define the motion.
-  double total_duration = 2.6;
+  double total_duration = 2.0;
   auto gait_gen_ = GaitGenerator::MakeGaitGenerator(4);
-  auto id_gait = towr::GaitGenerator::GapCross; //C0;
+  auto id_gait = towr::GaitGenerator::C1; //GapCross; //C0;
   gait_gen_->SetCombo(id_gait);
   for (int ee=0; ee<4; ++ee) {
 	formulation.params_.ee_phase_durations_.push_back(gait_gen_->GetPhaseDurations(total_duration, ee));
@@ -90,10 +90,10 @@ int main()
   solver->SetOption("print_level", 5);
 
   // derivative test
-//  solver->SetOption("max_iter", 0);
-//  solver->SetOption("derivative_test", "first-order");
-//  solver->SetOption("print_level", 4);
-//  solver->SetOption("derivative_test_tol", 1e-3);
+  solver->SetOption("max_iter", 0);
+  solver->SetOption("derivative_test", "first-order");
+  solver->SetOption("print_level", 4);
+  solver->SetOption("derivative_test_tol", 1e-3);
 
   solver->Solve(nlp);
 

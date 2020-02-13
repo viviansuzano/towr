@@ -126,6 +126,7 @@ private:
   ContraintPtrVec MakeBaseAccLimitsConstraint(const SplineHolder& s) const;
   ContraintPtrVec MakeEENodesAccConstraint(const SplineHolder& s) const;
   ContraintPtrVec MakeEEAccLimitsConstraint(const SplineHolder& s) const;
+  ContraintPtrVec MakeWheelsLateralConstraint(const SplineHolder& s) const;
 
   // costs
   CostPtrVec GetCost(const Parameters::CostName& id, double weight) const;

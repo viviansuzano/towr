@@ -18,10 +18,10 @@ Flat:
    
   final_pose: 
     x: 2.0 
-    y: 0.0 #1.0 #0.0
+    y: 1.0 #1.0 #0.0
     z: 0.48
 
-  total_time: 3.0 # from combo FlatSim
+  total_time: 2.0 # from combo FlatSim
   gait: 1
 
 Gap:

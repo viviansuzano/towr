@@ -146,7 +146,8 @@ public:
                         BaseAcc,        ///< sets SplineAccConstraint
 						BaseAccLimits,	///< sets BaseAccLimitsConstraint
 						EndeffectorAcc, ///< sets EEAccConstraint
-						EEAccLimits	    ///< sets EEAccLimitsConstraint
+						EEAccLimits,	    ///< sets EEAccLimitsConstraint
+						WheelsLateralConstraint /// rolling constraint for contact phase
   };
   /**
    *  @brief Indentifiers to be used to add certain costs to the optimization

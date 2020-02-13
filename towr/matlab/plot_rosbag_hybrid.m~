@@ -121,7 +121,7 @@ base_quat = [ts_base_pos.Data(idx,4), ts_base_pos.Data(idx,5), ...
              ts_base_pos.Data(idx,6), ts_base_pos.Data(idx,7)];
 [base_yaw, base_pitch, base_roll] = quat2angle(base_quat,'ZYX');
 base_yaw = mod(base_yaw,2*pi)-pi;
-base_ang = [base_yaw, base_pitch, base_roll];
+base_ang = 
 
 % base velocity
 base_vel_lin = [ts_base_vel_lin.Data(idx,1), ts_base_vel_lin.Data(idx,2), ts_base_vel_lin.Data(idx,3)];
