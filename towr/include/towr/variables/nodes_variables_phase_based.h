@@ -201,9 +201,14 @@ public:
   NodesVariablesEEMotion (int phase_count,
 	                      bool is_in_contact_at_start,
 	                      const std::string& name,
-						  std::vector<int> n_polys_per_phase);
+						  std::vector<int> n_polys_per_phase,
+						  bool y_lateral_constraint);
   virtual ~NodesVariablesEEMotion() = default;
   OptIndexMap GetPhaseBasedEEParameterization ();
+
+private:
+  bool y_lateral_constraint_ = false;
+
 };
 
 

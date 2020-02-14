@@ -183,6 +183,9 @@ public:
   /// Interval at which the dynamic constraint is enforced.
   double dt_constraint_dynamic_;
 
+  /// Use lateral constraint on the wheels motions during contact phase
+  bool use_non_holonomic_constraint_ = false;
+
   /// Interval at which the driving constraints are enforced.
   double dt_drive_constraint_;
 
@@ -232,6 +235,9 @@ public:
    *  limiting this range can help convergence when optimizing gait.
    */
   std::pair<double,double> bound_phase_duration_;
+
+  // Set constraint on the lateral displacement of the wheel in contact phase
+  void SetNonHolonomicConstraint ();
 
   /// Specifies that timings of all feet, so the gait, should be optimized.
   void OptimizePhaseDurations();

@@ -112,6 +112,9 @@ public:
     if (basenode.isNull())
     	throw std::runtime_error("CONFIGURATION LOADING FAILED");
 
+    std::string terrain = basenode["terrain"].as<std::string>();
+    auto towr_terrain_id = terrain_ids.find(terrain)->second;
+
     // Instead of manually defining the initial durations for each foot and
     // step, for convenience we use a GaitGenerator with some predefined gaits
     // for a variety of robots (walk, trot, pace, ...).
@@ -145,6 +148,13 @@ public:
       params.is_pure_driving_motion_ = true;
     }
 
+    bool use_non_holonomic_constraint = basenode[terrain]["use_non_holonomic_constraint"].as<bool>();
+    if (use_non_holonomic_constraint)
+  	  params.SetNonHolonomicConstraint();
+
+    double max_wheels_acc_z = basenode[terrain]["max_wheels_acc_z"].as<double>();
+    params.max_wheels_acc_.at(Z) = max_wheels_acc_z;
+
     return params;
   }
 
@@ -155,8 +165,7 @@ public:
     yaml_tools::YamlNode basenode = yaml_tools::YamlNode::fromFile(config_file_);
 
     if (basenode.isNull())
-  	throw std::runtime_error("CONFIGURATION LOADING FAILED");
-    Eigen::Vector3d final_position_;
+    	throw std::runtime_error("CONFIGURATION LOADING FAILED");
 
     std::string terrain = basenode["terrain"].as<std::string>();
     auto towr_terrain_id = terrain_ids.find(terrain)->second;
@@ -172,10 +181,12 @@ public:
       SetTowrInitialStateFromFile();
     }
 
+    Eigen::Vector3d final_position_;
     final_position_.x() = basenode[terrain]["final_pose"]["x"].as<double>();
     final_position_.y() = basenode[terrain]["final_pose"]["y"].as<double>();
     final_position_.z() = basenode[terrain]["final_pose"]["z"].as<double>();
-    goal_geom_.lin.p_ = final_position_;
+    goal_geom_.lin.p_ = final_position_;  // x, y, z
+//    goal_geom_.ang.p_ = Vector3d(0.0, 0.0, M_PI/3);  // roll, pitch, yaw
 //    goal_geom_.lin.p_.x() += formulation_.initial_base_.lin.at(kPos).x();
 
     bool plot_trajectory = basenode["plot_trajectory"].as<bool>();
@@ -184,7 +195,7 @@ public:
 
     float total_duration = basenode[terrain]["total_time"].as<float>();
 
-    bool shift_initialization = basenode["shift_initialization"].as<bool>();
+    bool shift_initialization = basenode[terrain]["shift_initialization"].as<bool>();
     if (shift_initialization)
     {
 	  Eigen::Vector3d pos_phase (0.15, 0.0, 0.0);
@@ -201,7 +212,7 @@ public:
     msg.total_duration           = total_duration;
     msg.replay_trajectory        = true;
     msg.play_initialization      = play_initialization;
-    msg.replay_speed             = 0.2; //1.0;
+    msg.replay_speed             = 0.6; //1.0;
     msg.optimize                 = true;
     msg.terrain                  = (int) towr_terrain_id;
     msg.gait                     = gait_combo; //towr::GaitGenerator::C0;

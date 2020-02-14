@@ -129,7 +129,7 @@ NlpFormulation::MakeBaseVariables () const
 
   // limits all angles displacement to 30 degrees (optional)
   Vector3d ang_limit_ = Vector3d(10, 10, 10) * (M_PI/180);
-//  spline_ang->AddAllNodesBounds(kPos, {Y}, -ang_limit_, ang_limit_);
+//  spline_ang->AddAllNodesBounds(kPos, {X}, -ang_limit_, ang_limit_);
 
   vars.push_back(spline_ang);
 
@@ -165,11 +165,12 @@ NlpFormulation::MakeEndeffectorVariables () const
 	std::cout << std::endl;
 
 //	std::cout << "OptIdxMap EE_motion " << ee << std::endl;
+	std::cout << "params_.use_non_holonomic_constraint_ = " << params_.use_non_holonomic_constraint_<< std::endl;
     auto nodes = std::make_shared<NodesVariablesEEMotion>(
                                               params_.GetPhaseCount(ee),
                                               params_.ee_in_contact_at_start_.at(ee),
                                               id::EEMotionNodes(ee),
-                                              n_polys);
+                                              n_polys, !params_.use_non_holonomic_constraint_);
 
     // initialize towards final footholds
     double yaw = final_base_.ang.p().z();
@@ -187,7 +188,7 @@ NlpFormulation::MakeEndeffectorVariables () const
 
     nodes->SetByLinearInterpolation(initial_ee_W_.at(ee), Vector3d(x,y,z), T);
 
-    nodes->AddStartBound(kPos, {Y}, initial_ee_W_.at(ee));
+    nodes->AddStartBound(kPos, {Y, Z}, initial_ee_W_.at(ee));
     nodes->AddStartBound(kVel, {X,Y,Z}, Vector3d(0, 0, 0));
     nodes->AddFinalBound(kVel, {X,Y,Z}, Vector3d(0, 0, 0));
 

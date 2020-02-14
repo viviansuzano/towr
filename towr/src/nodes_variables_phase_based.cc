@@ -238,11 +238,14 @@ NodesVariablesPhaseBased::PrintOptIdxMap ()
 NodesVariablesEEMotion::NodesVariablesEEMotion(int phase_count,
                                                bool is_in_contact_at_start,
                                                const std::string& name,
-											   std::vector<int> n_polys_per_phase)
+											   std::vector<int> n_polys_per_phase,
+											   bool y_lateral_constraint)
     :NodesVariablesPhaseBased(phase_count,
                               is_in_contact_at_start, // contact phase for motion is constant
                               name, n_polys_per_phase)
 {
+  y_lateral_constraint_ = y_lateral_constraint;
+
   index_to_node_value_info_ = GetPhaseBasedEEParameterization();
 //  PrintOptIdxMap();
   SetNumberOfVariables(index_to_node_value_info_.size());
@@ -289,11 +292,13 @@ NodesVariablesEEMotion::GetPhaseBasedEEParameterization ()
       for (int dim=0; dim<GetDim(); ++dim) {
         index_map[idx++].push_back(NodeValueInfo(node_id,   kPos, dim));
 
-//        if (dim == Y) {  // non-holonomic constraint takes care of this!
-//          nodes_.at(node_id).at(kVel).y() = 0.0;
-//        }
-//        else
-        if (dim == Z) {
+		if (dim == Y) {
+			if (y_lateral_constraint_) { // otherwise non-holonomic constraint will take care of this!
+				nodes_.at(node_id).at(kVel).y() = 0.0;
+				std::cout << "Y vel is ZERO!!" << std::endl;
+			}
+		}
+		else if (dim == Z) {
         	if (is_first_node_in_phase)
         		nodes_.at(node_id).at(kVel).z() = 0.0;
         }

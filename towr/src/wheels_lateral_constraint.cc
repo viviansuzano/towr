@@ -36,7 +36,7 @@ WheelsLateralConstraint::InitVariableDependedQuantities (const VariablesPtr& x)
   ee_motion_ = x->GetComponent<NodesVariablesPhaseBased>(id::EEMotionNodes(ee_));
 
   for (int id=0; id<ee_motion_->GetNodes().size(); ++id) {
-	  if (!ee_motion_->IsConstantNode(id))
+	  if (ee_motion_->IsConstantNode(id))
 		  pure_stance_node_ids_.push_back(id);
   }
 
