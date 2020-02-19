@@ -23,7 +23,7 @@ public:
   {
     const double x_nominal_b =  0.0849;
     const double y_nominal_b =  0.2975;
-    const double z_nominal_b =  0.03175; //-0.0074;
+    const double z_nominal_b = -0.0074; //-0.0836; //0.03175; //-0.0074;
 
     nominal_stance_.at(LF) <<  x_nominal_b,   y_nominal_b, z_nominal_b;
     nominal_stance_.at(RF) <<  x_nominal_b,  -y_nominal_b, z_nominal_b;
@@ -41,8 +41,8 @@ public:
 class HarpiaDynamicModel : public SingleRigidBodyDynamics {
 public:
   HarpiaDynamicModel()
-  : SingleRigidBodyDynamics(27.24, 1.39698239, 0.56281087, 1.82100537,
-		  	  	  	  	    -0.00160128, -0.01746027, -0.00814363, 4) {}
+  : SingleRigidBodyDynamics(1.5*27.24, 1.35484745362, 0.51559401168, 1.81519958621,
+		  	  	  	  	    -0.00300508233, -0.00238036472, -0.00425512338, 4) {}
 };
 
 } // namespace towr

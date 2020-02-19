@@ -39,7 +39,7 @@ w_R_b = GetRotationMatrixBaseToWorld(xyz);
 
 x_nominal_b =  0.0849;
 y_nominal_b =  0.2975;
-z_nominal_b =  0.03175;
+z_nominal_b =  -0.0074; %0.03175;
 
 r_wh = 0.0762;
 
@@ -47,10 +47,10 @@ wheels_center_B = [ x_nominal_b, -y_nominal_b, z_nominal_b;
                    -x_nominal_b, -y_nominal_b, z_nominal_b];
                
 n = w_R_b*[0; 0; 1];
-base_pos_W = [0.4, 0.0, 0.19004];
-base_pos_W = [0.58794, 0.0, 0.25844];
-base_pos_W = [0.0, 0.0, 0.04445];
-
+% base_pos_W = [0.4, 0.0, 0.19004];
+% base_pos_W = [0.58794, 0.0, 0.25844];
+%base_pos_W = [0.0, 0.0, 0.04445];
+base_pos_W = [0.0, 0.0, 0.0836];
 wheels_center_W = base_pos_W' + w_R_b*wheels_center_B';
 wheels_contact_W = wheels_center_W - r_wh*n;
 
@@ -62,7 +62,7 @@ plot(wheels_center_W(1,2),wheels_center_W(3,2),'g*'); hold on;
 t = 0:0.01:2*pi;
 plot(r_wh*cos(t)+wheels_center_W(1,1), r_wh*sin(t)+wheels_center_W(3,1), 'r'); hold on;
 plot(r_wh*cos(t)+wheels_center_W(1,2), r_wh*sin(t)+wheels_center_W(3,2), 'r'); hold on;
-body = robot_body_pos([base_pos_W(1) base_pos_W(3)],ang,0.4,0.07);
+body = robot_body_pos([base_pos_W(1) base_pos_W(3)],ang,0.4,0.0782);
 plot(body(1,:),body(2,:),'b'); hold on;
 plot(wheels_contact_W(1,1),wheels_contact_W(3,1),'k*'); hold on;
 plot(wheels_contact_W(1,2),wheels_contact_W(3,2),'k*'); hold on;

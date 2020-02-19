@@ -14,15 +14,15 @@ ParametersDrive::ParametersDrive()
 {
   duration_ee_polynomial_ = duration_base_polynomial_;
   wheels_torque_limit_ = 32.0;
-  max_wheels_acc_ = {10.0, 0.0, 10.0};
-  max_base_acc_lin_ = {10.0, 0.0, 10.0};
+  max_wheels_acc_ = {20.0, 0.0, 20.0};
+  max_base_acc_lin_ = {20.0, 0.0, 20.0};
   max_base_acc_ang_ = {10.0, 10.0, 10.0};
   wheels_radius_ = 0.0762;  // 3 inches = 76.2mm
   force_limit_in_x_direction_ = 400.0;
   use_non_holonomic_constraint_ = false;
   constrain_final_ee_pos_ = false;
 
-  bounds_initial_lin_pos_ = {X, Z};
+  bounds_initial_lin_pos_ = {X};
 
 //  dt_constraint_range_of_motion_ = 0.02;
 

@@ -79,9 +79,14 @@ WheelsMotionConstraint::UpdateBoundsAtInstance (double t, int k, VecBound& bound
 //  for (int dim=0; dim<k3D; ++dim) {
 //    bounds.at(GetRow(k,dim)) = Bounds(0.005, 0.005);
 //  }
-  bounds.at(GetRow(k,X)) = Bounds(-0.005, 0.005);
-  bounds.at(GetRow(k,Y)) = Bounds(-0.005, 0.005);
-  bounds.at(GetRow(k,Z)) = Bounds(-0.005, 0.005);
+
+//  bounds.at(GetRow(k,X)) = Bounds(-0.005, 0.005);
+//  bounds.at(GetRow(k,Y)) = Bounds(-0.005, 0.005);
+//  bounds.at(GetRow(k,Z)) = Bounds(-0.005, 0.005);
+
+  bounds.at(GetRow(k,X)) = ifopt::BoundZero;
+  bounds.at(GetRow(k,Y)) = ifopt::BoundZero;
+  bounds.at(GetRow(k,Z)) = ifopt::BoundZero;
 }
 
 Eigen::Matrix3d

@@ -124,7 +124,8 @@ std::vector<xpp::RobotStateCartesian> GetDrivingTorqueTrajectoryFromSolution (co
 
     state.t_global_ = t;
     trajectory.push_back(state);
-    t += 0.0025;
+//    t += 0.0025;
+    t += 0.01;
   }
 
   return trajectory;

@@ -93,7 +93,7 @@ Visualization Manager:
         support_polygons: true
       Queue Size: 100
       Value: true
-    - Alpha: 0.5
+    - Alpha: 1
       Class: rviz/RobotModel
       Collision Enabled: false
       Enabled: true
@@ -128,6 +128,16 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        castor_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        castor_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Name: Harpia Model
       Robot Description: harpia_rviz_urdf_robot_description
       TF Prefix: harpia
@@ -149,6 +159,10 @@ Visualization Manager:
           Value: true
         harpia/base_link:
           Value: true
+        harpia/castor_left:
+          Value: true
+        harpia/castor_right:
+          Value: true
         world:
           Value: true
       Marker Scale: 1
@@ -166,6 +180,10 @@ Visualization Manager:
             harpia/RearL_wheel:
               {}
             harpia/RearR_wheel:
+              {}
+            harpia/castor_left:
+              {}
+            harpia/castor_right:
               {}
       Update Interval: 0
       Value: true
@@ -303,5 +321,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1575
-  X: 332
-  Y: 323
+  X: 322
+  Y: 285

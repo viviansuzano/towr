@@ -42,7 +42,7 @@ TowrDriveRosInterface::TowrDriveRosInterface ()
   solver_ = std::make_shared<ifopt::IpoptSolver>();
 
   visualization_dt_ = 0.01;
-  trajectory_dt_ = 0.0025;
+  trajectory_dt_ = 0.01; //0.0025;
 
 }
 

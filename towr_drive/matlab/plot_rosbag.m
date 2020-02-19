@@ -90,7 +90,7 @@ base_pos  = [ts_base_pos.Data(:,1), ts_base_pos.Data(:,2), ts_base_pos.Data(:,3)
 base_quat = [ts_base_pos.Data(:,4), ts_base_pos.Data(:,5), ...
              ts_base_pos.Data(:,6), ts_base_pos.Data(:,7)];
 [base_yaw, base_pitch, base_roll] = quat2angle(base_quat,'XYZ');
-base_roll = abs(base_roll);
+base_roll = abs(base_roll)-pi;
 
 % base velocity
 base_vel_lin = [ts_base_vel_lin.Data(:,1), ts_base_vel_lin.Data(:,2), ts_base_vel_lin.Data(:,3)];
@@ -126,12 +126,12 @@ force_RH = [ts_force_RH.Data(:,1), ts_force_RH.Data(:,2), ts_force_RH.Data(:,3)]
 
 %% Check dynamics
 
-Ixx =  1.39698239;
-Iyy =  0.56281087;
-Izz =  1.82100537;
-Ixy = -0.00160128; 
-Ixz = -0.01746027;
-Iyz = -0.00814363;
+Ixx =  1.35484745362;
+Iyy =  0.51559401168;
+Izz =  1.81519958621;
+Ixy = -0.00300508233; 
+Ixz = -0.00238036472;
+Iyz = -0.00425512338;
 
 m = 27.24;
 J = [Ixx Ixy Ixz; 
@@ -282,18 +282,18 @@ xlabel('t [s]'); ylabel('p_y [m]'); %ylim([-0.2 -0.18]);
 subplot(3,4,12); plot(t,pos_RH(:,3)); grid on;
 xlabel('t [s]'); ylabel('p_z [m]')
 
-h = figure();
-terrain = "SlopePlat"; %"Step45";
-set(h, 'Name', 'Wheels position (X x Z)');
-subplot(4,1,1); plot(pos_LF(:,1),pos_LF(:,3),pos_LF(:,1),GetTerrainHeight(pos_LF(:,1), terrain)); grid on; axis equal;
-% hold on; plot(pos_LF(dyn_con_idx,1),pos_LF(dyn_con_idx,3),'r*');
-xlabel('p_x [m]'); ylabel('p_z [m]'); title('LF')
-subplot(4,1,2); plot(pos_RF(:,1),pos_RF(:,3),pos_RF(:,1),GetTerrainHeight(pos_RF(:,1), terrain)); grid on; axis equal;
-xlabel('p_x [m]'); ylabel('p_z [m]'); title('RF')
-subplot(4,1,3); plot(pos_LH(:,1),pos_LH(:,3),pos_LH(:,1),GetTerrainHeight(pos_LH(:,1), terrain)); grid on; axis equal;
-xlabel('p_x [m]'); ylabel('p_z [m]'); title('LH')
-subplot(4,1,4); plot(pos_RH(:,1),pos_RH(:,3),pos_RH(:,1),GetTerrainHeight(pos_RH(:,1), terrain)); grid on; axis equal;
-xlabel('p_x [m]'); ylabel('p_z [m]'); title('RH')
+% h = figure();
+% terrain = "Flat"; %"Step45";
+% set(h, 'Name', 'Wheels position (X x Z)');
+% subplot(4,1,1); plot(pos_LF(:,1),pos_LF(:,3),pos_LF(:,1),GetTerrainHeight(pos_LF(:,1), terrain)); grid on; axis equal;
+% % hold on; plot(pos_LF(dyn_con_idx,1),pos_LF(dyn_con_idx,3),'r*');
+% xlabel('p_x [m]'); ylabel('p_z [m]'); title('LF')
+% subplot(4,1,2); plot(pos_RF(:,1),pos_RF(:,3),pos_RF(:,1),GetTerrainHeight(pos_RF(:,1), terrain)); grid on; axis equal;
+% xlabel('p_x [m]'); ylabel('p_z [m]'); title('RF')
+% subplot(4,1,3); plot(pos_LH(:,1),pos_LH(:,3),pos_LH(:,1),GetTerrainHeight(pos_LH(:,1), terrain)); grid on; axis equal;
+% xlabel('p_x [m]'); ylabel('p_z [m]'); title('LH')
+% subplot(4,1,4); plot(pos_RH(:,1),pos_RH(:,3),pos_RH(:,1),GetTerrainHeight(pos_RH(:,1), terrain)); grid on; axis equal;
+% xlabel('p_x [m]'); ylabel('p_z [m]'); title('RH')
 
 % foot velocity
 h = figure();
@@ -358,31 +358,32 @@ subplot(3,4,12); plot(t,acc_RH(:,3)); grid on;
 xlabel('t [s]'); ylabel('a_z [m/s^2]')
 
 % foot forces
+wh_radius = 0.0762; % [m]
 lineWidth = 1.5;
 h = figure();
 set(h, 'Name', 'Wheels force');
-subplot(3,4,1); plot(t,force_LF(:,1),'LineWidth',lineWidth); grid on;
+subplot(3,4,1); plot(t,force_LF(:,1)*wh_radius,'LineWidth',lineWidth); grid on;
 xlabel('t [s]'); ylabel('f_x [N]'); title('LF')
 subplot(3,4,5); plot(t,force_LF(:,2),'LineWidth',lineWidth); grid on;
 xlabel('t [s]'); ylabel('f_y [N]')
 subplot(3,4,9); plot(t,force_LF(:,3),'LineWidth',lineWidth); grid on;
 xlabel('t [s]'); ylabel('f_z [N]')
 
-subplot(3,4,2); plot(t,force_RF(:,1),'LineWidth',lineWidth); grid on;
+subplot(3,4,2); plot(t,force_RF(:,1)*wh_radius,'LineWidth',lineWidth); grid on;
 xlabel('t [s]'); ylabel('f_x [N]'); title('RF')
 subplot(3,4,6); plot(t,force_RF(:,2),'LineWidth',lineWidth); grid on;
 xlabel('t [s]'); ylabel('f_y [N]')
 subplot(3,4,10); plot(t,force_RF(:,3),'LineWidth',lineWidth); grid on;
 xlabel('t [s]'); ylabel('f_z [N]')
 
-subplot(3,4,3); plot(t,force_LH(:,1),'LineWidth',lineWidth); grid on;
+subplot(3,4,3); plot(t,force_LH(:,1)*wh_radius,'LineWidth',lineWidth); grid on;
 xlabel('t [s]'); ylabel('f_x [N]'); title('LH')
 subplot(3,4,7); plot(t,force_LH(:,2),'LineWidth',lineWidth); grid on;
 xlabel('t [s]'); ylabel('f_y [N]')
 subplot(3,4,11); plot(t,force_LH(:,3),'LineWidth',lineWidth); grid on;
 xlabel('t [s]'); ylabel('f_z [N]')
 
-subplot(3,4,4); plot(t,force_RH(:,1),'LineWidth',lineWidth); grid on;
+subplot(3,4,4); plot(t,force_RH(:,1)*wh_radius,'LineWidth',lineWidth); grid on;
 xlabel('t [s]'); ylabel('f_x [N]'); title('RH')
 subplot(3,4,8); plot(t,force_RH(:,2),'LineWidth',lineWidth); grid on;
 xlabel('t [s]'); ylabel('f_y [N]')

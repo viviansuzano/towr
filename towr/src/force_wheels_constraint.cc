@@ -49,8 +49,16 @@ ForceWheelsConstraint::UpdateConstraintAtInstance (double t, int k, VectorXd& g)
   g(row++) = f.transpose() * t1; // traction limits
 
   // frictional pyramid
-  g(row++) = f.transpose() * (t1 - mu_*n); // t1 < mu*n
-  g(row++) = f.transpose() * (t1 + mu_*n); // t1 > -mu*n
+
+  if (t >= 0) {
+	  g(row++) = f.transpose() * (t1 - mu_*n); // t1 < mu*n
+	  g(row++) = f.transpose() * (t1 + mu_*n); // t1 > -mu*n
+  }
+  else {
+	  double mu_static = 0.5;
+	  g(row++) = -1;  // smaller than zero
+	  g(row++) = f.transpose() * (t1 - mu_static*n); // t1 > -mu*n
+  }
   g(row++) = f.transpose() * (t2 - mu_*n); // t2 < mu*n
   g(row++) = f.transpose() * (t2 + mu_*n); // t2 > -mu*n
 

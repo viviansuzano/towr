@@ -1,4 +1,4 @@
-terrain: "SineHighFreq"
+terrain: "Flat"
 run_derivative_test: false
 plot_trajectory: false
 play_initialization: false
@@ -15,12 +15,12 @@ Flat:
   initial_pose:
     x: 0.0
     y: 0.0
-    z: 0.04445
+    z: 0.0836
    
   final_pose: 
     x: 2.0
     y: 0.0
-    z: 0.04445
+    z: 0.0836
 
   total_time: 2.0
   traction_limit: 4000
@@ -29,12 +29,12 @@ Slope:
   initial_pose:
     x: 0.0
     y: 0.0
-    z: 0.04445
+    z: 0.0836
    
   final_pose: 
     x: 3.5
     y: 0.0
-    z: 0.04445
+    z: 0.0836
 
   total_time: 5.0
   traction_limit: 4000
@@ -43,12 +43,12 @@ SineHighFreq:
   initial_pose:
     x: 0.0
     y: 0.0
-    z: 0.04445
+    z: 0.0836
    
   final_pose: 
     x: 4.0
     y: 0.0
-    z: 0.04445
+    z: 0.0836
 
   total_time: 5.0
   traction_limit: 4000
@@ -57,12 +57,12 @@ SineLowFreq:
   initial_pose:
     x: 0.0
     y: 0.0
-    z: 0.04445
+    z: 0.0836
    
   final_pose: 
     x: 3.5
     y: 0.0
-    z: 0.04445
+    z: 0.0836
 
   total_time: 4.0
   traction_limit: 4000
@@ -71,12 +71,12 @@ SlopePlat:
   initial_pose:
     x: 0.0
     y: 0.0
-    z: 0.04445
+    z: 0.0836
    
   final_pose: 
     x: 4.0
     y: 0.0
-    z: 0.04445
+    z: 0.0836
 
   total_time: 4.0
   traction_limit: 4000
