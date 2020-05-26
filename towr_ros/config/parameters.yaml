@@ -1,4 +1,4 @@
-terrain: "Gap"
+terrain: "Flat"
 run_derivative_test: false
 plot_trajectory: false
 optimize_phase_durations: false
@@ -17,15 +17,15 @@ Flat:
    
   final_pose: 
     x: 2.0 
-    y: 1.0 #1.0 #0.0
+    y: 0.0 #1.0 #0.0
     z: 0.48
 
-  total_time: 2.0 # for non holonomic constraint
+  total_time: 3.0 # for non holonomic constraint
 #  total_time: 3.0 # for straight motions
   gait: 1
   use_non_holonomic_constraint: true
   shift_initialization: false
-  max_wheels_acc_z: 50.0 # 25 for gait 2 and 0, 50 for 1 and 5
+  max_wheels_acc_z: 90.0 # 25 for gait 2 and 0, 50 for 1 and 5
 
 Gap:
   initial_pose:

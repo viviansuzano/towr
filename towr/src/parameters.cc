@@ -55,7 +55,7 @@ Parameters::Parameters ()
 
   // maximum acceleration for smooth motions
   max_base_acc_lin_ = {10.0, 10.0, 10.0};
-  max_base_acc_ang_ = {10.0, 10.0, 5.0};
+  max_base_acc_ang_ = {10.0, 10.0, 10.0};
 //  max_wheels_acc_ = {40.0, 0.0, 120.0};
   max_wheels_acc_ = {20.0, 20.0, 50.0};
 

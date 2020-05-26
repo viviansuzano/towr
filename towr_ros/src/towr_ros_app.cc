@@ -186,8 +186,8 @@ public:
     final_position_.y() = basenode[terrain]["final_pose"]["y"].as<double>();
     final_position_.z() = basenode[terrain]["final_pose"]["z"].as<double>();
     goal_geom_.lin.p_ = final_position_;  // x, y, z
-//    goal_geom_.ang.p_ = Vector3d(0.0, 0.0, M_PI/3);  // roll, pitch, yaw
-//    goal_geom_.lin.p_.x() += formulation_.initial_base_.lin.at(kPos).x();
+    goal_geom_.ang.p_ = Vector3d(0.0, 0.0, 0.48*M_PI);  // roll, pitch, yaw
+    goal_geom_.lin.p_.x() += formulation_.initial_base_.lin.at(kPos).x();
 
     bool plot_trajectory = basenode["plot_trajectory"].as<bool>();
     bool play_initialization = basenode["play_initialization"].as<bool>();
@@ -235,7 +235,7 @@ public:
 	throw std::runtime_error("CONFIGURATION LOADING FAILED");
 
 	bool run_derivative_test = basenode["run_derivative_test"].as<bool>();
-	solver_->SetOption("linear_solver", "ma97"); // ma27, ma57, ma77, ma86, ma97
+	solver_->SetOption("linear_solver", "ma57"); // ma27, ma57, ma77, ma86, ma97
 	solver_->SetOption("jacobian_approximation", "exact"); // "finite difference-values"
 	solver_->SetOption("max_cpu_time", 60.0); // 3 min
 	solver_->SetOption("print_level", 5);

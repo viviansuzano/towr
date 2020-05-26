@@ -37,16 +37,17 @@ WheelsLateralConstraint::InitVariableDependedQuantities (const VariablesPtr& x)
 
   for (int id=0; id<ee_motion_->GetNodes().size(); ++id) {
 	  if (ee_motion_->IsConstantNode(id))
+	  //if (ee_motion_->AdjacentPolyIdsConstant(id))
 		  pure_stance_node_ids_.push_back(id);
   }
 
-//  std::cout << "WheelsLateralConstraint" << std::endl;
-//  std::cout << "Number of Nodes " << ee_motion_->GetNodes().size() << std::endl;
-//  std::cout << "T vector size " << T_.size() << std::endl;
-//  std::cout << "ee" << ee_ << " stance nodes: ";
-//  for (int id : pure_stance_node_ids_)
-//	  std::cout << "(" << id << ", " << T_.at(id) << ") ";
-//  std::cout << std::endl;
+  std::cout << "WheelsLateralConstraint" << std::endl;
+  std::cout << "Number of Nodes " << ee_motion_->GetNodes().size() << std::endl;
+  std::cout << "T vector size " << T_.size() << std::endl;
+  std::cout << "ee" << ee_ << " stance nodes: ";
+  for (int id : pure_stance_node_ids_)
+	  std::cout << "(" << id << ", " << T_.at(id) << ") ";
+  std::cout << std::endl;
 
   int constraint_count = pure_stance_node_ids_.size()*n_constraints_per_node_;
   SetRows(constraint_count);
