@@ -26,7 +26,7 @@ WheelsLateralConstraint::WheelsLateralConstraint (const HeightMap::Ptr& terrain,
 
   terrain_ = terrain;
 
-  n_constraints_per_node_ = 1;  // lateral velocity
+  n_constraints_per_node_ = 2;  // lateral velocity
 
 }
 
@@ -78,6 +78,7 @@ WheelsLateralConstraint::GetValues () const
   for (int id : pure_stance_node_ids_) {
 	Vector3d ee_pos_w = nodes.at(id).p();
 	Vector3d ee_vel_w = nodes.at(id).v();
+	Vector3d ee_acc_w = ee_spline_->GetPoint(T_.at(id)).a();
 
 	double t = T_.at(id);
 
@@ -94,8 +95,10 @@ WheelsLateralConstraint::GetValues () const
 	c_R_w << ex, ey, ez;
 
 	Vector3d ee_vel_c = c_R_w * ee_vel_w;
+	Vector3d ee_acc_c = c_R_w * ee_acc_w;
 
     g(row++) = ee_vel_c(Y);
+    g(row++) = ee_acc_c(Y);
   }
 
   return g;
@@ -143,6 +146,8 @@ WheelsLateralConstraint::FillJacobianBlock(std::string var_set, Jacobian& jac) c
 
 		double t = T_.at(id);
 
+		Vector3d ee_acc_w = ee_spline_->GetPoint(t).a();
+
 		Vector3d n = terrain_->GetNormalizedBasis(HeightMap::Normal, ee_pos_w.x(), ee_pos_w.y());
 		Eigen::Matrix3d jac_n = GetJacobianTerrainBasis(HeightMap::Normal, ee_pos_w.x(), ee_pos_w.y());
 
@@ -162,6 +167,15 @@ WheelsLateralConstraint::FillJacobianBlock(std::string var_set, Jacobian& jac) c
 		Jacobian jac5 = ee_vel_w.z() * (Dez * ee_spline_->GetJacobianWrtNodes(t, kPos)).sparseView().row(Y);
 		Jacobian jac6 = ee_spline_->GetJacobianWrtNodes(t, kVel).row(Z) * ez.y();
 		jac.row(row++) = (jac1 + jac2 + jac3 + jac4 + jac5 + jac6);
+
+
+		jac1 = ee_acc_w.x() * (Dex * ee_spline_->GetJacobianWrtNodes(t, kPos)).sparseView().row(Y);
+		jac2 = ee_spline_->GetJacobianWrtNodes(t, kAcc).row(X) * ex.y();
+		jac3 = ee_acc_w.y() * (Dey * ee_spline_->GetJacobianWrtNodes(t, kPos)).sparseView().row(Y);
+		jac4 = ee_spline_->GetJacobianWrtNodes(t, kAcc).row(Y) * ey.y();
+		jac5 = ee_acc_w.z() * (Dez * ee_spline_->GetJacobianWrtNodes(t, kPos)).sparseView().row(Y);
+		jac6 = ee_spline_->GetJacobianWrtNodes(t, kAcc).row(Z) * ez.y();
+		jac.row(row++) = (jac1 + jac2 + jac3 + jac4 + jac5 + jac6);
 	}
 //	  jac.coeffRef(row++,col) = dR.row(Y) * ee_acc_w;
   }
@@ -174,6 +188,9 @@ WheelsLateralConstraint::FillJacobianBlock(std::string var_set, Jacobian& jac) c
 		Vector3d ee_vel_w = nodes.at(id).v();
 
 		double t = T_.at(id);
+
+		Vector3d ee_acc_w = ee_spline_->GetPoint(t).a();
+
 		Vector3d n = terrain_->GetNormalizedBasis(HeightMap::Normal, ee_pos_w.x(), ee_pos_w.y());
 
 		Eigen::Matrix3d w_R_b = base_angular_.GetRotationMatrixBaseToWorld(t);
@@ -182,6 +199,7 @@ WheelsLateralConstraint::FillJacobianBlock(std::string var_set, Jacobian& jac) c
 		Jacobian Dex = - SkewSymmetricMatrix(n) * Dey;
 
 		jac.row(row++) = ee_vel_w.x() * Dex.row(Y) + ee_vel_w.y() * Dey.row(Y);
+		jac.row(row++) = ee_acc_w.x() * Dex.row(Y) + ee_acc_w.y() * Dey.row(Y);
 	}
 //    jac.row(row++) = base_angular_.DerivOfRotVecMult(t,ee_acc_w,true).row(Y);
   }

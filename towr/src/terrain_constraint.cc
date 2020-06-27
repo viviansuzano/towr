@@ -84,6 +84,7 @@ TerrainConstraint::GetBounds () const
       bounds.at(row) = ifopt::BoundZero;
     else
       bounds.at(row) = ifopt::Bounds(0.0, max_distance_above_terrain);
+      //bounds.at(row) = ifopt::Bounds(0.06, max_distance_above_terrain);
     row++;
   }
 

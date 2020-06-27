@@ -440,11 +440,11 @@ NlpFormulation::MakeEENodesAccConstraint (const SplineHolder& s) const
 {
   ContraintPtrVec constraints;
 
-  std::vector<int> dim = {X};
+  std::vector<int> dim = {X,Y};
   for (int ee=0; ee<params_.GetEECount(); ee++) {
 
-//    auto ee_acc = std::make_shared<EEAccConstraint>(s.ee_motion_.at(ee), id::EEMotionNodes(ee));
-    auto ee_acc = std::make_shared<SplineAccConstraint>(s.ee_motion_.at(ee), id::EEMotionNodes(ee), dim);
+    auto ee_acc = std::make_shared<EEAccConstraint>(s.ee_motion_.at(ee), id::EEMotionNodes(ee), dim);
+//    auto ee_acc = std::make_shared<SplineAccConstraint>(s.ee_motion_.at(ee), id::EEMotionNodes(ee), dim);
 
     constraints.push_back(ee_acc);
   }

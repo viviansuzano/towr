@@ -245,7 +245,7 @@ public:
 	bool run_derivative_test = basenode["run_derivative_test"].as<bool>();
 	solver_->SetOption("linear_solver", "ma57"); // ma27, ma57, ma77, ma86, ma97
 	solver_->SetOption("jacobian_approximation", "exact"); // "finite difference-values"
-	solver_->SetOption("max_cpu_time", 10.0); // 3 min
+	solver_->SetOption("max_cpu_time", 50.0); // 3 min
 	solver_->SetOption("print_level", 5);
 
 	if (msg.play_initialization)

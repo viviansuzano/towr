@@ -22,7 +22,7 @@ namespace towr {
  */
 class EEAccConstraint : public ifopt::ConstraintSet {
 public:
-  EEAccConstraint(const NodeSpline::Ptr& spline, std::string name);
+  EEAccConstraint(const NodeSpline::Ptr& spline, std::string name, const std::vector<int>& dimensions);
   virtual ~EEAccConstraint() = default;
 
   void InitVariableDependedQuantities(const VariablesPtr& x) override;
@@ -44,6 +44,9 @@ private:
 
   int n_junctions_;       ///< number of polynomials junctions in spline.
   std::vector<double> T_; ///< Duration of each polynomial in spline.
+
+  std::vector<int> dimensions_;  ///< dimensions that are constrained
+  int n_dim_;             ///< number of constrained dimensions
 };
 
 } /* namespace towr */
