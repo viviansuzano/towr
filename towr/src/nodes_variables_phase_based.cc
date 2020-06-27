@@ -273,7 +273,7 @@ NodesVariablesEEMotion::GetPhaseBasedEEParameterization ()
         // smoother stepping motions.
         if (dim == Z)
           nodes_.at(node_id).at(kVel).z() = 0.0;
-//        else if (dim == Y)
+//        else if (dim == Y) // no lateral motion during swing phase (testing...)
 //          nodes_.at(node_id).at(kVel).y() = 0.0;
         else
           // velocity in x,y dimension during swing fully optimized.
@@ -295,7 +295,7 @@ NodesVariablesEEMotion::GetPhaseBasedEEParameterization ()
 		if (dim == Y) {
 			if (y_lateral_constraint_) { // otherwise non-holonomic constraint will take care of this!
 				nodes_.at(node_id).at(kVel).y() = 0.0;
-				std::cout << "Y vel is ZERO!!" << std::endl;
+				//std::cout << "Y vel is ZERO!!" << std::endl;
 			}
 		}
 		else if (dim == Z) {
@@ -303,6 +303,7 @@ NodesVariablesEEMotion::GetPhaseBasedEEParameterization ()
         		nodes_.at(node_id).at(kVel).z() = 0.0;
         }
         else {
+          // wheel is allowed to move during stance!!
 		  index_map[idx++].push_back(NodeValueInfo(node_id,   kVel, dim));
         }
 

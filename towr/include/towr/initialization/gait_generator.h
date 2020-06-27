@@ -57,7 +57,7 @@ public:
    */
   enum Combos { C0, C1, C2, C3, C4,
 	  	  	  	DRIVE, FlatSim, BlockCross, BlockHop, GapCross,// specific for wheels
-				C5, C6,
+				C5, C6, Trot,
 			    COMBO_COUNT};
 
   /**

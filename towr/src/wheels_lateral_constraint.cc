@@ -26,7 +26,7 @@ WheelsLateralConstraint::WheelsLateralConstraint (const HeightMap::Ptr& terrain,
 
   terrain_ = terrain;
 
-  n_constraints_per_node_ = 1;  // lateral velocity and acceleration
+  n_constraints_per_node_ = 1;  // lateral velocity
 
 }
 

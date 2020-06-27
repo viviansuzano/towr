@@ -155,6 +155,10 @@ public:
     double max_wheels_acc_z = basenode[terrain]["max_wheels_acc_z"].as<double>();
     params.max_wheels_acc_.at(Z) = max_wheels_acc_z;
 
+    bool constrain_base_acc = basenode[terrain]["constrain_base_acc"].as<bool>();
+    if (constrain_base_acc)
+  	  params.SetBaseAccLimitsContraint();
+
     return params;
   }
 
@@ -186,7 +190,11 @@ public:
     final_position_.y() = basenode[terrain]["final_pose"]["y"].as<double>();
     final_position_.z() = basenode[terrain]["final_pose"]["z"].as<double>();
     goal_geom_.lin.p_ = final_position_;  // x, y, z
-    goal_geom_.ang.p_ = Vector3d(0.0, 0.0, 0.48*M_PI);  // roll, pitch, yaw
+
+    double final_yaw_angle = basenode[terrain]["final_yaw_angle"].as<double>();
+
+    //goal_geom_.ang.p_ = Vector3d(0.0, 0.0, 0.48*M_PI);  // roll, pitch, yaw
+    goal_geom_.ang.p_ = Vector3d(0.0, 0.0, final_yaw_angle);  // roll, pitch, yaw
     goal_geom_.lin.p_.x() += formulation_.initial_base_.lin.at(kPos).x();
 
     bool plot_trajectory = basenode["plot_trajectory"].as<bool>();
@@ -237,7 +245,7 @@ public:
 	bool run_derivative_test = basenode["run_derivative_test"].as<bool>();
 	solver_->SetOption("linear_solver", "ma57"); // ma27, ma57, ma77, ma86, ma97
 	solver_->SetOption("jacobian_approximation", "exact"); // "finite difference-values"
-	solver_->SetOption("max_cpu_time", 60.0); // 3 min
+	solver_->SetOption("max_cpu_time", 10.0); // 3 min
 	solver_->SetOption("print_level", 5);
 
 	if (msg.play_initialization)

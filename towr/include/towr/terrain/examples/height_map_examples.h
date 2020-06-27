@@ -121,9 +121,9 @@ public:
 
 private:
   const double slope_start_ = 0.5;
-  const double up_length_   = 1.0;
-  const double down_length_ = 1.0;
-  const double height_center = 0.7;
+  const double up_length_   = 2.0*cos(0.3);
+  const double down_length_ = 2.0*cos(0.3);
+  const double height_center = 2.0*sin(0.3);
 
   const double x_down_start_ = slope_start_+up_length_;
   const double x_flat_start_ = x_down_start_ + down_length_;

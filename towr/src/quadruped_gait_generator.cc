@@ -77,7 +77,7 @@ void
 QuadrupedGaitGenerator::SetCombo (Combos combo)
 {
   switch (combo) {
-    case C0: 		SetGaits({Stand, Walk2, Walk2, Walk2, Walk2E, Stand}); break; // overlap-walk
+    case C0: 		SetGaits({Stand, Walk2, Walk2, Walk2E, Stand}); break; // overlap-walk
     case C1: 		SetGaits({Stand, Run2, Run2, Run2, Run2E, Stand});     break; // fly trot
     case C2: 		SetGaits({Stand, Run3, Run3, Run3, Run3E, Stand}); break; // pace
     case C3: 		SetGaits({Stand, Hop1, Hop1, Hop1, Hop1E, Stand}); break; // bound
@@ -88,8 +88,9 @@ QuadrupedGaitGenerator::SetCombo (Combos combo)
 //    case BlockCross:  SetGaits({Block}); break;
     case BlockHop:  SetGaits({Hop4}); break;
     case GapCross:  SetGaits({Gap});     break; // fly trot
-    case C5: 		SetGaits({Stand, Walk1, Walk1, Walk1, Walk1, Stand}); break; // overlap-walk
+    case C5: 		SetGaits({Stand, Walk1, Walk1, Stand}); break; // overlap-walk
     case C6: 		SetGaits({Stand, Walk3, Walk3, Walk3, Walk3E, Stand}); break; // overlap-walk
+    case Trot: 		SetGaits({Stand, Run1, Run1, Run1, Run1, Stand}); break; // overlap-walk
     default: assert(false); std::cout << "Gait not defined\n"; break;
   }
 }

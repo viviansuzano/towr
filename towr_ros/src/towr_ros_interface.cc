@@ -114,6 +114,8 @@ TowrRosInterface::planServiceCallback(std_srvs::Trigger::Request  &req,
 
 		solver_->Solve(nlp_);
 		SaveOptimizationAsRosbag(bag_file, robot_params_msg, msg, false);
+		std::cout << "Total Wall Clock Time: " << solver_->GetTotalWallclockTime() << " s.\n";
+		std::cout << "Iteration count: " << nlp_.GetIterationCount() << std::endl;
 	}
 
 	nlp_.PrintCurrent();
@@ -322,8 +324,8 @@ TowrRosInterface::SaveTrajectoryAsRosbag (const std::string& bag_name,
     xpp_msgs::TerrainInfo terrain_msg;
     for (auto ee : state.ee_motion_.GetEEsOrdered()) {
       Eigen::Vector3d ee_pos = state.ee_motion_.at(ee).p_;
-      Vector3d n = Vector3d(0, 0, 1);
-      if (state.ee_contact_.at(ee))
+      //Vector3d n = Vector3d(0, 0, 1);
+      //if (state.ee_contact_.at(ee))
     	  Vector3d n = formulation_.terrain_->GetNormalizedBasis(HeightMap::Normal, ee_pos.x(), ee_pos.y());
 
       terrain_msg.surface_normals.push_back(xpp::Convert::ToRos<geometry_msgs::Vector3>(n));

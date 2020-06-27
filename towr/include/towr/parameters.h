@@ -239,6 +239,9 @@ public:
   // Set constraint on the lateral displacement of the wheel in contact phase
   void SetNonHolonomicConstraint ();
 
+  // Set constraint on the maximum acceleration of the base
+  void SetBaseAccLimitsContraint();
+
   /// Specifies that timings of all feet, so the gait, should be optimized.
   void OptimizePhaseDurations();
 

@@ -364,7 +364,7 @@ hold on; plot(t(idx_pos_RH), pos_RH(idx_pos_RH,3),'r*');
 xlabel('t [s]'); ylabel('p_z [m]')
 
 h = figure();
-terrain = "Block"; % "Block"; %"Gap"; %"Flat"; %"Step45";
+terrain = "Flat"; % "Block"; %"Gap"; %"Flat"; %"Step45";
 set(h, 'Name', 'Wheels position (X x Z)');
 subplot(4,1,1); plot(pos_LF(:,1),pos_LF(:,3),pos_LF(:,1),GetTerrainHeight(pos_LF(:,1), terrain)); grid on; %axis equal;
 % hold on; plot(pos_LF(idx_pos_LF,1),pos_LF(idx_pos_LF,3),'r*');
@@ -487,10 +487,8 @@ xlabel('t [s]'); ylabel('f_x [N]'); title('LF')
 subplot(3,4,5); plot(t,force_LF(:,2),'LineWidth',lineWidth); grid on;
 hold on; plot(t, contact_LF*max(force_LF(:,2)));
 xlabel('t [s]'); ylabel('f_y [N]')
-subplot(3,4,9); %plot(t,force_LF(:,3),'LineWidth',lineWidth); grid on;
-hold on; plot(t, GetTerrainHeight(pos_LF(:,1), terrain)); 
-hold on; plot(t, contact_LF*0.2); %max(force_LF(:,3)));
-% hold on; plot(t(idx_force_LF), force_LF(idx_force_LF,3),'r*');
+subplot(3,4,9); plot(t,force_LF(:,3),'LineWidth',lineWidth); grid on;
+hold on; plot(t, contact_LF*max(force_LF(:,3)));
 xlabel('t [s]'); ylabel('f_z [N]')
 
 subplot(3,4,2); plot(t,force_RF(:,1),'LineWidth',lineWidth); grid on;
@@ -499,10 +497,8 @@ xlabel('t [s]'); ylabel('f_x [N]'); title('RF')
 subplot(3,4,6); plot(t,force_RF(:,2),'LineWidth',lineWidth); grid on;
 hold on; plot(t, contact_RF*max(force_RF(:,2)));
 xlabel('t [s]'); ylabel('f_y [N]')
-subplot(3,4,10); %plot(t,force_RF(:,3),'LineWidth',lineWidth); grid on;
-hold on; plot(t, GetTerrainHeight(pos_RF(:,1), terrain)); 
-hold on; plot(t, contact_RF*0.2); %max(force_RF(:,3)));
-% hold on; plot(t(idx_force_RF), force_RF(idx_force_RF,3),'r*');
+subplot(3,4,10); plot(t,force_RF(:,3),'LineWidth',lineWidth); grid on;
+hold on; plot(t, contact_RF*max(force_RF(:,3)));
 xlabel('t [s]'); ylabel('f_z [N]')
 
 subplot(3,4,3); plot(t,force_LH(:,1),'LineWidth',lineWidth); grid on;
@@ -511,10 +507,8 @@ xlabel('t [s]'); ylabel('f_x [N]'); title('LH')
 subplot(3,4,7); plot(t,force_LH(:,2),'LineWidth',lineWidth); grid on;
 hold on; plot(t, contact_LH*max(force_LH(:,2)));
 xlabel('t [s]'); ylabel('f_y [N]')
-subplot(3,4,11); %plot(t,force_LH(:,3),'LineWidth',lineWidth); grid on;
-hold on; plot(t, GetTerrainHeight(pos_LH(:,1), terrain)); 
-hold on; plot(t, contact_LH*0.2); %max(force_LH(:,3)));
-% hold on; plot(t(idx_force_LH), force_LH(idx_force_LH,3),'r*');
+subplot(3,4,11); plot(t,force_LH(:,3),'LineWidth',lineWidth); grid on;
+hold on; plot(t, contact_LH*max(force_LH(:,3)));
 xlabel('t [s]'); ylabel('f_z [N]')
 
 subplot(3,4,4); plot(t,force_RH(:,1),'LineWidth',lineWidth); grid on;
@@ -523,45 +517,9 @@ xlabel('t [s]'); ylabel('f_x [N]'); title('RH')
 subplot(3,4,8); plot(t,force_RH(:,2),'LineWidth',lineWidth); grid on;
 hold on; plot(t, contact_RH*max(force_RH(:,2)));
 xlabel('t [s]'); ylabel('f_y [N]')
-subplot(3,4,12); %plot(t,force_RH(:,3),'LineWidth',lineWidth); grid on;
-hold on; plot(t, GetTerrainHeight(pos_RH(:,1), terrain)); 
-hold on; plot(t, contact_RH*0.2); %max(force_RH(:,3)));
-% hold on; plot(t(idx_force_RH), force_RH(idx_force_RH,3),'r*');
+subplot(3,4,12); plot(t,force_RH(:,3),'LineWidth',lineWidth); grid on;
+hold on; plot(t, contact_RH*max(force_RH(:,3)));
 xlabel('t [s]'); ylabel('f_z [N]')
-
-% base_ang = [base_roll, base_pitch, base_yaw];
-% plot_stability_measure(base_pos, base_ang, pos_ee, base_acc_lin, base_acc_ang, base_vel_ang, J, m ,g, t);
-
-% %% compute wheel's torque
-% 
-% wh_radius = 0.2; % [m]
-% wh_torque = zeros(size(forces_ee));
-% for i = 1:n
-%     for j = 1:n_ee
-%         x = pos_ee(i,1,j);
-%         [n, tx, ty] = GetTerrainBasis(x, "Step45");
-%         wh_torque(i,:,j) = (forces_ee(i,:,j) * tx) * wh_radius;    
-%     end
-% end
-% 
-% h = figure();
-% set(h, 'Name', 'Wheels torque');
-% subplot(1,4,1); plot(t,wh_torque(:,:,1),'m','LineWidth',2.0); grid on;
-% ylabel('torque [Nm]'); title('LF'); xlabel('t [s]')
-% ax = gca;
-% ax.FontSize = 14;
-% subplot(1,4,2); plot(t,wh_torque(:,:,2),'m','LineWidth',2.0); grid on;
-% ylabel('torque [Nm]'); title('RF'); xlabel('t [s]')
-% ax = gca;
-% ax.FontSize = 14;
-% subplot(1,4,3); plot(t,wh_torque(:,:,3),'m','LineWidth',2.0); grid on;
-% ylabel('torque [Nm]'); title('LH'); xlabel('t [s]')
-% ax = gca;
-% ax.FontSize = 14;
-% subplot(1,4,4); plot(t,wh_torque(:,:,4),'m','LineWidth',2.0); grid on;
-% ylabel('torque [Nm]'); title('RH'); xlabel('t [s]')
-% ax = gca;
-% ax.FontSize = 14;
 
 %% vel and acc without Hermite constraint (base and wheels)
 
@@ -582,23 +540,48 @@ title('Base Linear Acceleration')
 ax = gca;
 ax.FontSize = 14;
 
-% wheel LF
+% wheel LF (x-direction)
 figure()
+set(gcf, 'Position', [20, 300, 1200, 450]) % [x, y, width, height]
 subplot(2,1,1)
 plot(t,vel_LF(:,1),'LineWidth',2); hold on;
-plot(t(dyn_con_idx),vel_LF(dyn_con_idx,1),'r*','LineWidth',2);
+plot(t(idx_pos_LF),vel_LF(idx_pos_LF,1),'r*','LineWidth',2);
+amp = max(vel_LF(:,1)) - min(vel_LF(:,1));
+contact = contact_LF*amp-abs(min(vel_LF(:,1)));
+% pl = plot(t, contact,'Color', [0.15, 0.15, 0.15]);
+% pl.Color (4) = 0.15;
+ylim([min(contact) max(contact)]);
+xlim([0 t(idx_pos_LF(end))]);
+xticks(t(idx_pos_LF))
+xtickformat('%.2f')
 grid on; xlabel('t [s]'); ylabel('v_x [m/s^2]')
 title('Wheel LF Linear Velocity')
 ax = gca;
 ax.FontSize = 14;
+labels = string(ax.XAxis.TickLabels); % extract
+labels(2:2:end) = nan; % remove every other one
+ax.XAxis.TickLabels = labels; % set
+
 subplot(2,1,2)
 plot(t,acc_LF(:,1),'LineWidth',2); hold on;
-plot(t(dyn_con_idx),acc_LF(dyn_con_idx,1),'r*','LineWidth',2);
+plot(t(idx_pos_LF),acc_LF(idx_pos_LF,1),'r*','LineWidth',2);
+amp = max(acc_LF(:,1)) - min(acc_LF(:,1));
+contact = contact_LF*amp-abs(min(acc_LF(:,1))); hold on; 
+% pl = plot(t, contact,'Color', [0.15, 0.15, 0.15]);
+% pl.Color (4) = 0.15;
+ylim([min(contact) max(contact)]);
+xlim([0 t(idx_pos_LF(end))]);
+xticks(t(idx_pos_LF))
+xtickformat('%.2f')
 grid on; xlabel('t [s]'); ylabel('a_x [m/s^2]')
 title('Wheel LF Linear Acceleration')
 ax = gca;
 ax.FontSize = 14;
+labels = string(ax.XAxis.TickLabels); % extract
+labels(2:2:end) = nan; % remove every other one
+ax.XAxis.TickLabels = labels; % set
 
+%% 3D motion
 
 plot_3D_desired_motion(base_pos, pos_ee);
 

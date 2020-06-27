@@ -5,7 +5,20 @@ optimize_phase_durations: false
 play_initialization: false
 init_state_from_file: true  # 'true' if initial_pose for base is read from this file, 'false' if it is set by the current anymal state
 
-# Possible gaits: 0 (C0), 1 (C1), 2 (C2), 3 (C3), 4 (C4), 5 (DRIVE), 6 (FlatSim), 7 (BlockCross), 8 (BlockHop), 9 (GapCross), 10 (C5), 11 (C6)
+# Possible gaits: 
+# 0 (C0 - overlap-walk), 
+# 1 (C1 - running trot), 
+# 2 (C2 - running pace), 
+# 3 (C3 - bounding), 
+# 4 (C4 - gallop), 
+# 5 (driving), 
+# 6 (FlatSim - drive + running trot), 
+# 7 (BlockCross - gallop), 
+# 8 (BlockHop - bounding), 
+# 9 (GapCross - gallop), 
+# 10 (C5 - static-walk), 
+# 11 (C6 - overlap-walk)
+# 12 (troting)
 
 constrain_final_z_base: false
 
@@ -20,12 +33,13 @@ Flat:
     y: 0.0 #1.0 #0.0
     z: 0.48
 
-  total_time: 3.0 # for non holonomic constraint
-#  total_time: 3.0 # for straight motions
-  gait: 1
+  final_yaw_angle: 0.0 #1.50796447372 #1.0471975512 #1.50796447372 #1.57079632679 #3.14159265359
+  total_time: 4.0 # 3.0 for gallop, 2.0 for Others
+  gait: 10
   use_non_holonomic_constraint: true
   shift_initialization: false
-  max_wheels_acc_z: 90.0 # 25 for gait 2 and 0, 50 for 1 and 5
+  max_wheels_acc_z: 100.0
+  constrain_base_acc: true
 
 Gap:
   initial_pose:
@@ -38,11 +52,13 @@ Gap:
     y: 0.0
     z: 0.45
 
+  final_yaw_angle: 0.0
   total_time: 2.0 # 2.0 (converge)
   gait: 9
   use_non_holonomic_constraint: false
   shift_initialization: false
   max_wheels_acc_z: 50.0
+  constrain_base_acc: false
 
 Block:
   initial_pose:
@@ -55,26 +71,12 @@ Block:
     y: 0.0
     z: 0.5
 
+  final_yaw_angle: 0.0
   total_time: 3.0 # 2.0 (Hop), 3.0 (Cross)
   gait: 7
   use_non_holonomic_constraint: false
   shift_initialization: false
   max_wheels_acc_z: 50.0
+  constrain_base_acc: false
 
-Slope:
-  initial_pose:
-    x: 0.0
-    y: 0.0
-    z: 0.48
-   
-  final_pose: 
-    x: 3.0 #2.0
-    y: 0.0
-    z: 0.5
-
-  total_time: 3.0 #6.0
-  gait: 0
-  use_non_holonomic_constraint: false
-  shift_initialization: false
-  max_wheels_acc_z: 50.0
 
