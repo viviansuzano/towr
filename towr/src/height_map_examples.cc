@@ -88,11 +88,11 @@ Stairs::GetHeight (double x, double y) const
 double
 Gap::GetHeight (double x, double y) const
 {
-  double h = 0.0;
+  double h = height_offset;
 
   // modelled as parabola
   if (gap_start_ <= x && x <= gap_end_x)
-    h = a*x*x + b*x + c;
+    h = a*x*x + b*x + c + height_offset;
 
   return h;
 }

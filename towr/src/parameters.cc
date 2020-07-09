@@ -56,8 +56,7 @@ Parameters::Parameters ()
   // maximum acceleration for smooth motions
   max_base_acc_lin_ = {10.0, 10.0, 10.0};
   max_base_acc_ang_ = {10.0, 10.0, 10.0};
-//  max_wheels_acc_ = {40.0, 0.0, 120.0};
-  max_wheels_acc_ = {20.0, 20.0, 50.0};
+  max_wheels_acc_ = {20.0, 0.0, 40.0};
 
   DeleteAllConstraints();
 
@@ -70,7 +69,6 @@ Parameters::Parameters ()
 //  constraints_.push_back(Swing); // creates smoother swing motions, not absolutely required.
   constraints_.push_back(EEAccLimits); // ensures maximum acc on the ee motions
   constraints_.push_back(EndeffectorAcc); // so accelerations don't jump between polynomials
-//  constraints_.push_back(BaseAccLimits); // ensures maximum acc on the base motions
 
   // optional costs to e.g penalize endeffector forces
 //   costs_.push_back({EEMotionCostID, 1.0}); //weighed by 1.0 relative to other costs

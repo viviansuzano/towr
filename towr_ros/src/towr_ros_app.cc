@@ -142,9 +142,11 @@ public:
     	params.bounds_final_lin_pos_ = {X, Y, Z};
     }
 
+    int n_polys_in_swing_phase = basenode["n_polys_in_swing_phase"].as<int>();
+    params.n_polynomials_per_swing_phase_ = n_polys_in_swing_phase;
+
     params.is_pure_driving_motion_ = false;
     if (msg.gait == towr::GaitGenerator::DRIVE) {
-	  std::cout << "PARAM is_pure_driving_motion_ TRUE!!!" << std::endl;
       params.is_pure_driving_motion_ = true;
     }
 
@@ -152,12 +154,17 @@ public:
     if (use_non_holonomic_constraint)
   	  params.SetNonHolonomicConstraint();
 
-    double max_wheels_acc_z = basenode[terrain]["max_wheels_acc_z"].as<double>();
-    params.max_wheels_acc_.at(Z) = max_wheels_acc_z;
+    params.limit_base_angles_ = false;
+    bool limit_base_angles = basenode[terrain]["limit_base_angles"].as<bool>();
+    if (limit_base_angles)
+  	  params.limit_base_angles_ = true;
 
-    bool constrain_base_acc = basenode[terrain]["constrain_base_acc"].as<bool>();
-    if (constrain_base_acc)
-  	  params.SetBaseAccLimitsContraint();
+//    double max_wheels_acc_z = basenode[terrain]["max_wheels_acc_z"].as<double>();
+//    params.max_wheels_acc_.at(Z) = max_wheels_acc_z;
+//
+//    bool constrain_base_acc = basenode[terrain]["constrain_base_acc"].as<bool>();
+//    if (constrain_base_acc)
+//  	  params.SetBaseAccLimitsContraint();
 
     return params;
   }
@@ -193,7 +200,6 @@ public:
 
     double final_yaw_angle = basenode[terrain]["final_yaw_angle"].as<double>();
 
-    //goal_geom_.ang.p_ = Vector3d(0.0, 0.0, 0.48*M_PI);  // roll, pitch, yaw
     goal_geom_.ang.p_ = Vector3d(0.0, 0.0, final_yaw_angle);  // roll, pitch, yaw
     goal_geom_.lin.p_.x() += formulation_.initial_base_.lin.at(kPos).x();
 
@@ -203,7 +209,7 @@ public:
 
     float total_duration = basenode[terrain]["total_time"].as<float>();
 
-    bool shift_initialization = basenode[terrain]["shift_initialization"].as<bool>();
+    bool shift_initialization = basenode["shift_initialization"].as<bool>();
     if (shift_initialization)
     {
 	  Eigen::Vector3d pos_phase (0.15, 0.0, 0.0);
@@ -220,7 +226,7 @@ public:
     msg.total_duration           = total_duration;
     msg.replay_trajectory        = true;
     msg.play_initialization      = play_initialization;
-    msg.replay_speed             = 0.6; //1.0;
+    msg.replay_speed             = 0.4; //1.0;
     msg.optimize                 = true;
     msg.terrain                  = (int) towr_terrain_id;
     msg.gait                     = gait_combo; //towr::GaitGenerator::C0;
@@ -245,7 +251,7 @@ public:
 	bool run_derivative_test = basenode["run_derivative_test"].as<bool>();
 	solver_->SetOption("linear_solver", "ma57"); // ma27, ma57, ma77, ma86, ma97
 	solver_->SetOption("jacobian_approximation", "exact"); // "finite difference-values"
-	solver_->SetOption("max_cpu_time", 50.0); // 3 min
+	solver_->SetOption("max_cpu_time", 60.0); // 1 min
 	solver_->SetOption("print_level", 5);
 
 	if (msg.play_initialization)

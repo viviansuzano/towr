@@ -77,20 +77,19 @@ void
 QuadrupedGaitGenerator::SetCombo (Combos combo)
 {
   switch (combo) {
-    case C0: 		SetGaits({Stand, Walk2, Walk2, Walk2E, Stand}); break; // overlap-walk
-    case C1: 		SetGaits({Stand, Run2, Run2, Run2, Run2E, Stand});     break; // fly trot
-    case C2: 		SetGaits({Stand, Run3, Run3, Run3, Run3E, Stand}); break; // pace
-    case C3: 		SetGaits({Stand, Hop1, Hop1, Hop1, Hop1E, Stand}); break; // bound
-    case C4:  		SetGaits({Stand, Hop3, Hop3, Hop3, Hop3E, Stand}); break; // gallop
-    case DRIVE: 	SetGaits({Stand}); break;
-    case FlatSim:	SetGaits({Drive, Run2, Run2, Run2, Run2E, Stand}); break;
-    case BlockCross:  SetGaits({StandFlight, Walk3E, Drive}); break;
-//    case BlockCross:  SetGaits({Block}); break;
-    case BlockHop:  SetGaits({Hop4}); break;
-    case GapCross:  SetGaits({Gap});     break; // fly trot
-    case C5: 		SetGaits({Stand, Walk1, Walk1, Stand}); break; // overlap-walk
-    case C6: 		SetGaits({Stand, Walk3, Walk3, Walk3, Walk3E, Stand}); break; // overlap-walk
-    case Trot: 		SetGaits({Stand, Run1, Run1, Run1, Run1, Stand}); break; // overlap-walk
+    case C0: 		  SetGaits({Stand, Walk2, Walk2, Walk2E, Stand}); break; // overlap-walk
+    case C1: 		  SetGaits({Stand, Run2, Run2, Run2, Run2E, Stand});     break; // fly trot
+    case C2: 		  SetGaits({Stand, Run3, Run3, Run3, Run3E, Stand}); break; // pace
+    case C3: 		  SetGaits({Stand, Hop1, Hop1, Hop1, Hop1E, Stand}); break; // bound
+    case C4:  		  SetGaits({Stand, Hop3, Hop3, Hop3, Hop3E, Stand}); break; // gallop
+    case C5: 		  SetGaits({Stand, Walk1, Walk1, Stand}); break; // overlap-walk
+    case C6: 		  SetGaits({Stand, Walk3, Walk3, Walk3, Walk3E, Stand}); break; // overlap-walk
+    case Trot: 		  SetGaits({Stand, Run1, Run1, Run1, Run1, Stand}); break; // overlap-walk
+    case DRIVE: 	  SetGaits({Stand}); break;
+    case BlockCross:  SetGaits({BlockGallop}); break;
+    case BlockBound:  SetGaits({BlockHop}); break;
+    case GapCross:    SetGaits({GapGallop});     break;
+    case GapBound:    SetGaits({GapHop});     break;
     default: assert(false); std::cout << "Gait not defined\n"; break;
   }
 }
@@ -122,8 +121,10 @@ QuadrupedGaitGenerator::GetGait(Gaits gait) const
     // specific for wheels
     case Drive: return GetDriveGait();
     case StandFlight: return GetStrideStandFlight();
-    case Gap: return GetGapCrossingGait();
-    case Block: return GetBlockCrossingGait();
+    case GapGallop: return GetGapCrossingGait();
+    case GapHop: return GetGapHoppingGait();
+    case BlockGallop: return GetBlockCrossingGait();
+    case BlockHop: return GetGapHoppingGait();
 
     default: assert(false); // gait not implemented
   }
@@ -257,18 +258,28 @@ QuadrupedGaitGenerator::GetStrideWalkTest () const
 QuadrupedGaitGenerator::GaitInfo
 QuadrupedGaitGenerator::GetGapCrossingGait () const
 {
-  double three    = 0.35;
-  double lateral  = 0.25;
-  double diagonal = 0.25;
-
   auto times =
   {
-	  //three, lateral, three, diagonal, three, lateral, three, diagonal,
-     0.2, 0.15, 0.25, 0.15, 0.15, 0.15, 0.25, 0.15, 0.05,
+	  0.2, 0.15, 0.25, 0.15, 0.15, 0.15, 0.25, 0.15, 0.05,
   };
   auto phase_contacts =
   {
 	  BB_, Bb_, BI_, BP_, BB_, bB_, IB_, PB_, BB_,
+  };
+
+  return std::make_pair(times, phase_contacts);
+}
+
+QuadrupedGaitGenerator::GaitInfo
+QuadrupedGaitGenerator::GetGapHoppingGait () const
+{
+  auto times =
+  {
+	 0.4, 0.4, 0.3, 0.4, 0.2,
+  };
+  auto phase_contacts =
+  {
+	 BB_, BI_, BB_, IB_, BB_,
   };
 
   return std::make_pair(times, phase_contacts);

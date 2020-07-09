@@ -38,7 +38,6 @@ namespace towr {
 std::vector<NodesVariablesPhaseBased::PolyInfo>
 BuildPolyInfos (int phase_count, bool first_phase_constant,
         		std::vector<int> n_polys_per_phase)
-//                int n_polys_in_swing_phase, int n_polys_in_stance_phase)
 {
   using PolyInfo = NodesVariablesPhaseBased::PolyInfo;
   std::vector<PolyInfo> polynomial_info;
@@ -66,8 +65,6 @@ NodesVariablesPhaseBased::NodesVariablesPhaseBased (int phase_count,
                                                     bool first_phase_constant,
                                                     const std::string& name,
 													std::vector<int> n_polys_per_phase)
-						//	                        int n_polys_in_swing_phase,
-						//							int n_polys_in_stance_phase);
     : NodesVariables(name)
 {
   polynomial_info_ = BuildPolyInfos(phase_count, first_phase_constant, n_polys_per_phase);
@@ -241,7 +238,7 @@ NodesVariablesEEMotion::NodesVariablesEEMotion(int phase_count,
 											   std::vector<int> n_polys_per_phase,
 											   bool y_lateral_constraint)
     :NodesVariablesPhaseBased(phase_count,
-                              is_in_contact_at_start, // contact phase for motion is constant
+                              is_in_contact_at_start,
                               name, n_polys_per_phase)
 {
   y_lateral_constraint_ = y_lateral_constraint;
@@ -256,46 +253,28 @@ NodesVariablesEEMotion::GetPhaseBasedEEParameterization ()
 {
   OptIndexMap index_map;
 
-//  std::cout << "Number of nodes: " << nodes_.size() << std::endl;
-
   int idx = 0; // index in variables set
   for (int node_id=0; node_id<nodes_.size(); ++node_id) {
-//	std::cout << "is constant: " << IsConstantNode(node_id) << std::endl;
     // swing node:
     if (!IsConstantNode(node_id)) {
       for (int dim=0; dim<GetDim(); ++dim) {
-        // intermediate way-point position of swing motion are optimized
+        // both position and velocity is optimized during swing phase
         index_map[idx++].push_back(NodeValueInfo(node_id, kPos, dim));
-
-        // velocity in vertical direction fixed to zero and not optimized.
-        // Since we often choose two polynomials per swing-phase, this restricts
-        // the swing to have reached it's extreme at half-time and creates
-        // smoother stepping motions.
-        if (dim == Z)
-          nodes_.at(node_id).at(kVel).z() = 0.0;
-//        else if (dim == Y) // no lateral motion during swing phase (testing...)
-//          nodes_.at(node_id).at(kVel).y() = 0.0;
-        else
-          // velocity in x,y dimension during swing fully optimized.
-          index_map[idx++].push_back(NodeValueInfo(node_id, kVel, dim));
+        index_map[idx++].push_back(NodeValueInfo(node_id, kVel, dim));
       }
     }
     // stance node
     else {
-//      // ensure that foot doesn't move by not even optimizing over velocities
-//      nodes_.at(node_id).at(kVel).setZero();
-//      nodes_.at(node_id+1).at(kVel).setZero();
-
+      // both position and velocity is optimized during stance phase (hybrid motion)
       int phase = GetPhase(node_id);
       bool is_first_node_in_phase = (node_id == GetNodeIDAtStartOfPhase(phase));
 
       for (int dim=0; dim<GetDim(); ++dim) {
-        index_map[idx++].push_back(NodeValueInfo(node_id,   kPos, dim));
+        index_map[idx++].push_back(NodeValueInfo(node_id, kPos, dim));
 
 		if (dim == Y) {
 			if (y_lateral_constraint_) { // otherwise non-holonomic constraint will take care of this!
 				nodes_.at(node_id).at(kVel).y() = 0.0;
-				//std::cout << "Y vel is ZERO!!" << std::endl;
 			}
 		}
 		else if (dim == Z) {
@@ -304,7 +283,7 @@ NodesVariablesEEMotion::GetPhaseBasedEEParameterization ()
         }
         else {
           // wheel is allowed to move during stance!!
-		  index_map[idx++].push_back(NodeValueInfo(node_id,   kVel, dim));
+		  index_map[idx++].push_back(NodeValueInfo(node_id, kVel, dim));
         }
 
       }
@@ -334,25 +313,19 @@ NodesVariablesEEForce::GetPhaseBasedEEParameterization ()
 
   int idx = 0; // index in variables set
   for (int id=0; id<nodes_.size(); ++id) {
-    // stance node:
-    // forces can be created during stance, so these nodes are optimized over.
+    // stance node: forces can be created during stance, so these nodes are optimized over.
     if (!IsConstantNode(id)) {
       for (int dim=0; dim<GetDim(); ++dim) {
         index_map[idx++].push_back(NodeValueInfo(id, kPos, dim));
         index_map[idx++].push_back(NodeValueInfo(id, kVel, dim));
       }
     }
-    // swing node (next one will also be swing, so handle that one too)
+    // swing node
     else {
       // forces can't exist during swing phase, so no need to be optimized
       // -> all node values simply set to zero.
       nodes_.at(id).at(kPos).setZero();
-      //nodes_.at(id+1).at(kPos).setZero();
-
       nodes_.at(id).at(kVel).setZero();
-      //nodes_.at(id+1).at(kVel).setZero();
-
-      //id += 1; // already added next constant node, so skip
     }
   }
 

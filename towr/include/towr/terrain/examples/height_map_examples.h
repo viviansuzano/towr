@@ -102,6 +102,8 @@ private:
   const double xc = gap_start_ + dx; // gap center
   const double gap_end_x = gap_start_ + w;
 
+  const double height_offset = 0.2;
+
   // generated with matlab
   // see matlab/gap_height_map.m
   // coefficients of 2nd order polynomial
