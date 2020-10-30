@@ -371,7 +371,7 @@ NlpFormulation::MakeTerrainConstraint (const SplineHolder& s) const
   ContraintPtrVec constraints;
 
   for (int ee=0; ee<params_.GetEECount(); ee++) {
-	auto c = std::make_shared<TerrainConstraint>(terrain_, id::EEMotionNodes(ee));
+	auto c = std::make_shared<TerrainConstraint>(terrain_, id::EEMotionNodes(ee), params_.min_distance_above_terrain_);
     constraints.push_back(c);
   }
 

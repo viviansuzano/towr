@@ -70,6 +70,7 @@ private:
   GaitInfo GetGapCrossingGait() const;
   GaitInfo GetGapHoppingGait() const;
   GaitInfo GetBlockCrossingGait() const;
+  GaitInfo GetBlockHoppingGait() const;
 
   void SetCombo(Combos combo) override;
 

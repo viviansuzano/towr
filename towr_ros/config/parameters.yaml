@@ -1,4 +1,4 @@
-terrain: "Gap"
+terrain: "Flat"
 run_derivative_test: false
 plot_trajectory: false
 optimize_phase_durations: false
@@ -13,16 +13,17 @@ init_state_from_file: true  # 'true' if initial_pose for base is read from this 
 # 4 (C4 - gallop) 
 # 5 (C5 - static-walk) 
 # 6 (C6 - overlap-walk)
-# 7 (troting)
+# 7 (lateral troting)
 # 8 (driving)
-# 9 (BlockCross - gallop) => works better for 3 polynomials in the swing phase
-# 10 (BlockHop - bounding) 
-# 11 (GapCross - gallop) => works better for 3 polynomials in the swing phase
+# 9 (BlockCross - gallop) => works well for 3 polynomials in the swing phase
+# 10 (BlockBound - bounding) 
+# 11 (GapCross - gallop) => works well for 3 polynomials in the swing phase
 # 12 (GapBound - bounding)  
 
 constrain_final_z_base: false
 shift_initialization: false
 n_polys_in_swing_phase: 2
+min_distance_above_terrain: 0.0 #0.08
 
 Flat:
   initial_pose:
@@ -32,14 +33,15 @@ Flat:
    
   final_pose: 
     x: 2.0 
-    y: 1.0 #1.0 #0.0
+    y: 0.0
     z: 0.48
 
-  final_yaw_angle: 1.57079632679 #1.50796447372 #1.0471975512 #1.50796447372 #1.57079632679 #3.14159265359
-  total_time: 4.0 # 3.0 for gallop, 2.0 for Others
-  gait: 7
+  final_yaw_angle: 0.0 #1.57079632679
+  total_time: 2.0
+  gait: 4
   use_non_holonomic_constraint: true
-  limit_base_angles: false
+  limit_base_angles: true
+  max_wheels_acc_z: 100.0
 
 Gap:
   initial_pose:
@@ -54,7 +56,7 @@ Gap:
 
   final_yaw_angle: 0.0
   total_time: 2.0
-  gait: 12 #11
+  gait: 11 #12
   use_non_holonomic_constraint: false
   limit_base_angles: true # generates smoother motions, not mandatory
 
@@ -62,16 +64,16 @@ Block:
   initial_pose:
     x: 0.0
     y: 0.0
-    z: 0.48
+    z: 0.45
    
   final_pose: 
     x: 1.5 
     y: 0.0
-    z: 0.5
+    z: 0.65
 
   final_yaw_angle: 0.0
-  total_time: 3.0 # 2.0 (Hop), 3.0 (Cross)
-  gait: 7
+  total_time: 2.0
+  gait: 9 #10
   use_non_holonomic_constraint: false
   limit_base_angles: false
 

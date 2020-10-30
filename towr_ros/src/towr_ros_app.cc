@@ -159,9 +159,21 @@ public:
     if (limit_base_angles)
   	  params.limit_base_angles_ = true;
 
-//    double max_wheels_acc_z = basenode[terrain]["max_wheels_acc_z"].as<double>();
-//    params.max_wheels_acc_.at(Z) = max_wheels_acc_z;
-//
+    float min_distance_above_terrain = basenode["min_distance_above_terrain"].as<float>();
+    params.min_distance_above_terrain_ = min_distance_above_terrain;
+
+    // not the best way to check for an additional parameter, but I didn't want to insert it in all terrain entries.
+    // TODO: fix this...
+//    if ( (uint) basenode[terrain].size() > 7 )
+//    	params.min_distance_above_terrain_ = 0.08;
+
+
+    if (towr_terrain_id == HeightMap::FlatID)
+    {
+		double max_wheels_acc_z = basenode[terrain]["max_wheels_acc_z"].as<double>();
+		params.max_wheels_acc_.at(Z) = max_wheels_acc_z;
+    }
+
 //    bool constrain_base_acc = basenode[terrain]["constrain_base_acc"].as<bool>();
 //    if (constrain_base_acc)
 //  	  params.SetBaseAccLimitsContraint();

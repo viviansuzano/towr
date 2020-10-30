@@ -124,7 +124,7 @@ QuadrupedGaitGenerator::GetGait(Gaits gait) const
     case GapGallop: return GetGapCrossingGait();
     case GapHop: return GetGapHoppingGait();
     case BlockGallop: return GetBlockCrossingGait();
-    case BlockHop: return GetGapHoppingGait();
+    case BlockHop: return GetBlockHoppingGait();
 
     default: assert(false); // gait not implemented
   }
@@ -291,11 +291,26 @@ QuadrupedGaitGenerator::GetBlockCrossingGait () const
 
   auto times =
   {
-     0.1, 0.15, 0.15, 0.2, 0.2, 0.2, 0.15, 0.2, 0.4,
+	  0.2, 0.15, 0.25, 0.30, 0.15, 0.25, 0.10, 0.5,
   };
   auto phase_contacts =
   {
-	  BB_, Bb_, BI_, BP_, BB_, bB_, IB_, PB_, BB_,
+	  BB_, Bb_, BI_, BB_, bB_, IB_, PB_, BB_,
+  };
+
+  return std::make_pair(times, phase_contacts);
+}
+
+QuadrupedGaitGenerator::GaitInfo
+QuadrupedGaitGenerator::GetBlockHoppingGait () const
+{
+  auto times =
+  {
+     0.2, 0.4, 0.2, 0.4, 0.5,
+  };
+  auto phase_contacts =
+  {
+	 BB_, BI_, BB_, IB_, BB_,
   };
 
   return std::make_pair(times, phase_contacts);

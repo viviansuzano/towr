@@ -225,6 +225,9 @@ public:
   /// Limit maximum angles on the base
   bool limit_base_angles_;
 
+  /// Minimum distance above the ground
+  double min_distance_above_terrain_;
+
   /// which dimensions (x,y,z) of the final base state should be bounded
   std::vector<int> bounds_final_lin_pos_,
                    bounds_final_lin_vel_,
