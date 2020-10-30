@@ -37,6 +37,7 @@ FlatGround::FlatGround(double height)
   height_ = height;
 }
 
+// BLOCK
 double
 Block::GetHeight (double x, double y) const
 {
@@ -64,6 +65,37 @@ Block::GetHeightDerivWrtX (double x, double y) const
   return dhdx;
 }
 
+// BLOCK RIGHT
+double
+BlockRight::GetHeight (double x, double y) const
+{
+  double h = 0.0;
+
+  if (y <= 0) {
+    // very steep ramp leading up to block
+    if (block_start <= x && x <=block_start+eps_)
+	  h = slope_*(x-block_start);
+
+    if (block_start+eps_ <= x && x <= block_start+length_)
+	  h = height_;
+  }
+
+  return h;
+}
+
+double
+BlockRight::GetHeightDerivWrtX (double x, double y) const
+{
+  double dhdx = 0.0;
+
+  if (y <= 0) {
+    // very steep ramp leading up to block
+    if (block_start <= x && x <=block_start+eps_)
+      dhdx = slope_;
+  }
+
+  return dhdx;
+}
 
 // STAIRS
 double

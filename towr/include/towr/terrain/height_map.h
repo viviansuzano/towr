@@ -79,6 +79,7 @@ public:
    */
   enum TerrainID { FlatID,
                    BlockID,
+				   BlockRightID,
                    StairsID,
                    GapID,
                    SlopeID,
@@ -178,6 +179,7 @@ const static std::map<HeightMap::TerrainID, std::string> terrain_names =
 {
   {HeightMap::FlatID,        "Flat"       },
   {HeightMap::BlockID,       "Block"      },
+  {HeightMap::BlockRightID,  "BlockRight" },
   {HeightMap::StairsID,      "Stairs"     },
   {HeightMap::GapID,         "Gap"        },
   {HeightMap::SlopeID,       "Slope"      },
@@ -189,6 +191,7 @@ const static std::map<std::string, HeightMap::TerrainID> terrain_ids =
 {
   {"Flat", 			 HeightMap::FlatID         	  },
   {"Block", 		 HeightMap::BlockID        	  },
+  {"BlockRight", 	 HeightMap::BlockRightID  	  },
   {"Stairs", 		 HeightMap::StairsID       	  },
   {"Gap", 			 HeightMap::GapID          	  },
   {"Slope", 		 HeightMap::SlopeID        	  },

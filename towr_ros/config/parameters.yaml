@@ -1,4 +1,4 @@
-terrain: "Flat"
+terrain: "BlockRight"
 run_derivative_test: false
 plot_trajectory: false
 optimize_phase_durations: false
@@ -19,6 +19,7 @@ init_state_from_file: true  # 'true' if initial_pose for base is read from this 
 # 10 (BlockBound - bounding) 
 # 11 (GapCross - gallop) => works well for 3 polynomials in the swing phase
 # 12 (GapBound - bounding)  
+# 13 (BlockRight)
 
 constrain_final_z_base: false
 shift_initialization: false
@@ -74,6 +75,23 @@ Block:
   final_yaw_angle: 0.0
   total_time: 2.0
   gait: 9 #10
+  use_non_holonomic_constraint: false
+  limit_base_angles: false
+
+BlockRight:
+  initial_pose:
+    x: 0.0
+    y: 0.0
+    z: 0.45
+   
+  final_pose: 
+    x: 1.5 
+    y: 0.0
+    z: 0.45
+
+  final_yaw_angle: 0.0
+  total_time: 2.0
+  gait: 13
   use_non_holonomic_constraint: false
   limit_base_angles: false
 

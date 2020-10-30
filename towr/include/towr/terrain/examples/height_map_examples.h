@@ -69,6 +69,23 @@ private:
 };
 
 /**
+ * @brief Sample terrain with a step in height in the right side of the path.
+ */
+class BlockRight : public HeightMap {
+public:
+  double GetHeight(double x, double y)  const override;
+  double GetHeightDerivWrtX(double x, double y) const override;
+
+private:
+  double block_start = 0.7;
+  double length_     = 3.5;
+  double height_     = 0.2; // [m]
+
+  double eps_ = 0.03; // approximate as slope
+  const double slope_ = height_/eps_;
+};
+
+/**
  * @brief Sample terrain with a two-steps in height in x-direction.
  */
 class Stairs : public HeightMap {
