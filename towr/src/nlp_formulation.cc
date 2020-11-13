@@ -111,8 +111,6 @@ NlpFormulation::MakeBaseVariables () const
   double z = terrain_->GetHeight(x,y) - model_.kinematic_model_->GetNominalStanceInBase().front().z();
   Vector3d final_pos(x, y, z);
 
-//  std::cout << "Base: " << std::endl;
-
   spline_lin->SetByLinearInterpolation(initial_base_.lin.p(), final_pos, params_.GetTotalTime());
   spline_lin->AddStartBound(kPos, {X,Y,Z}, initial_base_.lin.p());
   spline_lin->AddStartBound(kVel, {X,Y,Z}, initial_base_.lin.v());
@@ -144,7 +142,6 @@ NlpFormulation::MakeEndeffectorVariables () const
 
   // Endeffector Motions
   double T = params_.GetTotalTime();
-//  std::cout << "Total time: " << T << std::endl;
 
   std::vector<int> n_polys;
 
@@ -154,19 +151,14 @@ NlpFormulation::MakeEndeffectorVariables () const
 	const std::vector<double> phase_durations = params_.ee_phase_durations_.at(ee);
 	for (auto v : phase_durations) {
 		if (phase_constant) {
-			std::cout << "(" << v << ", " << floor(v/params_.dt_drive_constraint_)+1 << ")";
 			n_polys.push_back(floor(v/params_.dt_drive_constraint_)+1);
 		}
 		else {
-			std::cout << "(" << v << ", " << params_.n_polynomials_per_swing_phase_ << ")";
 			n_polys.push_back(params_.n_polynomials_per_swing_phase_);
 		}
 		phase_constant = !phase_constant;
 	}
-	std::cout << std::endl;
 
-//	std::cout << "OptIdxMap EE_motion " << ee << std::endl;
-//	std::cout << "params_.use_non_holonomic_constraint_ = " << params_.use_non_holonomic_constraint_<< std::endl;
     auto nodes = std::make_shared<NodesVariablesEEMotion>(
                                               params_.GetPhaseCount(ee),
                                               params_.ee_in_contact_at_start_.at(ee),
@@ -182,11 +174,6 @@ NlpFormulation::MakeEndeffectorVariables () const
     double y = final_ee_pos_W.y();
     double z = terrain_->GetHeight(x,y);
 
-//    std::cout << "ee: " << ee << ", phase count: " << params_.GetPhaseCount(ee);
-//    std::cout << ", poly count: " << nodes->GetPolynomialCount();
-//    std::cout << ", initial pos: " << initial_ee_W_.at(ee).transpose();
-//    std::cout << ", final pos: " << x << ", " << y << std::endl;
-
     nodes->SetByLinearInterpolation(initial_ee_W_.at(ee), Vector3d(x,y,z), T);
 
     nodes->AddStartBound(kPos, {X,Y,Z}, initial_ee_W_.at(ee));
@@ -199,12 +186,7 @@ NlpFormulation::MakeEndeffectorVariables () const
     vars.push_back(nodes);
 
     n_polys.clear();
-
-    std::cout << "Poly Durations EE " << ee << " motion: ";
     std::vector<double> poly_durations = nodes->ConvertPhaseToPolyDurations(params_.ee_phase_durations_.at(ee));
-    for (auto p : poly_durations)
-    	std::cout << " " << p;
-    std::cout << std::endl;
   }
 
   return vars;
@@ -226,18 +208,14 @@ NlpFormulation::MakeForceVariables () const
 	const std::vector<double> phase_durations = params_.ee_phase_durations_.at(ee);
 	for (auto v : phase_durations) {
 		if (phase_constant) {
-			std::cout << "(" << v << ", " << 1 << ")";
 			n_polys.push_back(1);
 		}
 		else {
-			std::cout << "(" << v << ", " << floor(v/params_.dt_drive_constraint_)+1 << ")";
 			n_polys.push_back(floor(v/params_.dt_drive_constraint_)+1);
 		}
 		phase_constant = !phase_constant;
 	}
-	std::cout << std::endl;
 
-//	std::cout << "OptIdxMap EE_force " << ee << std::endl;
     auto nodes = std::make_shared<NodesVariablesEEForce>(
                                               params_.GetPhaseCount(ee),
                                               params_.ee_in_contact_at_start_.at(ee),
@@ -248,15 +226,8 @@ NlpFormulation::MakeForceVariables () const
     double m = model_.dynamic_model_->m();
     double g = model_.dynamic_model_->g();
 
-//    std::cout << "EE force: " << std::endl;
-
-    std::cout << "Poly Durations EE " << ee << " force: ";
-    std::vector<double> poly_durations = nodes->ConvertPhaseToPolyDurations(params_.ee_phase_durations_.at(ee));
-    for (auto p : poly_durations)
-    	std::cout << " " << p;
-    std::cout << std::endl;
-
     n_polys.clear();
+    std::vector<double> poly_durations = nodes->ConvertPhaseToPolyDurations(params_.ee_phase_durations_.at(ee));
 
     Vector3d f_stance(0.0, 0.0, m*g/params_.GetEECount());
     nodes->SetByLinearInterpolation(f_stance, f_stance, T); // stay constant

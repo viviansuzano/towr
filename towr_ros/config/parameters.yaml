@@ -1,4 +1,4 @@
-terrain: "BlockRight"
+terrain: "Flat"
 run_derivative_test: false
 plot_trajectory: false
 optimize_phase_durations: false
@@ -23,7 +23,7 @@ init_state_from_file: true  # 'true' if initial_pose for base is read from this 
 
 constrain_final_z_base: false
 shift_initialization: false
-n_polys_in_swing_phase: 2
+n_polys_in_swing_phase: 2 #3
 min_distance_above_terrain: 0.0 #0.08
 
 Flat:
@@ -34,15 +34,16 @@ Flat:
    
   final_pose: 
     x: 2.0 
-    y: 0.0
+    y: 1.0
     z: 0.48
 
   final_yaw_angle: 0.0 #1.57079632679
   total_time: 2.0
-  gait: 4
+  gait: 7
   use_non_holonomic_constraint: true
-  limit_base_angles: true
-  max_wheels_acc_z: 100.0
+  limit_base_angles: false
+  max_wheels_acc_z: 50.0
+#  constrain_base_acc: true
 
 Gap:
   initial_pose:
@@ -57,9 +58,10 @@ Gap:
 
   final_yaw_angle: 0.0
   total_time: 2.0
-  gait: 11 #12
+  gait: 12 #11
   use_non_holonomic_constraint: false
   limit_base_angles: true # generates smoother motions, not mandatory
+# obs: for the gallop gait, reducing max z-acc for the base improves the motion a little (optional)
 
 Block:
   initial_pose:
@@ -74,7 +76,7 @@ Block:
 
   final_yaw_angle: 0.0
   total_time: 2.0
-  gait: 9 #10
+  gait: 10 #9
   use_non_holonomic_constraint: false
   limit_base_angles: false
 

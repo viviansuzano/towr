@@ -41,8 +41,6 @@ Parameters::Parameters ()
 {
   // constructs optimization variables
   duration_base_polynomial_ = 0.1;
-  motion_polynomials_per_stance_phase_ = 3;
-  force_polynomials_per_stance_phase_ = 3;
   n_polynomials_per_swing_phase_ = 2; // so step can at least lift leg
   min_distance_above_terrain_ = 0.0;  // default is zero, unless set in the config file
 
@@ -57,7 +55,7 @@ Parameters::Parameters ()
   // maximum acceleration for smooth motions
   max_base_acc_lin_ = {10.0, 10.0, 10.0};
   max_base_acc_ang_ = {10.0, 10.0, 10.0};
-  max_wheels_acc_ = {20.0, 20.0, 40.0}; // test with other terrains!!
+  max_wheels_acc_ = {20.0, 0.0, 40.0};
 
   DeleteAllConstraints();
 

@@ -293,7 +293,8 @@ QuadrupedGaitGenerator::GetBlockCrossingGait () const
 
   auto times =
   {
-	  0.2, 0.15, 0.25, 0.30, 0.15, 0.25, 0.10, 0.5,
+	  0.2, 0.15, 0.25, 0.2, 0.15, 0.25, 0.10, 0.5,   // tests wheels' max_acc_y = 0.0
+      //0.2, 0.15, 0.25, 0.30, 0.15, 0.25, 0.10, 0.5,  // tests wheels' max_acc_y = 20.0
   };
   auto phase_contacts =
   {
@@ -327,8 +328,8 @@ QuadrupedGaitGenerator::GetBlockRightHoppingGait () const
 
   auto times =
   {
-	  0.3, 0.3, 0.3, 0.3, 0.5,
-      //0.2, 0.3, 0.3, 0.3, 0.4,
+	  0.3, 0.3, 0.2, 0.3, 0.3,
+	  //0.3, 0.3, 0.2, 0.3, 0.4,
   };
   auto phase_contacts =
   {

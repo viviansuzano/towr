@@ -276,6 +276,8 @@ NodesVariablesEEMotion::GetPhaseBasedEEParameterization ()
 			if (y_lateral_constraint_) { // otherwise non-holonomic constraint will take care of this!
 				nodes_.at(node_id).at(kVel).y() = 0.0;
 			}
+//			else
+//				index_map[idx++].push_back(NodeValueInfo(node_id, kVel, dim));
 		}
 		else if (dim == Z) {
         	if (is_first_node_in_phase)

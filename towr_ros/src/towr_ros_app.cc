@@ -172,11 +172,10 @@ public:
     {
 		double max_wheels_acc_z = basenode[terrain]["max_wheels_acc_z"].as<double>();
 		params.max_wheels_acc_.at(Z) = max_wheels_acc_z;
+//	    bool constrain_base_acc = basenode[terrain]["constrain_base_acc"].as<bool>();
+//	    if (constrain_base_acc)
+//	  	  params.SetBaseAccLimitsContraint();
     }
-
-//    bool constrain_base_acc = basenode[terrain]["constrain_base_acc"].as<bool>();
-//    if (constrain_base_acc)
-//  	  params.SetBaseAccLimitsContraint();
 
     return params;
   }
