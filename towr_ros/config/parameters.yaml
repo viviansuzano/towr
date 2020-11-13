@@ -39,7 +39,7 @@ Flat:
 
   final_yaw_angle: 0.0 #1.57079632679
   total_time: 2.0
-  gait: 7
+  gait: 1
   use_non_holonomic_constraint: false
   limit_base_angles: false
   max_wheels_acc_z: 50.0
